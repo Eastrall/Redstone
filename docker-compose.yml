@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  redstone.server:
+    image: ${DOCKER_REGISTRY-}redstoneserver
+    build:
+      context: .
+      dockerfile: src/Redstone.Server/Dockerfile

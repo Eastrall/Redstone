@@ -28,4 +28,8 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Redstone.Configuration.Yaml\Redstone.Configuration.Yaml.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,0 +1,5 @@
+server:
+  ip: ''
+  port: 25565
+
+# Additionnal configuration

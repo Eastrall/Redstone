@@ -5,9 +5,20 @@ VisualStudioVersion = 16.0.30711.63
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{EF4B4050-023B-4009-9FD7-20180883F55A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Redstone.Server", "src\Redstone.Server\Redstone.Server.csproj", "{9D0C06DF-6112-4A03-9FE2-548FA2105D9E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Redstone.Server", "src\Redstone.Server\Redstone.Server.csproj", "{9D0C06DF-6112-4A03-9FE2-548FA2105D9E}"
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{326EB3AE-998B-4D19-A243-FBF5293299EF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "global", "global", "{3BF039C4-4899-4419-8261-976030E53377}"
+	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Redstone.Configuration.Yaml", "src\Redstone.Configuration.Yaml\Redstone.Configuration.Yaml.csproj", "{C85E9914-11EF-4D66-96AD-AEB040DA84FA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,12 +34,17 @@ Global
 		{326EB3AE-998B-4D19-A243-FBF5293299EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{326EB3AE-998B-4D19-A243-FBF5293299EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{326EB3AE-998B-4D19-A243-FBF5293299EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C85E9914-11EF-4D66-96AD-AEB040DA84FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C85E9914-11EF-4D66-96AD-AEB040DA84FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C85E9914-11EF-4D66-96AD-AEB040DA84FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C85E9914-11EF-4D66-96AD-AEB040DA84FA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{9D0C06DF-6112-4A03-9FE2-548FA2105D9E} = {EF4B4050-023B-4009-9FD7-20180883F55A}
+		{C85E9914-11EF-4D66-96AD-AEB040DA84FA} = {EF4B4050-023B-4009-9FD7-20180883F55A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {978B7507-DC0B-478F-85D5-36AE4E3B0F9C}

@@ -13,5 +13,5 @@ steps:
     version: '5.0.x'
 
 - script: |
-    dotnet build --configuration Release
+    dotnet build Redstone.sln --configuration Release
   displayName: 'Build'

@@ -30,6 +30,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Redstone.Configuration.Yaml\Redstone.Configuration.Yaml.csproj" />
+    <ProjectReference Include="..\Redstone.Protocol\Redstone.Protocol.csproj" />
   </ItemGroup>
 
 </Project>

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Redstone.Configuration.Yaml;
+using Redstone.Protocol;
 using System;
 using System.Threading.Tasks;
 
@@ -28,6 +29,7 @@ namespace Redstone.Server
 
                     options.Host = serverConfiguration.Ip;
                     options.Port = serverConfiguration.Port;
+                    options.PacketProcessor = new MinecraftPacketProcessor();
                 })
                 .UseConsoleLifetime()
                 .Build();

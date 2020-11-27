@@ -15,3 +15,7 @@ steps:
 - script: |
     dotnet build Redstone.sln --configuration Release
   displayName: 'Build'
+
+- script: |
+    dotnet test Redstone.sln --configuration Release
+  displayName: 'Test'

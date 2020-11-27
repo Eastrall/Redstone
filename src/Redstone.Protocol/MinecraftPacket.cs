@@ -4,7 +4,7 @@ using System;
 
 namespace Redstone.Protocol
 {
-    public class MinecraftPacket : LitePacket, IMinecraftPacket
+    public class MinecraftPacket : LitePacketStream, IMinecraftPacket
     {
         public int PacketId { get; }
 
@@ -29,7 +29,14 @@ namespace Redstone.Protocol
 
         public Guid ReadUUID()
         {
-            throw new NotImplementedException();
+            var guidData = new byte[sizeof(ulong) * 2];
+            ulong a = ReadUInt64();
+            ulong b = ReadUInt64();
+
+            Array.Copy(BitConverter.GetBytes(a), guidData, sizeof(ulong));
+            Array.Copy(BitConverter.GetBytes(b), 0, guidData, sizeof(ulong), sizeof(ulong));
+
+            return new Guid(guidData);
         }
 
         public int ReadVarInt32()
@@ -78,17 +85,50 @@ namespace Redstone.Protocol
 
         public void WriteUUID(Guid value)
         {
-            throw new NotImplementedException();
+            var bytes = value.ToByteArray();
+            var long1 = BitConverter.ToUInt64(bytes, 0);
+            var long2 = BitConverter.ToUInt64(bytes, 8);
+
+            WriteUInt64(long1);
+            WriteUInt64(long2);
         }
 
         public void WriteVarInt32(int value)
         {
-            throw new NotImplementedException();
+            var valueToWrite = (uint)value;
+
+            do
+            {
+                var temp = (byte)(valueToWrite & 127);
+
+                valueToWrite >>= 7;
+
+                if (valueToWrite != 0)
+                {
+                    temp |= sbyte.MaxValue + 1;
+                }
+
+                WriteByte(temp);
+            } while (valueToWrite != 0);
         }
 
         public void WriteVarInt64(long value)
         {
-            throw new NotImplementedException();
+            var valueToWrite = (ulong)value;
+
+            do
+            {
+                var temp = (byte)(valueToWrite & 127);
+
+                valueToWrite >>= 7;
+
+                if (valueToWrite != 0)
+                {
+                    temp |= sbyte.MaxValue + 1;
+                }
+
+                WriteByte(temp);
+            } while (valueToWrite != 0);
         }
     }
 }

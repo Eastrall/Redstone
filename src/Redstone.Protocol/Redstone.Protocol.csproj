@@ -1,11 +1,16 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>9.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="LiteNetwork.Server" Version="1.0.0-rc.1" />
+    <PackageReference Include="LiteNetwork.Server" Version="1.0.0-rc.4" />
+    <PackageReference Include="System.Text.Json" Version="5.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Redstone.Common\Redstone.Common.csproj" />
+  </ItemGroup>
 </Project>

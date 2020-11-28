@@ -97,7 +97,7 @@ namespace Redstone.Protocol.Tests
             packet.Seek(1, System.IO.SeekOrigin.Begin); // Seek to skip packet header byte
             packet.WriteVarInt32(valueToWrite);
 
-            Assert.Equal(expectedContent, packet.Buffer.Skip(1)); // Skip 1 byte to skip packet header
+            Assert.Equal(expectedContent, packet.GetBuffer().Skip(1).Take(expectedContent.Length)); // Skip 1 byte to skip packet header
         }
 
         [Theory]
@@ -109,7 +109,7 @@ namespace Redstone.Protocol.Tests
             packet.Seek(1, System.IO.SeekOrigin.Begin); // Seek to skip packet header byte
             packet.WriteVarInt64(valueToWrite);
 
-            Assert.Equal(expectedContent, packet.Buffer.Skip(1)); // Skip 1 byte to skip packet header
+            Assert.Equal(expectedContent, packet.GetBuffer().Skip(1).Take(expectedContent.Length)); // Skip 1 byte to skip packet header
         }
 
         [Theory]
@@ -121,7 +121,7 @@ namespace Redstone.Protocol.Tests
             packet.Seek(1, System.IO.SeekOrigin.Begin); // Seek to skip packet header byte
             packet.WriteUUID(valueToWrite);
 
-            Assert.Equal(expectedContent, packet.Buffer.Skip(1)); // Skip 1 byte to skip packet header
+            Assert.Equal(expectedContent, packet.GetBuffer().Skip(1).Take(expectedContent.Length)); // Skip 1 byte to skip packet header
         }
     }
 }

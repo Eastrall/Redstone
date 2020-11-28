@@ -1,20 +1,51 @@
 ﻿using LiteNetwork.Protocol;
 using Redstone.Protocol.Abstractions;
 using System;
+using System.Collections.Generic;
 
 namespace Redstone.Protocol
 {
+    /// <summary>
+    /// Minecraft packet implementation.
+    /// </summary>
     public class MinecraftPacket : LitePacketStream, IMinecraftPacket
     {
         public int PacketId { get; }
 
         /// <summary>
-        /// Creates a new <see cref="MinecraftPacket"/> in write-only mode.
+        /// Gets the final <see cref="MinecraftPacket"/> buffer including the packet size.
         /// </summary>
+        public override byte[] Buffer
+        {
+            get
+            {
+                var packetSizeBuffer = ConvertInt32ToVarInt32Buffer((int)Length);
+                var packetBuffer = new byte[packetSizeBuffer.Length + Length];
+
+                Array.Copy(packetSizeBuffer, packetBuffer, packetSizeBuffer.Length);
+                Array.Copy(base.Buffer, 0, packetBuffer, packetSizeBuffer.Length, Length);
+
+                return packetBuffer;
+            }
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="MinecraftPacket"/> in write-only mode with a given packet id as an integer.
+        /// </summary>
+        /// <param name="packetId">Packet Id.</param>
         public MinecraftPacket(int packetId)
         {
             PacketId = packetId;
             WriteVarInt32(packetId);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="MinecraftPacket"/> in write-only mode with a given packet id as an enum value.
+        /// </summary>
+        /// <param name="packetId">Packet Id.</param>
+        public MinecraftPacket(Enum packetId)
+            : this(Convert.ToInt32(packetId))
+        {
         }
 
         /// <summary>
@@ -25,6 +56,22 @@ namespace Redstone.Protocol
             : base(buffer)
         {
             PacketId = packetId;
+        }
+
+        public override string ReadString()
+        {
+            int stringLength = ReadVarInt32();
+            byte[] stringBytes = ReadBytes(stringLength);
+
+            return ReadEncoding.GetString(stringBytes);
+        }
+
+        public override void WriteString(string value)
+        {
+            byte[] stringData = WriteEncoding.GetBytes(value);
+
+            WriteVarInt32(stringData.Length);
+            Write(stringData, 0, stringData.Length);
         }
 
         public Guid ReadUUID()
@@ -129,6 +176,28 @@ namespace Redstone.Protocol
 
                 WriteByte(temp);
             } while (valueToWrite != 0);
+        }
+
+        private byte[] ConvertInt32ToVarInt32Buffer(int value)
+        {
+            var buffer = new List<byte>();
+            var valueToWrite = (uint)value;
+
+            do
+            {
+                var temp = (byte)(valueToWrite & 127);
+
+                valueToWrite >>= 7;
+
+                if (valueToWrite != 0)
+                {
+                    temp |= sbyte.MaxValue + 1;
+                }
+
+                buffer.Add(temp);
+            } while (valueToWrite != 0);
+
+            return buffer.ToArray();
         }
     }
 }

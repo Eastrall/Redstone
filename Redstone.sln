@@ -18,7 +18,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "global", "global", "{3BF039
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Redstone.Configuration.Yaml", "src\Redstone.Configuration.Yaml\Redstone.Configuration.Yaml.csproj", "{C85E9914-11EF-4D66-96AD-AEB040DA84FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Redstone.Configuration.Yaml", "src\Redstone.Configuration.Yaml\Redstone.Configuration.Yaml.csproj", "{C85E9914-11EF-4D66-96AD-AEB040DA84FA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Redstone.Protocol", "src\Redstone.Protocol\Redstone.Protocol.csproj", "{95345F60-D12B-4020-AA19-E60D282790C8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{AE6964FA-6359-4548-A538-CE357A346E68}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Redstone.Protocol.Tests", "tests\Redstone.Protocol.Tests\Redstone.Protocol.Tests.csproj", "{B316CC8B-712F-441B-A497-20AF64720997}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Redstone.Common", "src\Redstone.Common\Redstone.Common.csproj", "{49C03517-A92B-4DA2-B082-C0D6211EBBBB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,6 +46,18 @@ Global
 		{C85E9914-11EF-4D66-96AD-AEB040DA84FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C85E9914-11EF-4D66-96AD-AEB040DA84FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C85E9914-11EF-4D66-96AD-AEB040DA84FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95345F60-D12B-4020-AA19-E60D282790C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95345F60-D12B-4020-AA19-E60D282790C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95345F60-D12B-4020-AA19-E60D282790C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95345F60-D12B-4020-AA19-E60D282790C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B316CC8B-712F-441B-A497-20AF64720997}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B316CC8B-712F-441B-A497-20AF64720997}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B316CC8B-712F-441B-A497-20AF64720997}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B316CC8B-712F-441B-A497-20AF64720997}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49C03517-A92B-4DA2-B082-C0D6211EBBBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49C03517-A92B-4DA2-B082-C0D6211EBBBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49C03517-A92B-4DA2-B082-C0D6211EBBBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49C03517-A92B-4DA2-B082-C0D6211EBBBB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -45,6 +65,9 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{9D0C06DF-6112-4A03-9FE2-548FA2105D9E} = {EF4B4050-023B-4009-9FD7-20180883F55A}
 		{C85E9914-11EF-4D66-96AD-AEB040DA84FA} = {EF4B4050-023B-4009-9FD7-20180883F55A}
+		{95345F60-D12B-4020-AA19-E60D282790C8} = {EF4B4050-023B-4009-9FD7-20180883F55A}
+		{B316CC8B-712F-441B-A497-20AF64720997} = {AE6964FA-6359-4548-A538-CE357A346E68}
+		{49C03517-A92B-4DA2-B082-C0D6211EBBBB} = {EF4B4050-023B-4009-9FD7-20180883F55A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {978B7507-DC0B-478F-85D5-36AE4E3B0F9C}

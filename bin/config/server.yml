@@ -1,5 +1,7 @@
 server:
   ip: ''
   port: 25565
+  maxplayers: 100
+  description: 'An awesome Minecraft server powered by Redstone!'
 
 # Additionnal configuration

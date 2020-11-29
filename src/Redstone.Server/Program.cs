@@ -1,7 +1,9 @@
 ﻿using LiteNetwork.Server.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Redstone.Configuration.Yaml;
+using Redstone.Protocol;
 using System;
 using System.Threading.Tasks;
 
@@ -12,10 +14,16 @@ namespace Redstone.Server
         static Task Main()
         {
             IHost serverHost = new HostBuilder()
-                .ConfigureAppConfiguration((host, builder) =>
+                .ConfigureAppConfiguration((host, config) =>
                 {
-                    builder.SetBasePath("/opt/redstone/config");
-                    builder.AddYamlFile("server.yml");
+                    config.SetBasePath("/opt/redstone/config");
+                    config.AddYamlFile("server.yml", optional: false, reloadOnChange: true);
+                    config.AddEnvironmentVariables();
+                })
+                .ConfigureServices((context, services) =>
+                {
+                    services.AddOptions();
+                    services.Configure<ServerConfiguration>(context.Configuration.GetSection("server"));
                 })
                 .UseLiteServer<RedstoneServer, MinecraftUser>((context, options) =>
                 {
@@ -28,6 +36,7 @@ namespace Redstone.Server
 
                     options.Host = serverConfiguration.Ip;
                     options.Port = serverConfiguration.Port;
+                    options.PacketProcessor = new MinecraftPacketProcessor();
                 })
                 .UseConsoleLifetime()
                 .Build();

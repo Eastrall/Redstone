@@ -1,4 +1,5 @@
-﻿using LiteNetwork.Protocol.Abstractions;
+﻿using LiteNetwork.Common;
+using LiteNetwork.Protocol.Abstractions;
 using LiteNetwork.Server;
 using System;
 
@@ -9,6 +10,7 @@ namespace Redstone.Server
         public RedstoneServer(LiteServerConfiguration configuration, ILitePacketProcessor packetProcessor = null, IServiceProvider serviceProvider = null) 
             : base(configuration, packetProcessor, serviceProvider)
         {
+            Configuration.ReceiveStrategy = ReceiveStrategyType.Queued;
         }
 
         protected override void OnAfterStart()

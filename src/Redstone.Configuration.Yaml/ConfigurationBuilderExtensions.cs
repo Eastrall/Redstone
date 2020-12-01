@@ -4,7 +4,10 @@ using Redstone.Configuration.Yaml.Internal;
 using System;
 using System.IO;
 
-namespace Redstone.Configuration.Yaml
+// All the code of this project comes from https://github.com/andrewlock/NetEscapades.Configuration 
+// Credits to https://github.com/andrewlock
+
+namespace Microsoft.Extensions.Configuration
 {
     public static class ConfigurationBuilderExtensions
     {

@@ -2,7 +2,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Redstone.Configuration.Yaml;
+using Microsoft.Extensions.Logging;
+using Redstone.Common;
 using Redstone.Protocol;
 using System;
 using System.Threading.Tasks;
@@ -24,6 +25,15 @@ namespace Redstone.Server
                 {
                     services.AddOptions();
                     services.Configure<ServerConfiguration>(context.Configuration.GetSection("server"));
+                    services.Configure<GameConfiguration>(context.Configuration.GetSection("game"));
+                })
+                .ConfigureLogging(builder =>
+                {
+                    builder.AddConsole();
+                    builder.AddFilter("LiteNetwork", LogLevel.Trace);
+
+                    // Debug stuff: make a configuration for this
+                    builder.SetMinimumLevel(LogLevel.Trace);
                 })
                 .UseLiteServer<RedstoneServer, MinecraftUser>((context, options) =>
                 {

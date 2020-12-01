@@ -1,7 +1,12 @@
 server:
   ip: ''
   port: 25565
-  maxplayers: 100
+  maxPlayers: 100
   description: 'An awesome Minecraft server powered by Redstone!'
+  useEncryption: true
+  mode: 'online'
+
+game:
+  mode: 'creative'
 
 # Additionnal configuration

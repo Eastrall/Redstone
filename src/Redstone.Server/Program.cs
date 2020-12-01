@@ -26,11 +26,12 @@ namespace Redstone.Server
                     services.AddOptions();
                     services.Configure<ServerConfiguration>(context.Configuration.GetSection("server"));
                     services.Configure<GameConfiguration>(context.Configuration.GetSection("game"));
+                    services.AddMinecraftProtocol();
                 })
                 .ConfigureLogging(builder =>
                 {
                     builder.AddConsole();
-                    builder.AddFilter("LiteNetwork", LogLevel.Trace);
+                    builder.AddFilter("LiteNetwork", LogLevel.Information);
 
                     // Debug stuff: make a configuration for this
                     builder.SetMinimumLevel(LogLevel.Trace);

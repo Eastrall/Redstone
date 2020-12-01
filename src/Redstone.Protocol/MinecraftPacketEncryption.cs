@@ -7,5 +7,6 @@ namespace Redstone.Protocol
     /// </summary>
     public class MinecraftPacketEncryption : IMinecraftPacketEncryption
     {
+        // https://stackoverflow.com/questions/1307204/how-to-generate-unique-public-and-private-key-via-rsa
     }
 }

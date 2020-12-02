@@ -16,15 +16,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Resources\redstone.png" />
+    <None Remove="Resources\DefaultFavicon.png" />
+    <None Remove="Resources\dimensions.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources\redstone.png" />
+    <EmbeddedResource Include="Resources\DefaultFavicon.png" />
+    <EmbeddedResource Include="Resources\dimensions.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="LiteNetwork.Server" Version="1.0.0-rc.4" />
+    <PackageReference Include="LiteNetwork.Server" Version="1.0.0-rc.5" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
   </ItemGroup>

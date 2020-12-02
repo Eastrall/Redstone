@@ -1,0 +1,23 @@
+﻿{
+  "values": [
+    {
+      "name": "minecraft:overworld",
+      "id": 0,
+      "element": {
+        "piglin_safe": "0B",
+        "natural": "1B",
+        "ambient_light": "0.0F",
+        "infiniburn": "minecraft:infiniburn_overworld",
+        "respawn_anchor_works": "0B",
+        "has_skylight": "1B",
+        "bed_works": "1B",
+        "effects": "minecraft:overworld",
+        "has_raids": "1B",
+        "logical_height": 256,
+        "coordinate_scale": 1.0,
+        "ultrawarm": "0B",
+        "has_ceiling": "0B"
+      }
+    }
+  ]
+}

@@ -17,10 +17,12 @@
 
   <ItemGroup>
     <None Remove="Resources\DefaultFavicon.png" />
+    <None Remove="Resources\dimensions.json" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\DefaultFavicon.png" />
+    <EmbeddedResource Include="Resources\dimensions.json" />
   </ItemGroup>
 
   <ItemGroup>

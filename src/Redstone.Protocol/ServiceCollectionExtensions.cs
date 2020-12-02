@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Redstone.Protocol.Abstractions;
+using Redstone.Protocol.Cryptography;
 
 namespace Redstone.Protocol
 {

@@ -2,7 +2,10 @@
 {
     public enum ServerGameModeType
     {
+        Unknown = -1,
+        Survival,
         Creative,
-        Survival
+        Adventure,
+        Spectator
     }
 }

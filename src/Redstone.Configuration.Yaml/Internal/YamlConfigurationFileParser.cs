@@ -65,6 +65,7 @@ namespace Redstone.Configuration.Yaml.Internal
             //a node with a single 1-1 mapping 
             EnterContext(context);
             var currentKey = _currentPath;
+            var pascalCaseKey = ConvertToPascalCase(_currentPath);
 
             if (_data.ContainsKey(currentKey))
             {
@@ -72,6 +73,8 @@ namespace Redstone.Configuration.Yaml.Internal
             }
 
             _data[currentKey] = IsNullValue(yamlValue) ? null : yamlValue.Value;
+            _data[pascalCaseKey] = _data[currentKey];
+
             ExitContext();
         }
 
@@ -134,5 +137,11 @@ namespace Redstone.Configuration.Yaml.Internal
                 );
         }
 
+        private string ConvertToPascalCase(string key)
+        {
+            return key.Split(new[] { "_", "-" }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(s => char.ToUpperInvariant(s[0]) + s.Substring(1, s.Length - 1))
+                .Aggregate(string.Empty, (s1, s2) => s1 + s2);
+        }
     }
 }

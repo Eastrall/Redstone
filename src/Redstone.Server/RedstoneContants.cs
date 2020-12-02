@@ -6,7 +6,7 @@ namespace Redstone.Server
 {
     public static class RedstoneContants
     {
-        public const string DefaultFaviconFileName = "Redstone.Server.Resources.redstone.png";
+        public const string DefaultFaviconFileName = "Redstone.Server.Resources.DefaultFavicon.png";
 
         private static string _defaultFavicon;
 

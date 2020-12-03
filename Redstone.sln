@@ -28,6 +28,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Redstone.Common", "src\Reds
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Redstone.Configuration.Yaml", "src\Redstone.Configuration.Yaml\Redstone.Configuration.Yaml.csproj", "{5435DD1A-09E8-44DA-8499-D9137F3578DC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Redstone.NBT", "src\Redstone.NBT\Redstone.NBT.csproj", "{DDF27A4F-D32B-4459-A718-1FFD010EDFE4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Redstone.NBT.Tests", "tests\Redstone.NBT.Tests\Redstone.NBT.Tests.csproj", "{D8D7444F-6D0B-4CAB-B30B-B542CE9A3DBE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -58,6 +62,14 @@ Global
 		{5435DD1A-09E8-44DA-8499-D9137F3578DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5435DD1A-09E8-44DA-8499-D9137F3578DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5435DD1A-09E8-44DA-8499-D9137F3578DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DDF27A4F-D32B-4459-A718-1FFD010EDFE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDF27A4F-D32B-4459-A718-1FFD010EDFE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DDF27A4F-D32B-4459-A718-1FFD010EDFE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DDF27A4F-D32B-4459-A718-1FFD010EDFE4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8D7444F-6D0B-4CAB-B30B-B542CE9A3DBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8D7444F-6D0B-4CAB-B30B-B542CE9A3DBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8D7444F-6D0B-4CAB-B30B-B542CE9A3DBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8D7444F-6D0B-4CAB-B30B-B542CE9A3DBE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -68,6 +80,8 @@ Global
 		{B316CC8B-712F-441B-A497-20AF64720997} = {AE6964FA-6359-4548-A538-CE357A346E68}
 		{49C03517-A92B-4DA2-B082-C0D6211EBBBB} = {EF4B4050-023B-4009-9FD7-20180883F55A}
 		{5435DD1A-09E8-44DA-8499-D9137F3578DC} = {EF4B4050-023B-4009-9FD7-20180883F55A}
+		{DDF27A4F-D32B-4459-A718-1FFD010EDFE4} = {EF4B4050-023B-4009-9FD7-20180883F55A}
+		{D8D7444F-6D0B-4CAB-B30B-B542CE9A3DBE} = {AE6964FA-6359-4548-A538-CE357A346E68}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {978B7507-DC0B-478F-85D5-36AE4E3B0F9C}

@@ -158,7 +158,7 @@ namespace Redstone.Protocol.Cryptography.ASN
             return new AsnType(0x04, Concatenate(values));
         }
 
-        public static AsnType CreateOctetString(String value)
+        public static AsnType CreateOctetString(string value)
         {
             if (IsEmpty(value))
             { return CreateOctetString(EMPTY); }
@@ -168,7 +168,7 @@ namespace Redstone.Protocol.Cryptography.ASN
             List<byte> octets = new List<byte>();
             for (int i = 0; i < len; i++)
             {
-                String s = value.Substring(i * 2, 2);
+                string s = value.Substring(i * 2, 2);
                 byte b = 0x00;
 
                 try
@@ -217,7 +217,7 @@ namespace Redstone.Protocol.Cryptography.ASN
             return CreateBitString(Concatenate(values), 0x00);
         }
 
-        public static AsnType CreateBitString(String value)
+        public static AsnType CreateBitString(string value)
         {
             if (IsEmpty(value))
             { return CreateBitString(EMPTY); }
@@ -234,7 +234,7 @@ namespace Redstone.Protocol.Cryptography.ASN
             List<byte> octets = new List<byte>();
             for (int i = 0; i < loctlen; i++)
             {
-                String s = value.Substring(i * 8, 8);
+                string s = value.Substring(i * 8, 8);
                 byte b = 0x00;
 
                 try
@@ -274,7 +274,7 @@ namespace Redstone.Protocol.Cryptography.ASN
             return false;
         }
 
-        public static bool IsEmpty(String s)
+        public static bool IsEmpty(string s)
         {
             if (null == s || 0 == s.Length)
             { return true; }
@@ -282,7 +282,7 @@ namespace Redstone.Protocol.Cryptography.ASN
             return false;
         }
 
-        public static bool IsEmpty(String[] strings)
+        public static bool IsEmpty(string[] strings)
         {
             if (null == strings || 0 == strings.Length)
                 return true;
@@ -428,21 +428,21 @@ namespace Redstone.Protocol.Cryptography.ASN
             return new AsnType((0x10 | 0x20), Concatenate(values));
         }
 
-        public static AsnType CreateOid(String value)
+        public static AsnType CreateOid(string value)
         {
             if (IsEmpty(value))
                 return null;
 
-            String[] tokens = value.Split(new Char[] { ' ', '.' });
+            string[] tokens = value.Split(new char[] { ' ', '.' });
 
             if (IsEmpty(tokens))
                 return null;
 
-            UInt64 a = 0;
+            ulong a = 0;
 
-            List<UInt64> arcs = new List<UInt64>();
+            List<ulong> arcs = new List<ulong>();
 
-            foreach (String t in tokens)
+            foreach (string t in tokens)
             {
                 if (t.Length == 0) { break; }
 
@@ -466,7 +466,7 @@ namespace Redstone.Protocol.Cryptography.ASN
             {
                 List<byte> temp = new List<byte>();
 
-                UInt64 arc = arcs[i];
+                ulong arc = arcs[i];
 
                 do
                 {

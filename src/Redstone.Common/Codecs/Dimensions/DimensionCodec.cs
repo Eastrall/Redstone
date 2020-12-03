@@ -1,4 +1,4 @@
-﻿namespace Redstone.Common.Codecs
+﻿namespace Redstone.Common.Codecs.Dimensions
 {
     /// <summary>
     /// Describes the dimension codec.

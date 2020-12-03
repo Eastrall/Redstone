@@ -10,3 +10,4 @@ services:
       - 25565:25565
     volumes:
       - ./bin/config/:/opt/redstone/config/
+      - ./bin/data/:/opt/redstone/data/

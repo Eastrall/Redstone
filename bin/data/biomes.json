@@ -1,0 +1,50 @@
+﻿[
+  {
+    "name": "minecraft:ocean",
+    "id": 0,
+    "element": {
+      "precipitation": "rain",
+      "effects": {
+        "sky_color": 8103167,
+        "water_fog_color": 329011,
+        "fog_color": 12638463,
+        "water_color": 4159204,
+        "mood_sound": {
+          "tick_delay": 6000,
+          "offset": 2,
+          "sound": "minecraft:ambient.cave",
+          "block_search_extent": 8
+        }
+      },
+      "depth": "-1.0F",
+      "temperature": "0.5F",
+      "scale": "0.1F",
+      "downfall": "0.5F",
+      "category": "ocean"
+    }
+  },
+  {
+    "name": "minecraft:plains",
+    "id": 1,
+    "element": {
+      "precipitation": "rain",
+      "effects": {
+        "sky_color": 7907327,
+        "water_fog_color": 329011,
+        "fog_color": 12638463,
+        "water_color": 4159204,
+        "mood_sound": {
+          "tick_delay": 6000,
+          "offset": 2,
+          "sound": "minecraft:ambient.cave",
+          "block_search_extent": 8
+        }
+      },
+      "depth": "0.125F",
+      "temperature": "0.8F",
+      "scale": "0.05F",
+      "downfall": "0.4F",
+      "category": "plains"
+    }
+  }
+]

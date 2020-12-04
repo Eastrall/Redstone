@@ -1,9 +1,9 @@
 ﻿namespace Redstone.Common.Codecs.Dimensions
 {
     /// <summary>
-    /// Describes the dimension codec.
+    /// Describes the dimension data structure.
     /// </summary>
-    public class DimensionCodec
+    public class Dimension
     {
         /// <summary>
         /// Gets or sets the biome id.
@@ -18,6 +18,6 @@
         /// <summary>
         /// Gets or sets the dimension codec element.
         /// </summary>
-        public DimensionCodecElement Element { get; set; }
+        public DimensionElement Element { get; set; }
     }
 }

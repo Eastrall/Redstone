@@ -3,9 +3,9 @@
 namespace Redstone.Common.Codecs.Dimensions
 {
     /// <summary>
-    /// Describes the dimension element codec.
+    /// Describes the dimension element data structure.
     /// </summary>
-    public class DimensionCodecElement
+    public class DimensionElement
     {
         /// <summary>
         /// Gets or sets a boolean value that indicates if whether piglins shake and transform to zombified piglins.

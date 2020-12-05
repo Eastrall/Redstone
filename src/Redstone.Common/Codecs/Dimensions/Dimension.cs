@@ -1,8 +1,11 @@
-﻿namespace Redstone.Common.Codecs.Dimensions
+﻿using System.Diagnostics;
+
+namespace Redstone.Common.Codecs.Dimensions
 {
     /// <summary>
     /// Describes the dimension data structure.
     /// </summary>
+    [DebuggerDisplay("{Name} (Id = {Id})")]
     public class Dimension
     {
         /// <summary>

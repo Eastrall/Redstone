@@ -3,7 +3,13 @@ using LiteNetwork.Server;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Redstone.Common;
+using Redstone.Common.Codecs.Biomes;
+using Redstone.Common.Codecs.Dimensions;
+using Redstone.Common.Configuration;
+using Redstone.Common.Serialization;
 using Redstone.Common.Server;
+using Redstone.NBT;
+using Redstone.NBT.Tags;
 using Redstone.Protocol;
 using Redstone.Protocol.Abstractions;
 using Redstone.Protocol.Packets.Game.Client;
@@ -14,6 +20,9 @@ using Redstone.Protocol.Packets.Status;
 using Redstone.Protocol.Packets.Status.Client;
 using Redstone.Protocol.Packets.Status.Server;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Redstone.Server
@@ -41,7 +50,7 @@ namespace Redstone.Server
 
             try
             {
-                _logger.LogInformation($"Current minecraft client status: {Status}");
+                _logger.LogInformation($"Current minecraft client status: {Status} | Packet: 0x{packet.PacketId:X2}");
 
                 switch (Status)
                 {
@@ -145,11 +154,14 @@ namespace Redstone.Server
             {
                 case ServerLoginPacketType.LoginStart:
                     string username = packet.ReadString();
-                    
+
                     _logger.LogInformation($"{username} trying to log-in");
 
                     if (_serverConfiguration.Value.Mode == ServerModeType.Offline)
                     {
+                        IEnumerable<Dimension> dimensions = LoadDimensions();
+                        IEnumerable<Biome> biomes = LoadBiomes();
+
                         using var p = new MinecraftPacket(ClientLoginPacketType.LoginSuccess);
                         p.WriteUUID(Id);
                         p.WriteString(username);
@@ -163,10 +175,15 @@ namespace Redstone.Server
                         joinPacket.WriteByte((byte)ServerGameModeType.Creative); // GameMode
                         joinPacket.WriteSByte((sbyte)ServerGameModeType.Unknown); // Previous game mode
                         joinPacket.WriteVarInt32(1); // World count
-                        joinPacket.WriteString("THE WORLD"); // Worlds name FOREACH()
-                        // TODO: NBT for Dimensions
-                        // TODO: NBT for biomes
-                        joinPacket.WriteString("minecraft:world"); // World name identifier
+                        joinPacket.WriteString("overworld"); // Worlds name FOREACH()
+
+                        // TODO: NBT for Dimensions and Biomes
+                        WriteDimensionsAndBiomes(dimensions, biomes, joinPacket);
+
+                        Dimension currentDimension = dimensions.First();
+                        WriteDimension(currentDimension, joinPacket);
+                        joinPacket.WriteString(currentDimension.Name); // World name identifier
+
                         joinPacket.WriteInt64(0); // Seed
                         joinPacket.WriteVarInt32((int)_serverConfiguration.Value.MaxPlayers); // Max players
                         joinPacket.WriteVarInt32(Math.Clamp(5, 2, 32)); // Render distance (2-32 chunks)
@@ -193,6 +210,118 @@ namespace Redstone.Server
 
             _logger.LogInformation($"Received Login packet: 0x{packet.PacketId:X2}");
             return Task.CompletedTask;
+        }
+
+        private IEnumerable<Dimension> LoadDimensions()
+        {
+            return JsonSerializer.Deserialize<IEnumerable<Dimension>>(File.ReadAllText("/opt/redstone/data/dimensions.json"));
+        }
+        private IEnumerable<Biome> LoadBiomes()
+        {
+            return JsonSerializer.Deserialize<IEnumerable<Biome>>(File.ReadAllText("/opt/redstone/data/biomes.json"));
+        }
+
+        private void WriteDimensionsAndBiomes(IEnumerable<Dimension> dimensions, IEnumerable<Biome> biomes, IMinecraftPacket packet)
+        {
+            // Dimension serialization
+
+            var nbtDimensionCompound = new NbtCompound("minecraft:dimension_type")
+            {
+                new NbtString("type", "minecraft:dimension_type")
+            };
+
+            var nbtDimensionList = new NbtList("value");
+            foreach (Dimension dimension in dimensions)
+            {
+                var dimensionNbt = new NbtCompound()
+                {
+                    new NbtString("name", dimension.Name),
+                    new NbtInt("id", dimension.Id),
+                    new NbtCompound("element")
+                    {
+                        new NbtByte("piglin_safe", Convert.ToByte(dimension.Element.PiglinSafe)),
+                        new NbtByte("natural", Convert.ToByte(dimension.Element.IsNatural)),
+                        new NbtFloat("ambient_light", dimension.Element.AmbientLight),
+                        new NbtString("infiniburn", dimension.Element.Infiniburn),
+                        new NbtByte("respawn_anchor_works", Convert.ToByte(dimension.Element.RespawnAnchorWorks)),
+                        new NbtByte("has_skylight", Convert.ToByte(dimension.Element.HasSkylight)),
+                        new NbtByte("bed_works", Convert.ToByte(dimension.Element.BedWorks)),
+                        new NbtString("effects", dimension.Element.Effects),
+                        new NbtByte("has_raids", Convert.ToByte(dimension.Element.HasRaids)),
+                        new NbtInt("logical_height", dimension.Element.LogicalHeight),
+                        new NbtFloat("coordinate_scale", dimension.Element.CoordinateScale),
+                        new NbtByte("ultrawarm", Convert.ToByte(dimension.Element.IsUltrawarm)),
+                        new NbtByte("has_ceiling", Convert.ToByte(dimension.Element.HasCeiling))
+                    }
+                };
+
+                nbtDimensionList.Add(dimensionNbt);
+            }
+
+            nbtDimensionCompound.Add(nbtDimensionList);
+
+            // Biomes serialization
+
+            var nbtBiomes = new NbtCompound("minecraft:worldgen/biome")
+            {
+                new NbtString("type", "minecraft:worldgen/biome")
+            };
+            var nbtBiomeList = new NbtList("value");
+
+            foreach (Biome biome in biomes)
+            {
+                var nbtBiomeCompound = new NbtCompound()
+                {
+                    new NbtString("name", biome.Name),
+                    new NbtInt("id", biome.Id),
+                    new NbtCompound("element")
+                    {
+                        new NbtFloat("precipitation", (float)biome.Element.Precipitation),
+                        new NbtFloat("depth", biome.Element.Depth),
+                        new NbtFloat("temperature", biome.Element.Temperature),
+                        new NbtFloat("scale", biome.Element.Scale),
+                        new NbtFloat("downfall", biome.Element.DownFall),
+                        new NbtFloat("category", (float)biome.Element.Category),
+                        new NbtCompound("effects")
+                        {
+                            new NbtFloat("sky_color", biome.Element.Effects.SkyColor),
+                            new NbtFloat("water_fog_color", biome.Element.Effects.WaterFogColor),
+                            new NbtFloat("fog_color", biome.Element.Effects.FogColor),
+                            new NbtFloat("water_color", biome.Element.Effects.WaterColor),
+                            new NbtCompound("mood_sound")
+                            {
+                                new NbtInt("tick_delay", biome.Element.Effects.MoodSound.TickDelay),
+                                new NbtDouble("offset", biome.Element.Effects.MoodSound.Offset),
+                                new NbtString("sound", biome.Element.Effects.MoodSound.Sound),
+                                new NbtInt("block_search_extent", biome.Element.Effects.MoodSound.BlockSearchExtent)
+                            }
+                        }
+                    }
+                };
+
+                nbtBiomeList.Add(nbtBiomeCompound);
+            }
+
+            nbtBiomes.Add(nbtBiomeList);
+
+            var nbtCompound = new NbtCompound("")
+            {
+                nbtDimensionCompound,
+                nbtBiomes
+            };
+            var nbtFile = new NbtFile(nbtCompound);
+
+            using var memoryStream = new MemoryStream();
+            nbtFile.SaveToStream(memoryStream, NbtCompression.None);
+
+            byte[] nbtBuffer = memoryStream.GetBuffer();
+
+            packet.WriteBytes(nbtBuffer);
+        }
+
+        private void WriteDimension(Dimension dimension, IMinecraftPacket packet)
+        {
+
         }
     }
 }

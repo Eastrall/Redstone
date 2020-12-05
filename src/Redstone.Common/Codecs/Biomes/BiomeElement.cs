@@ -2,8 +2,18 @@
 {
     public class BiomeElement
     {
-        public string Precipitation { get; set; }
+        public PrecipitationType Precipitation { get; set; }
 
-        public BiomeEffect Effets { get; set; }
+        public float Depth { get; set; }
+
+        public float Temperature { get; set; }
+
+        public float Scale { get; set; }
+
+        public float DownFall { get; set; }
+
+        public BiomeCategoryType Category { get; set; }
+
+        public BiomeEffect Effects { get; set; }
     }
 }

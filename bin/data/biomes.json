@@ -3,7 +3,7 @@
     "name": "minecraft:ocean",
     "id": 0,
     "element": {
-      "precipitation": "rain",
+      "precipitation": "Rain",
       "effects": {
         "sky_color": 8103167,
         "water_fog_color": 329011,
@@ -16,10 +16,10 @@
           "block_search_extent": 8
         }
       },
-      "depth": "-1.0F",
-      "temperature": "0.5F",
-      "scale": "0.1F",
-      "downfall": "0.5F",
+      "depth": -1.0,
+      "temperature": 0.5,
+      "scale": 0.1,
+      "downfall": 0.5,
       "category": "ocean"
     }
   },
@@ -27,7 +27,7 @@
     "name": "minecraft:plains",
     "id": 1,
     "element": {
-      "precipitation": "rain",
+      "precipitation": "Rain",
       "effects": {
         "sky_color": 7907327,
         "water_fog_color": 329011,
@@ -40,10 +40,10 @@
           "block_search_extent": 8
         }
       },
-      "depth": "0.125F",
-      "temperature": "0.8F",
-      "scale": "0.05F",
-      "downfall": "0.4F",
+      "depth": 0.125,
+      "temperature": 0.8,
+      "scale": 0.05,
+      "downfall": 0.4,
       "category": "plains"
     }
   }

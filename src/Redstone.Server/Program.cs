@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Redstone.Common;
+using Redstone.Common.Configuration;
 using Redstone.Protocol;
 using System;
 using System.Threading.Tasks;

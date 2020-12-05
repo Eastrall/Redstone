@@ -1,23 +1,21 @@
-﻿{
-  "values": [
-    {
-      "name": "minecraft:overworld",
-      "id": 0,
-      "element": {
-        "piglin_safe": "0B",
-        "natural": "1B",
-        "ambient_light": "0.0F",
-        "infiniburn": "minecraft:infiniburn_overworld",
-        "respawn_anchor_works": "0B",
-        "has_skylight": "1B",
-        "bed_works": "1B",
-        "effects": "minecraft:overworld",
-        "has_raids": "1B",
-        "logical_height": 256,
-        "coordinate_scale": 1.0,
-        "ultrawarm": "0B",
-        "has_ceiling": "0B"
-      }
+﻿[
+  {
+    "name": "minecraft:overworld",
+    "id": 0,
+    "element": {
+      "piglin_safe": false,
+      "natural": true,
+      "ambient_light": 0,
+      "infiniburn": "minecraft:infiniburn_overworld",
+      "respawn_anchor_works": false,
+      "has_skylight": true,
+      "bed_works": true,
+      "effects": "minecraft:overworld",
+      "has_raids": true,
+      "logical_height": 256,
+      "coordinate_scale": 1.0,
+      "ultrawarm": false,
+      "has_ceiling": false
     }
-  ]
-}
+  }
+]

@@ -5,9 +5,15 @@ server:
   description: 'An awesome Minecraft server powered by Redstone!'
   use-encryption: false
   mode: 'offline'
+  debug: true
+  reduced-debug-info: false
+  flat-terrain: true
 
 game:
   mode: 'creative'
   seed: 0
+  display-respawn-screen: true
+  is-hardcore: false
+  rendering-distance: 5
 
 # Additionnal configuration

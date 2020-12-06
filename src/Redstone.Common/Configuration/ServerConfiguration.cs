@@ -37,5 +37,20 @@
         /// Gets or sets the server mode.
         /// </summary>
         public ServerModeType Mode { get; set; }
+
+        /// <summary>
+        /// Gets or sets a boolean value that indicates if the server and client are running in debug mode.
+        /// </summary>
+        public bool Debug { get; set; }
+
+        /// <summary>
+        /// Gets or sets a boolean value that indicates if the server and client should display reduced debug information.
+        /// </summary>
+        public bool ReducedDebugInfo { get; set; }
+
+        /// <summary>
+        /// Gets or sets a boolean value that indicates if the server is using a flat terrain.
+        /// </summary>
+        public bool FlatTerrain { get; set; }
     }
 }

@@ -58,6 +58,16 @@ namespace Redstone.Protocol
             PacketId = packetId;
         }
 
+        public override void WriteBytes(byte[] values)
+        {
+            if (values is null)
+            {
+                throw new ArgumentNullException(nameof(values), "Failed to write a null byte array into the packet stream.");
+            }
+
+            Write(values, 0, values.Length);
+        }
+
         public override string ReadString()
         {
             int stringLength = ReadVarInt32();
@@ -68,6 +78,11 @@ namespace Redstone.Protocol
 
         public override void WriteString(string value)
         {
+            if (value is null)
+            {
+                throw new ArgumentNullException(nameof(value), "Failed to write a null string into the packet stream.");
+            }
+
             byte[] stringData = WriteEncoding.GetBytes(value);
 
             WriteVarInt32(stringData.Length);

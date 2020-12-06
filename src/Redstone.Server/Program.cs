@@ -7,6 +7,7 @@ using Redstone.Common.Configuration;
 using Redstone.Protocol;
 using System;
 using System.Threading.Tasks;
+using NLog.Extensions.Hosting;
 
 namespace Redstone.Server
 {
@@ -30,10 +31,7 @@ namespace Redstone.Server
                 })
                 .ConfigureLogging(builder =>
                 {
-                    builder.AddConsole();
-                    builder.AddFilter("LiteNetwork", LogLevel.Information);
-
-                    // Debug stuff: make a configuration for this
+                    builder.AddFilter("LiteNetwork", LogLevel.Warning);
                     builder.SetMinimumLevel(LogLevel.Trace);
                 })
                 .UseLiteServer<RedstoneServer, MinecraftUser>((context, options) =>
@@ -49,6 +47,7 @@ namespace Redstone.Server
                     options.Port = serverConfiguration.Port;
                     options.PacketProcessor = new MinecraftPacketProcessor();
                 })
+                .UseNLog()
                 .UseConsoleLifetime()
                 .Build();
 

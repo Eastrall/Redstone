@@ -1,5 +1,5 @@
 ﻿using Redstone.NBT;
-using Redstone.NBT.Attributes;
+using Redstone.NBT.Serialization;
 using System.Text.Json.Serialization;
 
 namespace Redstone.Common.Codecs.Dimensions

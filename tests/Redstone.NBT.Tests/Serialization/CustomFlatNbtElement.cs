@@ -1,4 +1,4 @@
-﻿using Redstone.NBT.Attributes;
+﻿using Redstone.NBT.Serialization;
 
 namespace Redstone.NBT.Tests.Serialization
 {
@@ -24,14 +24,5 @@ namespace Redstone.NBT.Tests.Serialization
 
         [NbtElement(NbtTagType.String, "string_value")]
         public string StringValue { get; set; }
-    }
-
-    internal class CustomComplexNbtElement
-    {
-        [NbtElement(NbtTagType.Int, "integer_value")]
-        public int IntegerValue { get; set; }
-
-        [NbtElement(NbtTagType.Compound, "flat_element_compound")]
-        public CustomFlatNbtElement FlatElement { get; set; }
     }
 }

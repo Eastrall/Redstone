@@ -1,5 +1,5 @@
 ﻿using Redstone.NBT;
-using Redstone.NBT.Attributes;
+using Redstone.NBT.Serialization;
 using System.Diagnostics;
 
 namespace Redstone.Common.Codecs.Dimensions

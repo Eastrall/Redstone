@@ -20,6 +20,11 @@ namespace Redstone.NBT.Serialization
         public string Name { get; }
 
         /// <summary>
+        /// Gets or sets the string serialization options.
+        /// </summary>
+        public NbtStringSerializationOption StringSerializationOption { get; set; }
+
+        /// <summary>
         /// Gets the attached property.
         /// </summary>
         public PropertyInfo Property { get; }

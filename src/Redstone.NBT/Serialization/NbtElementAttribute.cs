@@ -19,6 +19,11 @@ namespace Redstone.NBT.Serialization
         public string Name { get; }
 
         /// <summary>
+        /// Gets or sets the Nbt string serialization option.
+        /// </summary>
+        public NbtStringSerializationOption StringSerialization { get; set; } = NbtStringSerializationOption.Default;
+
+        /// <summary>
         /// Creates a new <see cref="NbtElementAttribute"/> instance.
         /// </summary>
         /// <param name="type">NBT tag type.</param>

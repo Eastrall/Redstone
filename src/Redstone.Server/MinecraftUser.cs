@@ -217,7 +217,7 @@ namespace Redstone.Server
         {
             //var packetId = (ServerLoginPacketType)packet.PacketId;
 
-            _logger.LogInformation($"Received Login packet: 0x{packet.PacketId:X2}");
+            _logger.LogInformation($"Received Play packet: 0x{packet.PacketId:X2}");
             return Task.CompletedTask;
         }
 
@@ -232,101 +232,33 @@ namespace Redstone.Server
 
         private void WriteDimensionsAndBiomes(IEnumerable<Dimension> dimensions, IEnumerable<Biome> biomes, IMinecraftPacket packet)
         {
-            // Dimension serialization
-
             IEnumerable<NbtTag> dimensionsTags = dimensions.Select(x => NbtSerializer.SerializeCompound(x));
-            var nbtDimensionCompound = new NbtCompound("minecraft:dimension_type")
-            {
-                new NbtString("type", "minecraft:dimension_type"),
-                new NbtList("value", dimensionsTags, NbtTagType.Compound)
-            };
-
-            // Biomes serialization
-
-            var nbtBiomesCompound = new NbtCompound("minecraft:worldgen/biome")
-            {
-                new NbtString("type", "minecraft:worldgen/biome")
-            };
-            var nbtBiomeList = new NbtList("value", NbtTagType.Compound);
-
-            foreach (Biome biome in biomes)
-            {
-                var nbtBiomeCompound = new NbtCompound()
-                {
-                    new NbtInt("id", biome.Id),
-                    new NbtString("name", biome.Name),
-                    new NbtCompound("element")
-                    {
-                        new NbtString("precipitation", biome.Element.Precipitation.ToString().ToLower()),
-                        new NbtFloat("depth", biome.Element.Depth),
-                        new NbtFloat("temperature", biome.Element.Temperature),
-                        new NbtFloat("scale", biome.Element.Scale),
-                        new NbtFloat("downfall", biome.Element.DownFall),
-                        new NbtString("category", biome.Element.Category.ToString().ToLower()),
-                        new NbtCompound("effects")
-                        {
-                            new NbtFloat("sky_color", biome.Element.Effects.SkyColor),
-                            new NbtFloat("water_fog_color", biome.Element.Effects.WaterFogColor),
-                            new NbtFloat("fog_color", biome.Element.Effects.FogColor),
-                            new NbtFloat("water_color", biome.Element.Effects.WaterColor),
-                            new NbtCompound("mood_sound")
-                            {
-                                new NbtInt("tick_delay", biome.Element.Effects.MoodSound.TickDelay),
-                                new NbtDouble("offset", biome.Element.Effects.MoodSound.Offset),
-                                new NbtString("sound", biome.Element.Effects.MoodSound.Sound),
-                                new NbtInt("block_search_extent", biome.Element.Effects.MoodSound.BlockSearchExtent)
-                            }
-                        }
-                    }
-                };
-
-                nbtBiomeList.Add(nbtBiomeCompound);
-            }
-
-            nbtBiomesCompound.Add(nbtBiomeList);
+            IEnumerable<NbtTag> biomesTags = biomes.Select(x => NbtSerializer.SerializeCompound(x));
 
             var nbtCompound = new NbtCompound("")
             {
-                nbtDimensionCompound,
-                nbtBiomesCompound
+                new NbtCompound("minecraft:dimension_type")
+                {
+                    new NbtString("type", "minecraft:dimension_type"),
+                    new NbtList("value", dimensionsTags, NbtTagType.Compound)
+                },
+                new NbtCompound("minecraft:worldgen/biome")
+                {
+                    new NbtString("type", "minecraft:worldgen/biome"),
+                    new NbtList("value", biomesTags, NbtTagType.Compound)
+                }
             };
             var nbtFile = new NbtFile(nbtCompound);
 
-            using var memoryStream = new MemoryStream();
-            long bytesWritten = nbtFile.SaveToStream(memoryStream, NbtCompression.None);
-
-            byte[] nbtBuffer = memoryStream.GetBuffer().Take((int)bytesWritten).ToArray();
-
-            packet.WriteBytes(nbtBuffer);
+            packet.WriteBytes(nbtFile.GetBuffer());
         }
 
         private void WriteDimension(Dimension dimension, IMinecraftPacket packet)
         {
-            var nbtDimension = new NbtCompound("")
-            {
-                new NbtByte("piglin_safe", Convert.ToByte(dimension.Element.PiglinSafe)),
-                new NbtByte("natural", Convert.ToByte(dimension.Element.IsNatural)),
-                new NbtFloat("ambient_light", dimension.Element.AmbientLight),
-                new NbtString("infiniburn", dimension.Element.Infiniburn),
-                new NbtByte("respawn_anchor_works", Convert.ToByte(dimension.Element.RespawnAnchorWorks)),
-                new NbtByte("has_skylight", Convert.ToByte(dimension.Element.HasSkylight)),
-                new NbtByte("bed_works", Convert.ToByte(dimension.Element.BedWorks)),
-                new NbtString("effects", dimension.Element.Effects),
-                new NbtByte("has_raids", Convert.ToByte(dimension.Element.HasRaids)),
-                new NbtInt("logical_height", dimension.Element.LogicalHeight),
-                new NbtFloat("coordinate_scale", dimension.Element.CoordinateScale),
-                new NbtByte("ultrawarm", Convert.ToByte(dimension.Element.IsUltrawarm)),
-                new NbtByte("has_ceiling", Convert.ToByte(dimension.Element.HasCeiling))
-            };
-
+            var nbtDimension = NbtSerializer.SerializeCompound(dimension.Element, "");
             var nbtFile = new NbtFile(nbtDimension);
 
-            using var memoryStream = new MemoryStream();
-            long bytesWritten = nbtFile.SaveToStream(memoryStream, NbtCompression.None);
-
-            byte[] nbtBuffer = memoryStream.GetBuffer().Take((int)bytesWritten).ToArray();
-
-            packet.WriteBytes(nbtBuffer);
+            packet.WriteBytes(nbtFile.GetBuffer());
         }
     }
 }

@@ -39,7 +39,7 @@ namespace Redstone.NBT.Serialization
                 }
                 else
                 {
-                    tag = CreateTag(nbtProperty.Type, nbtProperty.Name, propertyValue);
+                    tag = CreateTag(nbtProperty, propertyValue);
                 }
 
                 if (tag is not null)
@@ -78,29 +78,50 @@ namespace Redstone.NBT.Serialization
             return from x in @object.GetType().GetProperties()
                    let attribute = x.GetCustomAttribute<NbtElementAttribute>()
                    where attribute != null
-                   select new NbtObjectDescriptor(attribute.Type, attribute.Name, x);
+                   select new NbtObjectDescriptor(attribute.Type, attribute.Name, x)
+                   {
+                       StringSerializationOption = attribute.StringSerialization
+                   };
         }
 
         /// <summary>
         /// Creates a new <see cref="NbtTag"/> based on the given type.
         /// </summary>
-        /// <param name="type">Nbt tag type.</param>
-        /// <param name="name">Nbt element name.</param>
+        /// <param name="nbtObjectProperties">Nbt element object scriptor.</param>
         /// <param name="value">Nbt element value.</param>
         /// <returns>NBT Tag.</returns>
-        private static NbtTag CreateTag(NbtTagType type, string name, object value)
+        private static NbtTag CreateTag(NbtObjectDescriptor nbtObjectProperties, object value)
         {
-            return type switch
+            return nbtObjectProperties.Type switch
             {
-                NbtTagType.Byte => new NbtByte(name, Convert.ToByte(value)),
-                NbtTagType.Short => new NbtShort(name, Convert.ToInt16(value)),
-                NbtTagType.Int => new NbtInt(name, Convert.ToInt32(value)),
-                NbtTagType.Float => new NbtFloat(name, Convert.ToSingle(value)),
-                NbtTagType.Long => new NbtLong(name, Convert.ToInt64(value)),
-                NbtTagType.Double => new NbtDouble(name, Convert.ToDouble(value)),
-                NbtTagType.String => new NbtString(name, value?.ToString()),
+                NbtTagType.Byte => new NbtByte(nbtObjectProperties.Name, Convert.ToByte(value)),
+                NbtTagType.Short => new NbtShort(nbtObjectProperties.Name, Convert.ToInt16(value)),
+                NbtTagType.Int => new NbtInt(nbtObjectProperties.Name, Convert.ToInt32(value)),
+                NbtTagType.Float => new NbtFloat(nbtObjectProperties.Name, Convert.ToSingle(value)),
+                NbtTagType.Long => new NbtLong(nbtObjectProperties.Name, Convert.ToInt64(value)),
+                NbtTagType.Double => new NbtDouble(nbtObjectProperties.Name, Convert.ToDouble(value)),
+                NbtTagType.String => CreateNbtString(nbtObjectProperties, value),
                 _ => throw new NotImplementedException()
             };
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="NbtString"/> from a <see cref="NbtObjectDescriptor"/>.
+        /// </summary>
+        /// <param name="nbtObjectProperties">Nbt element object scriptor.</param>
+        /// <param name="value">Nbt element value.</param>
+        /// <returns>NbtString</returns>
+        private static NbtString CreateNbtString(NbtObjectDescriptor nbtObjectProperties, object value)
+        {
+            string stringValue = nbtObjectProperties.StringSerializationOption switch
+            {
+                NbtStringSerializationOption.Default => value?.ToString(),
+                NbtStringSerializationOption.Lowercase => value?.ToString().ToLower(),
+                NbtStringSerializationOption.Uppercase => value?.ToString().ToUpper(),
+                _ => null
+            };
+
+            return new NbtString(nbtObjectProperties.Name, stringValue);
         }
     }
 }

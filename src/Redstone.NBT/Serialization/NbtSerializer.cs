@@ -1,5 +1,4 @@
-﻿using Redstone.NBT.Attributes;
-using Redstone.NBT.Tags;
+﻿using Redstone.NBT.Tags;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Redstone.NBT.Attributes
+namespace Redstone.NBT.Serialization
 {
     /// <summary>
     /// Data annotation describing a NBT element.

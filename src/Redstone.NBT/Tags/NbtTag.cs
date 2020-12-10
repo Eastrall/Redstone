@@ -7,15 +7,21 @@ namespace Redstone.NBT.Tags
     /// <summary> Base class for different kinds of named binary tags. </summary>
     public abstract class NbtTag : ICloneable
     {
-        /// <summary> Parent compound tag, either NbtList or NbtCompound, if any.
-        /// May be <c>null</c> for detached tags. </summary>
+        /// <summary>
+        /// Parent compound tag, either NbtList or NbtCompound, if any.
+        /// May be <c>null</c> for detached tags.
+        /// </summary>
         public NbtTag Parent { get; internal set; }
 
-        /// <summary> Type of this tag. </summary>
+        /// <summary>
+        /// Type of this tag.
+        /// </summary>
         public abstract NbtTagType TagType { get; }
 
-        /// <summary> Returns true if tags of this type have a value attached.
-        /// All tags except Compound, List, and End have values. </summary>
+        /// <summary>
+        /// Returns true if tags of this type have a value attached.
+        /// All tags except Compound, List, and End have values.
+        /// </summary>
         public bool HasValue => TagType switch
         {
             NbtTagType.Compound or NbtTagType.End or NbtTagType.List or NbtTagType.Unknown => false,
@@ -34,7 +40,7 @@ namespace Redstone.NBT.Tags
         /// </exception>
         public string Name
         {
-            get { return _name; }
+            get => _name;
             set
             {
                 if (_name == value)

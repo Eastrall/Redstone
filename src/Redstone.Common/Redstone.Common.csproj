@@ -9,4 +9,8 @@
     <PackageReference Include="System.Text.Json" Version="5.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Redstone.NBT\Redstone.NBT.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -4,6 +4,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 
 namespace Redstone.NBT
 {
@@ -397,7 +398,7 @@ namespace Redstone.NBT
         }
 
 
-        static NbtCompression DetectCompression(Stream stream)
+        private static NbtCompression DetectCompression(Stream stream)
         {
             if (!stream.CanSeek)
             {
@@ -421,7 +422,7 @@ namespace Redstone.NBT
         }
 
 
-        void LoadFromStreamInternal(Stream stream, TagSelector tagSelector)
+        private void LoadFromStreamInternal(Stream stream, TagSelector tagSelector)
         {
             // Make sure the first byte in this file is the tag for a TAG_Compound
             int firstByte = stream.ReadByte();
@@ -626,6 +627,18 @@ namespace Redstone.NBT
 
         #endregion
 
+        /// <summary>
+        /// Gets the buffer of the current NbtFile.
+        /// </summary>
+        /// <returns>The file content's buffer.</returns>
+        public byte[] GetBuffer()
+        {
+            using var memoryStream = new MemoryStream();
+            long bytesWritten = SaveToStream(memoryStream, NbtCompression.None);
+
+            return memoryStream.GetBuffer().Take((int)bytesWritten).ToArray();
+        }
+
 
         /// <summary> Reads the root name from the given NBT file. Automatically detects compression. </summary>
         /// <param name="fileName">Name of the file from which first tag will be read. </param>
@@ -690,7 +703,6 @@ namespace Redstone.NBT
         /// <exception cref="EndOfStreamException">If file ended earlier than expected. </exception>
         /// <exception cref="InvalidDataException">If file compression could not be detected, decompressing failed, or given stream does not support reading. </exception>
         /// <exception cref="NbtFormatException">If an error occurred while parsing data in NBT format. </exception>
-
         public static string ReadRootTagName(Stream stream, NbtCompression compression, bool bigEndian, int bufferSize)
         {
             if (stream is null)

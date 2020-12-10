@@ -9,6 +9,7 @@ using Redstone.Common.Configuration;
 using Redstone.Common.Serialization;
 using Redstone.Common.Server;
 using Redstone.NBT;
+using Redstone.NBT.Serialization;
 using Redstone.NBT.Tags;
 using Redstone.Protocol;
 using Redstone.Protocol.Abstractions;
@@ -233,40 +234,12 @@ namespace Redstone.Server
         {
             // Dimension serialization
 
+            IEnumerable<NbtTag> dimensionsTags = dimensions.Select(x => NbtSerializer.SerializeCompound(x));
             var nbtDimensionCompound = new NbtCompound("minecraft:dimension_type")
             {
-                new NbtString("type", "minecraft:dimension_type")
+                new NbtString("type", "minecraft:dimension_type"),
+                new NbtList("value", dimensionsTags, NbtTagType.Compound)
             };
-
-            var nbtDimensionList = new NbtList("value", NbtTagType.Compound);
-            foreach (Dimension dimension in dimensions)
-            {
-                var dimensionNbt = new NbtCompound()
-                {
-                    new NbtInt("id", dimension.Id),
-                    new NbtString("name", dimension.Name),
-                    new NbtCompound("element")
-                    {
-                        new NbtByte("piglin_safe", Convert.ToByte(dimension.Element.PiglinSafe)),
-                        new NbtByte("natural", Convert.ToByte(dimension.Element.IsNatural)),
-                        new NbtFloat("ambient_light", dimension.Element.AmbientLight),
-                        new NbtString("infiniburn", dimension.Element.Infiniburn),
-                        new NbtByte("respawn_anchor_works", Convert.ToByte(dimension.Element.RespawnAnchorWorks)),
-                        new NbtByte("has_skylight", Convert.ToByte(dimension.Element.HasSkylight)),
-                        new NbtByte("bed_works", Convert.ToByte(dimension.Element.BedWorks)),
-                        new NbtString("effects", dimension.Element.Effects),
-                        new NbtByte("has_raids", Convert.ToByte(dimension.Element.HasRaids)),
-                        new NbtInt("logical_height", dimension.Element.LogicalHeight),
-                        new NbtFloat("coordinate_scale", dimension.Element.CoordinateScale),
-                        new NbtByte("ultrawarm", Convert.ToByte(dimension.Element.IsUltrawarm)),
-                        new NbtByte("has_ceiling", Convert.ToByte(dimension.Element.HasCeiling))
-                    }
-                };
-
-                nbtDimensionList.Add(dimensionNbt);
-            }
-
-            nbtDimensionCompound.Add(nbtDimensionList);
 
             // Biomes serialization
 

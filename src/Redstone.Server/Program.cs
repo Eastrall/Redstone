@@ -3,11 +3,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using NLog.Extensions.Hosting;
 using Redstone.Common.Configuration;
 using Redstone.Protocol;
 using System;
 using System.Threading.Tasks;
-using NLog.Extensions.Hosting;
 
 namespace Redstone.Server
 {
@@ -22,6 +22,11 @@ namespace Redstone.Server
                     config.AddYamlFile("server.yml", optional: false, reloadOnChange: true);
                     config.AddEnvironmentVariables();
                 })
+                .ConfigureLogging(builder =>
+                {
+                    builder.AddFilter("LiteNetwork", LogLevel.Warning);
+                    builder.SetMinimumLevel(LogLevel.Trace);
+                })
                 .ConfigureServices((context, services) =>
                 {
                     services.AddOptions();
@@ -29,12 +34,7 @@ namespace Redstone.Server
                     services.Configure<GameConfiguration>(context.Configuration.GetSection("game"));
                     services.AddMinecraftProtocol();
                 })
-                .ConfigureLogging(builder =>
-                {
-                    builder.AddFilter("LiteNetwork", LogLevel.Warning);
-                    builder.SetMinimumLevel(LogLevel.Trace);
-                })
-                .UseLiteServer<RedstoneServer, MinecraftUser>((context, options) =>
+                .UseLiteServer<IRedstoneServer, RedstoneServer, MinecraftUser>((context, options) =>
                 {
                     var serverConfiguration = context.Configuration.GetSection("server").Get<ServerConfiguration>();
 

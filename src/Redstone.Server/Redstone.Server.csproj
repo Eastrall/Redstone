@@ -30,10 +30,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="LiteNetwork.Server" Version="1.0.0-rc.5" />
+    <PackageReference Include="LiteNetwork.Server" Version="1.0.0-rc.6" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
-    <PackageReference Include="NLog" Version="4.7.5" />
+    <PackageReference Include="NLog" Version="4.7.6" />
     <PackageReference Include="NLog.Extensions.Hosting" Version="1.6.5" />
   </ItemGroup>
 

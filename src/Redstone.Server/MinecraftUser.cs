@@ -7,12 +7,12 @@ using Redstone.Common.Codecs.Biomes;
 using Redstone.Common.Codecs.Dimensions;
 using Redstone.Common.Configuration;
 using Redstone.Common.Serialization;
-using Redstone.Common.Server;
 using Redstone.NBT;
 using Redstone.NBT.Serialization;
 using Redstone.NBT.Tags;
 using Redstone.Protocol;
 using Redstone.Protocol.Abstractions;
+using Redstone.Protocol.Handlers;
 using Redstone.Protocol.Packets.Game.Client;
 using Redstone.Protocol.Packets.Handskake;
 using Redstone.Protocol.Packets.Handskake.Server;
@@ -34,17 +34,20 @@ namespace Redstone.Server
         private readonly IOptionsSnapshot<ServerConfiguration> _serverConfiguration;
         private readonly IOptionsSnapshot<GameConfiguration> _gameConfiguration;
         private readonly IRedstoneServer _server;
+        private readonly IPacketHandler _packetHandler;
 
         public MinecraftUserStatus Status { get; private set; } = MinecraftUserStatus.Handshaking;
 
-        public MinecraftUser(ILogger<MinecraftUser> logger, IOptionsSnapshot<ServerConfiguration> serverConfiguration, IOptionsSnapshot<GameConfiguration> gameConfiguration)
+        public MinecraftUser(ILogger<MinecraftUser> logger, IOptionsSnapshot<ServerConfiguration> serverConfiguration, IOptionsSnapshot<GameConfiguration> gameConfiguration, IRedstoneServer server, IPacketHandler packetHandler)
         {
             _logger = logger;
             _serverConfiguration = serverConfiguration;
             _gameConfiguration = gameConfiguration;
+            _server = server;
+            _packetHandler = packetHandler;
         }
 
-        public override async Task HandleMessageAsync(ILitePacketStream incomingPacketStream)
+        public override Task HandleMessageAsync(ILitePacketStream incomingPacketStream)
         {
             if (incomingPacketStream is not IMinecraftPacket packet)
             {
@@ -54,29 +57,32 @@ namespace Redstone.Server
             try
             {
                 _logger.LogInformation($"Current minecraft client status: {Status} | Packet: 0x{packet.PacketId:X2}");
+                _packetHandler.Invoke(this, Status, packet.PacketId);
 
-                switch (Status)
-                {
-                    case MinecraftUserStatus.Handshaking:
-                        await OnHandshakingAsync(packet);
-                        break;
-                    case MinecraftUserStatus.Status:
-                        await OnStatusAsync(packet);
-                        break;
-                    case MinecraftUserStatus.Login:
-                        await OnLoginAsync(packet);
-                        break;
-                    case MinecraftUserStatus.Play:
-                        await OnPlayAsync(packet);
-                        break;
-                    default: throw new NotImplementedException();
-                }
+                //switch (Status)
+                //{
+                //    case MinecraftUserStatus.Handshaking:
+                //        await OnHandshakingAsync(packet);
+                //        break;
+                //    case MinecraftUserStatus.Status:
+                //        await OnStatusAsync(packet);
+                //        break;
+                //    case MinecraftUserStatus.Login:
+                //        await OnLoginAsync(packet);
+                //        break;
+                //    case MinecraftUserStatus.Play:
+                //        await OnPlayAsync(packet);
+                //        break;
+                //    default: throw new NotImplementedException();
+                //}
             }
             catch (Exception e)
             {
                 _logger.LogError(e, $"An error occured while handling a message during '{Status}' state.");
                 throw;
             }
+
+            return Task.CompletedTask;
         }
 
         protected override void OnConnected()
@@ -114,22 +120,7 @@ namespace Redstone.Server
             switch (packetId)
             {
                 case ServerStatusPacketType.Request:
-                    var serverInfo = new MinecraftServerStatus
-                    {
-                        Version = new MinecraftServerVersion { Name = "Redstone dev", Protocol = 754 },
-                        Players = new MinecraftServerPlayers
-                        {
-                            Max = _serverConfiguration.Value.MaxPlayers,
-                            Online = 0
-                        },
-                        Description = new MinecraftServerDescription
-                        {
-                            Text = _serverConfiguration.Value.Description
-                        },
-                        Favicon = RedstoneContants.GetDefaultFavicon()
-                    };
-
-                    using (var responsePacket = new StatusResponsePacket(serverInfo))
+                    using (var responsePacket = new StatusResponsePacket(_server.GetServerStatus()))
                     {
                         Send(responsePacket);
                     }

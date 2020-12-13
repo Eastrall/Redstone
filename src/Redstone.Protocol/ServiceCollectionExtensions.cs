@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Redstone.Protocol.Abstractions;
 using Redstone.Protocol.Cryptography;
+using Redstone.Protocol.Handlers;
 
 namespace Redstone.Protocol
 {
@@ -18,7 +19,18 @@ namespace Redstone.Protocol
         {
             services.AddSingleton<IMinecraftPacketEncryption, MinecraftPacketEncryption>();
 
+            AddHandlerSystem(services);
+
             return services;
+        }
+
+        /// <summary>
+        /// Adds all services related to the packet handler system.
+        /// </summary>
+        /// <param name="services">Service collection.</param>
+        private static void AddHandlerSystem(IServiceCollection services)
+        {
+            services.AddSingleton<IPacketHandler, PacketHandler>();
         }
     }
 }

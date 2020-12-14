@@ -11,6 +11,6 @@
         /// <param name="status">User status.</param>
         /// <param name="handler">Packet handler to invoke during the given status.</param>
         /// <param name="parameters">Additionnal parameters to pass to the packet handler action.</param>
-        void Invoke(MinecraftUserStatus status, object handler, params object[] parameters);
+        object Invoke(MinecraftUserStatus status, object handler, params object[] parameters);
     }
 }

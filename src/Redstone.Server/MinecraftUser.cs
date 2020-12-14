@@ -13,6 +13,7 @@ using Redstone.NBT.Tags;
 using Redstone.Protocol;
 using Redstone.Protocol.Abstractions;
 using Redstone.Protocol.Handlers;
+using Redstone.Protocol.Packets.Game;
 using Redstone.Protocol.Packets.Game.Client;
 using Redstone.Protocol.Packets.Handskake;
 using Redstone.Protocol.Packets.Handskake.Server;
@@ -36,7 +37,7 @@ namespace Redstone.Server
         private readonly IRedstoneServer _server;
         private readonly IPacketHandler _packetHandler;
 
-        public MinecraftUserStatus Status { get; private set; } = MinecraftUserStatus.Handshaking;
+        public MinecraftUserStatus Status { get; internal set; } = MinecraftUserStatus.Handshaking;
 
         public MinecraftUser(ILogger<MinecraftUser> logger, IOptionsSnapshot<ServerConfiguration> serverConfiguration, IOptionsSnapshot<GameConfiguration> gameConfiguration, IRedstoneServer server, IPacketHandler packetHandler)
         {
@@ -57,7 +58,7 @@ namespace Redstone.Server
             try
             {
                 _logger.LogInformation($"Current minecraft client status: {Status} | Packet: 0x{packet.PacketId:X2}");
-                _packetHandler.Invoke(Status, packet.PacketId, this);
+                _packetHandler.Invoke(Status, GetMinecraftPacketType(packet.PacketId), this, packet);
 
                 //switch (Status)
                 //{
@@ -250,6 +251,20 @@ namespace Redstone.Server
             var nbtFile = new NbtFile(nbtDimension);
 
             packet.WriteBytes(nbtFile.GetBuffer());
+        }
+
+        private object GetMinecraftPacketType(int packetId)
+        {
+            Type type = Status switch
+            {
+                MinecraftUserStatus.Handshaking => typeof(ServerHandshakePacketType),
+                MinecraftUserStatus.Status => typeof(ServerStatusPacketType),
+                MinecraftUserStatus.Login => typeof(ServerLoginPacketType),
+                MinecraftUserStatus.Play => typeof(ServerPlayPacketType),
+                _ => throw new NotImplementedException()
+            };
+
+            return Enum.ToObject(type, packetId);
         }
     }
 }

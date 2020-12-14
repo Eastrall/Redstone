@@ -1,11 +1,7 @@
 ﻿using Redstone.Protocol.Abstractions;
 using Redstone.Protocol.Handlers;
 using Redstone.Protocol.Packets.Handskake;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Redstone.Protocol.Packets.Handskake.Server;
 
 namespace Redstone.Server.Handlers.Handshake
 {
@@ -14,7 +10,9 @@ namespace Redstone.Server.Handlers.Handshake
         [HandshakePacketHandler(ServerHandshakePacketType.Handshaking)]
         public void OnHandshake(MinecraftUser user, IMinecraftPacket packet)
         {
-            // Process handshake
+            var handshake = new HandshakePacket(packet);
+
+            user.Status = handshake.NextState;
         }
     }
 }

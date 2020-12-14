@@ -1,18 +1,17 @@
 ﻿using LiteNetwork.Common;
 using LiteNetwork.Protocol.Abstractions;
 using LiteNetwork.Server;
-using Redstone.Protocol.Abstractions;
-using System;
-using System.Security.Cryptography;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using System.Linq;
-using Redstone.Common.Server;
 using Microsoft.Extensions.Options;
 using Redstone.Common.Configuration;
-using Redstone.Protocol.Handlers;
-using Redstone.Protocol.Packets.Handskake;
+using Redstone.Common.Server;
+using Redstone.Protocol;
+using Redstone.Protocol.Abstractions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
 
 namespace Redstone.Server
 {
@@ -26,7 +25,7 @@ namespace Redstone.Server
 
         public IEnumerable<MinecraftUser> ConnectedPlayers => ConnectedUsers;
 
-        public uint ConnectedPlayersCount => (uint)ConnectedUsers.Count();
+        public uint ConnectedPlayersCount => (uint)ConnectedUsers.Count(x => x.Status == MinecraftUserStatus.Play);
 
         public RedstoneServer(LiteServerConfiguration configuration, ILitePacketProcessor packetProcessor = null, IServiceProvider serviceProvider = null) 
             : base(configuration, packetProcessor, serviceProvider)

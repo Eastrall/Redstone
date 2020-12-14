@@ -4,18 +4,19 @@ namespace Redstone.Protocol.Handlers
 {
     /// <summary>
     /// Provides an attribute that indicates that the method annotated with this attribute should
-    /// be invoked only during  <see cref="MinecraftUserStatus.Handshaking"/> state.
+    /// be invoked only during <see cref="MinecraftUserStatus.Login"/> state.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-    public class HandshakePacketHandlerAttribute : PacketHandlerAttribute
+    public class LoginPacketHandlerAttribute : PacketHandlerAttribute
     {
         /// <summary>
-        /// Creates a new <see cref="HandshakePacketHandlerAttribute"/> instance.
+        /// Creates a new <see cref="LoginPacketHandlerAttribute"/> instance.
         /// </summary>
         /// <param name="action">Handler action type.</param>
-        public HandshakePacketHandlerAttribute(object action)
-            : base(MinecraftUserStatus.Handshaking, action)
+        public LoginPacketHandlerAttribute(object action)
+            : base(MinecraftUserStatus.Status, action)
         {
+
         }
     }
 }

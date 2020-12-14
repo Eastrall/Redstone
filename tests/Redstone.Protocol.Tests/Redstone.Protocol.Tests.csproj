@@ -23,4 +23,8 @@
     <ProjectReference Include="..\..\src\Redstone.Protocol\Redstone.Protocol.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Handlers\" />
+  </ItemGroup>
+
 </Project>

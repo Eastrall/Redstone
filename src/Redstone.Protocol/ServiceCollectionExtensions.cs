@@ -30,7 +30,7 @@ namespace Redstone.Protocol
         /// <param name="services">Service collection.</param>
         private static void AddHandlerSystem(IServiceCollection services)
         {
-            services.AddSingleton<IPacketHandler, PacketHandler>();
+            services.AddSingleton<IPacketHandler, PacketHandlerInvoker>();
         }
     }
 }

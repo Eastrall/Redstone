@@ -57,7 +57,7 @@ namespace Redstone.Server
             try
             {
                 _logger.LogInformation($"Current minecraft client status: {Status} | Packet: 0x{packet.PacketId:X2}");
-                _packetHandler.Invoke(this, Status, packet.PacketId);
+                _packetHandler.Invoke(Status, packet.PacketId, this);
 
                 //switch (Status)
                 //{

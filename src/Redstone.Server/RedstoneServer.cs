@@ -11,6 +11,8 @@ using System.Linq;
 using Redstone.Common.Server;
 using Microsoft.Extensions.Options;
 using Redstone.Common.Configuration;
+using Redstone.Protocol.Handlers;
+using Redstone.Protocol.Packets.Handskake;
 
 namespace Redstone.Server
 {

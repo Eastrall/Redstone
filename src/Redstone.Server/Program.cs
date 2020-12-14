@@ -7,6 +7,7 @@ using NLog.Extensions.Hosting;
 using Redstone.Common.Configuration;
 using Redstone.Protocol;
 using System;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Redstone.Server
@@ -32,7 +33,7 @@ namespace Redstone.Server
                     services.AddOptions();
                     services.Configure<ServerConfiguration>(context.Configuration.GetSection("server"));
                     services.Configure<GameConfiguration>(context.Configuration.GetSection("game"));
-                    services.AddMinecraftProtocol();
+                    services.AddMinecraftProtocol(new[] { Assembly.GetExecutingAssembly() });
                 })
                 .UseLiteServer<IRedstoneServer, RedstoneServer, MinecraftUser>((context, options) =>
                 {

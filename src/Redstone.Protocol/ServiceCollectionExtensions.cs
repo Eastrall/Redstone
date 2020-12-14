@@ -1,7 +1,13 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Redstone.Protocol.Abstractions;
 using Redstone.Protocol.Cryptography;
 using Redstone.Protocol.Handlers;
+using Redstone.Protocol.Handlers.Internal;
+using Redstone.Protocol.Handlers.Internal.Transformers;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace Redstone.Protocol
 {
@@ -14,12 +20,16 @@ namespace Redstone.Protocol
         /// Adds the Minecraft protocol related stuff.
         /// </summary>
         /// <param name="services">Servie collection.</param>
+        /// <param name="handlersAssemblies">
+        /// Optionnal assemblies to look for handlers. 
+        /// If null, use the <see cref="Assembly.GetExecutingAssembly"/> method.
+        /// </param>
         /// <returns>Service collection.</returns>
-        public static IServiceCollection AddMinecraftProtocol(this IServiceCollection services)
+        public static IServiceCollection AddMinecraftProtocol(this IServiceCollection services, IEnumerable<Assembly> handlersAssemblies = null)
         {
             services.AddSingleton<IMinecraftPacketEncryption, MinecraftPacketEncryption>();
 
-            AddHandlerSystem(services);
+            AddHandlerSystem(services, handlersAssemblies);
 
             return services;
         }
@@ -28,9 +38,27 @@ namespace Redstone.Protocol
         /// Adds all services related to the packet handler system.
         /// </summary>
         /// <param name="services">Service collection.</param>
-        private static void AddHandlerSystem(IServiceCollection services)
+        /// <param name="assemblies">
+        /// Optionnal assemblies to look for handlers. 
+        /// If null, use the <see cref="Assembly.GetExecutingAssembly"/> method.
+        /// </param>
+        private static void AddHandlerSystem(IServiceCollection services, IEnumerable<Assembly> assemblies = null)
         {
-            services.AddSingleton<IPacketHandler, PacketHandlerInvoker>();
+            IDictionary<MinecraftUserStatus, IHandlerActionCache> invokerCache = PacketHandlerLoader.LoadHandlers(assemblies ?? new[] { Assembly.GetExecutingAssembly() });
+            
+            services.AddSingleton<IPacketHandler, PacketHandlerInvoker>(serviceProvider =>
+            {
+                var cache = invokerCache.ToDictionary(x => x.Key, x => ActivatorUtilities.CreateInstance<HandlerActionInvokerCache>(serviceProvider, x.Value));
+                return new PacketHandlerInvoker(cache);
+            }); 
+            //services.TryAddSingleton<HandlerActionInvokerCache>();
+            services.TryAddSingleton<IHandlerFactory, HandlerFactory>();
+
+            services.TryAddSingleton<ParameterTransformerCache>();
+            services.TryAddSingleton<IParameterFactory, ParameterFactory>();
+            services.TryAddSingleton<IParameterTransformer, ParameterTransformer>();
+
+            services.TryAddSingleton<ITypeActivatorCache, TypeActivatorCache>();
         }
     }
 }

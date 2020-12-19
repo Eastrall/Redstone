@@ -45,9 +45,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\common\Redstone.Configuration.Yaml\Redstone.Configuration.Yaml.csproj" />
+    <ProjectReference Include="..\common\Redstone.NBT\Redstone.NBT.csproj" />
     <ProjectReference Include="..\Redstone.Common\Redstone.Common.csproj" />
-    <ProjectReference Include="..\Redstone.Configuration.Yaml\Redstone.Configuration.Yaml.csproj" />
-    <ProjectReference Include="..\Redstone.NBT\Redstone.NBT.csproj" />
     <ProjectReference Include="..\Redstone.Protocol\Redstone.Protocol.csproj" />
   </ItemGroup>
 

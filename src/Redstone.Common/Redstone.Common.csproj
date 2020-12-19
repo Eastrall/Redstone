@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Redstone.NBT\Redstone.NBT.csproj" />
+    <ProjectReference Include="..\common\Redstone.NBT\Redstone.NBT.csproj" />
   </ItemGroup>
 
 </Project>

@@ -6,9 +6,10 @@ WORKDIR /app
 FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
 WORKDIR /src
 COPY ["src/Redstone.Server/Redstone.Server.csproj", "src/Redstone.Server/"]
+COPY ["src/common/Redstone.NBT/Redstone.NBT.csproj", "src/common/Redstone.NBT/"]
 COPY ["src/Redstone.Protocol/Redstone.Protocol.csproj", "src/Redstone.Protocol/"]
 COPY ["src/Redstone.Common/Redstone.Common.csproj", "src/Redstone.Common/"]
-COPY ["src/Redstone.Configuration.Yaml/Redstone.Configuration.Yaml.csproj", "src/Redstone.Configuration.Yaml/"]
+COPY ["src/common/Redstone.Configuration.Yaml/Redstone.Configuration.Yaml.csproj", "src/common/Redstone.Configuration.Yaml/"]
 RUN dotnet restore "src/Redstone.Server/Redstone.Server.csproj"
 COPY . .
 WORKDIR "/src/src/Redstone.Server"

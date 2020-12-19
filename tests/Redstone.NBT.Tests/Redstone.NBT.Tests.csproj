@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Redstone.NBT\Redstone.NBT.csproj" />
+    <ProjectReference Include="..\..\src\common\Redstone.NBT\Redstone.NBT.csproj" />
   </ItemGroup>
 
   <ItemGroup>

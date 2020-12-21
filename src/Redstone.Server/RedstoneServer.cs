@@ -1,5 +1,4 @@
-﻿using LiteNetwork.Common;
-using LiteNetwork.Protocol.Abstractions;
+﻿using LiteNetwork.Protocol.Abstractions;
 using LiteNetwork.Server;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -32,7 +31,6 @@ namespace Redstone.Server
         public RedstoneServer(LiteServerConfiguration configuration, ILitePacketProcessor packetProcessor = null, IServiceProvider serviceProvider = null) 
             : base(configuration, packetProcessor, serviceProvider)
         {
-            Configuration.ReceiveStrategy = ReceiveStrategyType.Queued;
             _logger = serviceProvider.GetRequiredService<ILogger<RedstoneServer>>();
             _packetEncryption = serviceProvider.GetRequiredService<IMinecraftPacketEncryption>();
             _serverConfiguration = serviceProvider.GetRequiredService<IOptions<ServerConfiguration>>();

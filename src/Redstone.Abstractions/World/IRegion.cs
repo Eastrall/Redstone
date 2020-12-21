@@ -11,5 +11,9 @@ namespace Redstone.Abstractions.World
         IEnumerable<IChunk> Chunks { get; }
 
         IChunk GetChunk(int x, int z);
+
+        IChunk AddChunk(int x, int z);
+
+        bool ContainsChunk(int x, int z);
     }
 }

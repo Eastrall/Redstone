@@ -11,5 +11,7 @@ namespace Redstone.Abstractions.World
         IEnumerable<IChunkSection> Sections { get; }
 
         IChunkSection GetSection(int sectionIndex);
+
+        void GenerateHeightMap();
     }
 }

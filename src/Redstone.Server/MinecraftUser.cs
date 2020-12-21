@@ -57,6 +57,12 @@ namespace Redstone.Server
             catch (Exception e)
             {
                 _logger.LogError(e, $"An error occured while handling packet '{packetHeader}' during '{Status}' state.");
+
+                if (Status != MinecraftUserStatus.Play)
+                {
+                    Socket.Close();
+                }
+
                 throw;
             }
 

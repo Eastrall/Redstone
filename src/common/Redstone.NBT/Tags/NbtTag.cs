@@ -155,20 +155,9 @@ namespace Redstone.NBT.Tags
         /// Only supported by NbtByte tags. 
         /// </summary>
         /// <exception cref="InvalidCastException">When used on a tag other than NbtByte.</exception>
-        public byte ByteValue
-        {
-            get
-            {
-                if (TagType == NbtTagType.Byte)
-                {
-                    return ((NbtByte)this).Value;
-                }
-                else
-                {
-                    throw new InvalidCastException("Cannot get ByteValue from " + GetCanonicalTagName(TagType));
-                }
-            }
-        }
+        public byte ByteValue => TagType == NbtTagType.Byte
+                    ? ((NbtByte)this).Value
+                    : throw new InvalidCastException("Cannot get ByteValue from " + GetCanonicalTagName(TagType));
 
         /// <summary>
         /// Returns the value of this tag, cast as a short (16-bit signed integer).
@@ -245,39 +234,25 @@ namespace Redstone.NBT.Tags
         /// Returns the value of this tag, cast as a byte array. Only supported by NbtByteArray tags.
         /// </summary>
         /// <exception cref="InvalidCastException">When used on a tag other than NbtByteArray.</exception>
-        public byte[] ByteArrayValue
-        {
-            get
-            {
-                if (TagType == NbtTagType.ByteArray)
-                {
-                    return ((NbtByteArray)this).Value;
-                }
-                else
-                {
-                    throw new InvalidCastException("Cannot get ByteArrayValue from " + GetCanonicalTagName(TagType));
-                }
-            }
-        }
+        public byte[] ByteArrayValue => TagType == NbtTagType.ByteArray
+                    ? ((NbtByteArray)this).Value
+                    : throw new InvalidCastException("Cannot get ByteArrayValue from " + GetCanonicalTagName(TagType));
 
         /// <summary>
         /// Returns the value of this tag, cast as an int array. Only supported by NbtIntArray tags.
         /// </summary>
         /// <exception cref="InvalidCastException">When used on a tag other than NbtIntArray.</exception>
-        public int[] IntArrayValue
-        {
-            get
-            {
-                if (TagType == NbtTagType.IntArray)
-                {
-                    return ((NbtIntArray)this).Value;
-                }
-                else
-                {
-                    throw new InvalidCastException("Cannot get IntArrayValue from " + GetCanonicalTagName(TagType));
-                }
-            }
-        }
+        public int[] IntArrayValue => TagType == NbtTagType.IntArray
+                    ? ((NbtIntArray)this).Value
+                    : throw new InvalidCastException("Cannot get IntArrayValue from " + GetCanonicalTagName(TagType));
+
+        /// <summary>
+        /// Returns the value of this tag, cast as a long array. Only supported by NbtLongArray tags.
+        /// </summary>
+        /// <exception cref="InvalidCastException">When used on a tag other than NbtLongArray.</exception>
+        public long[] LongArrayValue => TagType == NbtTagType.LongArray
+                    ? ((NbtLongArray)this).Value
+                    : throw new InvalidCastException("Cannot get LongArrayValue from " + GetCanonicalTagName(TagType));
 
         /// <summary>
         /// Returns the value of this tag, cast as a string.
@@ -317,6 +292,7 @@ namespace Redstone.NBT.Tags
             NbtTagType.Float => "TAG_Float",
             NbtTagType.Int => "TAG_Int",
             NbtTagType.IntArray => "TAG_Int_Array",
+            NbtTagType.LongArray => "TAG_Long_Array",
             NbtTagType.List => "TAG_List",
             NbtTagType.Long => "TAG_Long",
             NbtTagType.Short => "TAG_Short",

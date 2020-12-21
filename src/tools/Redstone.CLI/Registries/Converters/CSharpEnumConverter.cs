@@ -50,11 +50,11 @@ namespace Redstone.CLI.Registries.Converters
                 .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword))
                 .AddMembers(enumMembers);
 
-            var result = @namespace is not null
+            string generatedCode = @namespace is not null
                 ? @namespace.AddMembers(@enum).NormalizeWhitespace().ToFullString()
                 : @enum.NormalizeWhitespace().ToFullString();
             
-            return result;
+            return generatedCode;
         }
     }
 }

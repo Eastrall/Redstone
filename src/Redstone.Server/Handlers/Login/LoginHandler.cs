@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Redstone.Abstractions.Registry;
+using Redstone.Abstractions.World;
 using Redstone.Common;
 using Redstone.Common.Configuration;
 using Redstone.Common.Structures.Biomes;
@@ -13,6 +14,7 @@ using Redstone.Protocol.Abstractions;
 using Redstone.Protocol.Handlers;
 using Redstone.Protocol.Packets.Game.Client;
 using Redstone.Protocol.Packets.Login;
+using Redstone.Server.World.Blocks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -156,16 +158,26 @@ namespace Redstone.Server.Handlers.Login
 
         private void SendChunkData(MinecraftUser user)
         {
+            var world = new WorldMap("minecraft:overworld");
+            IRegion region = world.AddRegion(0, 0);
+            IChunk chunk = region.AddChunk(0, 0);
+            IChunkSection chunkSection = chunk.GetSection(0);
+
+            chunkSection.SetBlock(0, 0, 0, new GrassBlock());
+            chunkSection.SetBlock(0, 0, 1, new GrassBlock());
+            chunkSection.SetBlock(0, 1, 1, new GrassBlock());
+            chunk.GenerateHeightMap();
+
             using var packet = new ChunkDataPacket();
 
-            packet.WriteInt32(0); // Chunk X
-            packet.WriteInt32(0); // Chunk Z
+            packet.WriteInt32(chunk.X); // Chunk X
+            packet.WriteInt32(chunk.Z); // Chunk Z
             packet.WriteBoolean(true); // full chunk
 
             int mask = 0;
 
             // if full chunk
-            for (int i = 0; i < 16; i++)
+            for (int i = 0; i < chunk.Sections.Count(); i++)
             {
                 mask |= 1 << i;
             }

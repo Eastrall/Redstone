@@ -11,5 +11,10 @@ namespace Redstone.Abstractions.Entities
         /// Gets the entity unique id.
         /// </summary>
         Guid Id { get; }
+
+        /// <summary>
+        /// Gets the entity position.
+        /// </summary>
+        Position Position { get; }
     }
 }

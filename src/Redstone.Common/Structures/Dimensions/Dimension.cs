@@ -2,7 +2,7 @@
 using Redstone.NBT.Serialization;
 using System.Diagnostics;
 
-namespace Redstone.Common.Codecs.Dimensions
+namespace Redstone.Common.Structures.Dimensions
 {
     /// <summary>
     /// Describes the dimension data structure.
@@ -11,19 +11,19 @@ namespace Redstone.Common.Codecs.Dimensions
     public class Dimension
     {
         /// <summary>
-        /// Gets or sets the biome id.
+        /// Gets or sets the dimension id.
         /// </summary>
         [NbtElement(NbtTagType.Int, "id")]
         public int Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the biome dimension name.
+        /// Gets or sets the dimension name.
         /// </summary>
         [NbtElement(NbtTagType.String, "name")]
         public string Name { get; set; }
 
         /// <summary>
-        /// Gets or sets the dimension codec element.
+        /// Gets or sets the dimension element.
         /// </summary>
         [NbtElement(NbtTagType.Compound, "element")]
         public DimensionElement Element { get; set; }

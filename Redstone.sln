@@ -34,7 +34,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Redstone.NBT", "src\common\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Redstone.Configuration.Yaml", "src\common\Redstone.Configuration.Yaml\Redstone.Configuration.Yaml.csproj", "{C9E8F1E8-3B32-4C56-A1B1-35023CC34039}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Redstone.Abstractions", "src\Redstone.Abstractions\Redstone.Abstractions.csproj", "{A3747DE6-18B9-47C7-B11F-BC2448E166DD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Redstone.Abstractions", "src\Redstone.Abstractions\Redstone.Abstractions.csproj", "{A3747DE6-18B9-47C7-B11F-BC2448E166DD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{BA86A6BD-A61C-4186-B970-42173A895F79}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Redstone.CLI", "src\tools\Redstone.CLI\Redstone.CLI.csproj", "{4BCDE769-AFF9-4170-8233-47CCF315A991}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -78,6 +82,10 @@ Global
 		{A3747DE6-18B9-47C7-B11F-BC2448E166DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A3747DE6-18B9-47C7-B11F-BC2448E166DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A3747DE6-18B9-47C7-B11F-BC2448E166DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4BCDE769-AFF9-4170-8233-47CCF315A991}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4BCDE769-AFF9-4170-8233-47CCF315A991}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4BCDE769-AFF9-4170-8233-47CCF315A991}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4BCDE769-AFF9-4170-8233-47CCF315A991}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -92,6 +100,8 @@ Global
 		{8EBFB763-2D08-4B8A-B57F-D89F3542FAE8} = {32A4BF40-197A-4E4B-8701-786BA49C048B}
 		{C9E8F1E8-3B32-4C56-A1B1-35023CC34039} = {32A4BF40-197A-4E4B-8701-786BA49C048B}
 		{A3747DE6-18B9-47C7-B11F-BC2448E166DD} = {EF4B4050-023B-4009-9FD7-20180883F55A}
+		{BA86A6BD-A61C-4186-B970-42173A895F79} = {EF4B4050-023B-4009-9FD7-20180883F55A}
+		{4BCDE769-AFF9-4170-8233-47CCF315A991} = {BA86A6BD-A61C-4186-B970-42173A895F79}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {978B7507-DC0B-478F-85D5-36AE4E3B0F9C}

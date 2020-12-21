@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Redstone.Protocol.Packets.Game
+﻿namespace Redstone.Protocol.Packets.Game
 {
-    public enum ClientPlayPacketType
+    public enum ClientPlayPacketType : byte
     {
-        JoinGame = 0x24
+        ChunkData = 0x20,
+        JoinGame = 0x24,
+        PlayerInfo = 0x32,
+        UpdateViewPosition = 0x40
     }
 }

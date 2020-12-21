@@ -2,7 +2,7 @@
 using Redstone.NBT.Serialization;
 using System.Text.Json.Serialization;
 
-namespace Redstone.Common.Codecs.Biomes
+namespace Redstone.Common.Structures.Biomes
 {
     public class BiomeMoodSound
     {

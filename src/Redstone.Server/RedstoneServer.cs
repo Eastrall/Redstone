@@ -4,6 +4,7 @@ using LiteNetwork.Server;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Redstone.Abstractions.Registry;
 using Redstone.Common.Configuration;
 using Redstone.Common.Server;
 using Redstone.Protocol;
@@ -20,6 +21,7 @@ namespace Redstone.Server
         private readonly ILogger<RedstoneServer> _logger;
         private readonly IMinecraftPacketEncryption _packetEncryption;
         private readonly IOptions<ServerConfiguration> _serverConfiguration;
+        private readonly IRegistry _registry;
 
         public RSAParameters ServerEncryptionKey { get; private set; }
 
@@ -34,10 +36,13 @@ namespace Redstone.Server
             _logger = serviceProvider.GetRequiredService<ILogger<RedstoneServer>>();
             _packetEncryption = serviceProvider.GetRequiredService<IMinecraftPacketEncryption>();
             _serverConfiguration = serviceProvider.GetRequiredService<IOptions<ServerConfiguration>>();
+            _registry = serviceProvider.GetRequiredService<IRegistry>();
         }
 
         protected override void OnBeforeStart()
         {
+            _registry.Load();
+
             _logger.LogInformation("Generating server encryption keys...");
             ServerEncryptionKey = _packetEncryption.GenerateEncryptionKeys();
         }

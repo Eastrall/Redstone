@@ -44,7 +44,7 @@ namespace Redstone.Protocol.Handlers.Internal
             {
                 HandlerActionModel handlerActionModel = _handlerCache.GetHandlerAction(handlerAction);
 
-                if (handlerActionModel == null)
+                if (handlerActionModel is null)
                 {
                     return null;
                 }
@@ -57,7 +57,10 @@ namespace Redstone.Protocol.Handlers.Internal
                     _handlerFactory.ReleaseHandler,
                     new HandlerExecutor(handlerActionModel.HandlerTypeInfo, handlerActionModel.Method, defaultHandlerActionParameters));
 
-                _cache.Add(handlerAction, cacheEntry);
+                if (!_cache.ContainsKey(handlerAction))
+                {
+                    _cache.Add(handlerAction, cacheEntry);
+                }
             }
 
             return cacheEntry;

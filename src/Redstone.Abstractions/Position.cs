@@ -1,4 +1,4 @@
-﻿namespace Redstone.Common
+﻿namespace Redstone.Abstractions
 {
     /// <summary>
     /// Provides a data structure that represents a 3D position in the world.

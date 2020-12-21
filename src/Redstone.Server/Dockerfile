@@ -9,6 +9,7 @@ COPY ["src/Redstone.Server/Redstone.Server.csproj", "src/Redstone.Server/"]
 COPY ["src/common/Redstone.NBT/Redstone.NBT.csproj", "src/common/Redstone.NBT/"]
 COPY ["src/Redstone.Protocol/Redstone.Protocol.csproj", "src/Redstone.Protocol/"]
 COPY ["src/Redstone.Common/Redstone.Common.csproj", "src/Redstone.Common/"]
+COPY ["src/Redstone.Abstractions/Redstone.Abstractions.csproj", "src/Redstone.Abstractions/"]
 COPY ["src/common/Redstone.Configuration.Yaml/Redstone.Configuration.Yaml.csproj", "src/common/Redstone.Configuration.Yaml/"]
 RUN dotnet restore "src/Redstone.Server/Redstone.Server.csproj"
 COPY . .

@@ -136,7 +136,7 @@ namespace Redstone.NBT
             {
                 throw new ArgumentOutOfRangeException(nameof(size), "List size may not be negative.");
             }
-            if (elementType < NbtTagType.Byte || elementType > NbtTagType.IntArray)
+            if (elementType < NbtTagType.Byte || elementType > NbtTagType.LongArray)
             {
                 throw new ArgumentOutOfRangeException(nameof(elementType));
             }
@@ -171,7 +171,7 @@ namespace Redstone.NBT
                 throw new ArgumentOutOfRangeException(nameof(size), "List size may not be negative.");
             }
 
-            if (elementType < NbtTagType.Byte || elementType > NbtTagType.IntArray)
+            if (elementType < NbtTagType.Byte || elementType > NbtTagType.LongArray)
             {
                 throw new ArgumentOutOfRangeException(nameof(elementType));
             }

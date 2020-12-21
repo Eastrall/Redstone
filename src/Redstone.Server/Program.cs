@@ -1,13 +1,14 @@
-﻿using LiteNetwork.Server.Hosting;
+﻿using LiteNetwork.Common;
+using LiteNetwork.Server.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Hosting;
 using Redstone.Common.Configuration;
+using Redstone.Common.DependencyInjection;
 using Redstone.Protocol;
 using System;
-using Redstone.Common.DependencyInjection;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -49,6 +50,7 @@ namespace Redstone.Server
                     options.Host = serverConfiguration.Ip;
                     options.Port = serverConfiguration.Port;
                     options.PacketProcessor = new MinecraftPacketProcessor();
+                    options.ReceiveStrategy = ReceiveStrategyType.Queued;
                 })
                 .UseNLog()
                 .UseConsoleLifetime()

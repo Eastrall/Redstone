@@ -106,11 +106,13 @@ namespace Redstone.NBT
         /// <summary> Whether the current tag is a List. </summary>
         public bool IsList => TagType == NbtTagType.List;
 
-        /// <summary> Whether the current tag has length (Lists, ByteArrays, and IntArrays have length).
-        /// Compound tags also have length, technically, but it is not known until all child tags are read. </summary>
+        /// <summary>
+        /// Whether the current tag has length (Lists, ByteArrays, and IntArrays have length).
+        /// Compound tags also have length, technically, but it is not known until all child tags are read.
+        /// </summary>
         public bool HasLength => TagType switch
         {
-            NbtTagType.List or NbtTagType.ByteArray or NbtTagType.IntArray => true,
+            NbtTagType.List or NbtTagType.ByteArray or NbtTagType.IntArray or NbtTagType.LongArray => true,
             _ => false,
         };
 

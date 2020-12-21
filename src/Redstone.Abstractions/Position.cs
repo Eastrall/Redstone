@@ -1,8 +1,11 @@
-﻿namespace Redstone.Abstractions
+﻿using System.Diagnostics;
+
+namespace Redstone.Abstractions
 {
     /// <summary>
     /// Provides a data structure that represents a 3D position in the world.
     /// </summary>
+    [DebuggerDisplay("{X}/{Y}/{Z}")]
     public class Position
     {
         /// <summary>

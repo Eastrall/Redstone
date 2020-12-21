@@ -30,7 +30,7 @@ namespace Redstone.NBT.Tags
                         throw new ArgumentException("Only empty list tags may have TagType of End.");
                     }
                 }
-                else if (value < NbtTagType.Byte || value > NbtTagType.IntArray && value != NbtTagType.Unknown)
+                else if (value < NbtTagType.Byte || value > NbtTagType.LongArray && value != NbtTagType.Unknown)
                 {
                     throw new ArgumentOutOfRangeException(nameof(value));
                 }
@@ -251,13 +251,9 @@ namespace Redstone.NBT.Tags
             }
         }
 
-
         /// <summary> Copies all tags in this NbtList to an array. </summary>
         /// <returns> Array of NbtTags. </returns>
-        public NbtTag[] ToArray() =>
-            // ReSharper restore ReturnTypeCanBeEnumerable.Global
-            tags.ToArray();
-
+        public NbtTag[] ToArray() => tags.ToArray();
 
         /// <summary> Copies all tags in this NbtList to an array, and casts it to the desired type. </summary>
         /// <typeparam name="T"> Type to cast every member of NbtList to. Must derive from NbtTag. </typeparam>
@@ -309,6 +305,7 @@ namespace Redstone.NBT.Tags
                     NbtTagType.List => new NbtList(),
                     NbtTagType.Compound => new NbtCompound(),
                     NbtTagType.IntArray => new NbtIntArray(),
+                    NbtTagType.LongArray => new NbtLongArray(),
                     _ => throw new NbtFormatException("Unsupported tag type found in a list: " + ListType),// should never happen, since ListType is checked beforehand
                 };
 
@@ -373,6 +370,9 @@ namespace Redstone.NBT.Tags
                                 break;
                             case NbtTagType.IntArray:
                                 new NbtIntArray().SkipTag(readStream);
+                                break;
+                            case NbtTagType.LongArray:
+                                new NbtLongArray().SkipTag(readStream);
                                 break;
                         }
                     }

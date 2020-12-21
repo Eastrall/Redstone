@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Redstone.Abstractions.Registry;
 using Redstone.Common;
-using Redstone.Common.Codecs.Biomes;
-using Redstone.Common.Codecs.Dimensions;
 using Redstone.Common.Configuration;
-using Redstone.Common.Serialization;
+using Redstone.Common.Structures.Biomes;
+using Redstone.Common.Structures.Dimensions;
 using Redstone.NBT;
 using Redstone.NBT.Serialization;
 using Redstone.NBT.Tags;
@@ -15,7 +15,6 @@ using Redstone.Protocol.Packets.Game.Client;
 using Redstone.Protocol.Packets.Login;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace Redstone.Server.Handlers.Login
@@ -25,74 +24,159 @@ namespace Redstone.Server.Handlers.Login
         private readonly ILogger<LoginHandler> _logger;
         private readonly IOptions<ServerConfiguration> _serverConfiguration;
         private readonly IOptions<GameConfiguration> _gameConfiguration;
+        private readonly IRegistry _registry;
+        private readonly IRedstoneServer _server;
 
-        public LoginHandler(ILogger<LoginHandler> logger, IOptions<ServerConfiguration> serverConfiguration, IOptions<GameConfiguration> gameConfiguration)
+        public LoginHandler(ILogger<LoginHandler> logger, IOptions<ServerConfiguration> serverConfiguration, IOptions<GameConfiguration> gameConfiguration, IRegistry registry, IRedstoneServer server)
         {
             _logger = logger;
             _serverConfiguration = serverConfiguration;
             _gameConfiguration = gameConfiguration;
+            _registry = registry;
+            _server = server;
         }
 
         [LoginPacketHandler(ServerLoginPacketType.LoginStart)]
         public void OnLogin(MinecraftUser user, IMinecraftPacket packet)
         {
-            string username = packet.ReadString();
+            user.Username = packet.ReadString();
 
-            _logger.LogInformation($"{username} trying to log-in");
+            _logger.LogInformation($"{user.Username} trying to log-in");
 
             if (_serverConfiguration.Value.Mode == ServerModeType.Offline)
             {
-                IEnumerable<Dimension> dimensions = LoadDimensions();
-                IEnumerable<Biome> biomes = LoadBiomes();
-
-                using var p = new MinecraftPacket(ClientLoginPacketType.LoginSuccess);
-                p.WriteUUID(user.Id);
-                p.WriteString(username);
-                user.Send(p);
-
+                SendLoginSucess(user);
                 user.Status = MinecraftUserStatus.Play;
+                SendJoinGame(user);
+                // TODO: held item changed
+                // TODO: declare recipes
+                // TODO: Tags
+                // TODO: Entity status
+                // TODO: declare commands
+                // TODO: Unlock recipes
+                // TODO: Player position and look
+                SendPlayerInfo(user, PlayerInfoActionType.Add); 
+                SendPlayerInfo(user, PlayerInfoActionType.UpdateLatency);
+                SendUpdateViewPosition(user);
+                // TODO: Update light
+                SendChunkData(user);
+                // TODO: World border
+                // TODO: Spawn position
+                // TODO: Player position and look
 
-                using var joinPacket = new JoinGamePacket();
-                joinPacket.WriteInt32(1); // EntityID
-                joinPacket.WriteBoolean(_gameConfiguration.Value.IsHardcore); // Is hardcore
-                joinPacket.WriteByte((byte)ServerGameModeType.Creative); // GameMode
-                joinPacket.WriteSByte((sbyte)ServerGameModeType.Survival); // Previous game mode
+            }
+            else
+            {
+                // TODO: login to Mojang API
+            }
+        }
 
-                var worldList = new[] { "minecraft:world" };
+        private void SendLoginSucess(MinecraftUser user)
+        {
+            using var p = new MinecraftPacket(ClientLoginPacketType.LoginSuccess);
 
-                joinPacket.WriteVarInt32(worldList.Length); // World count
-                foreach (string world in worldList)
-                {
-                    joinPacket.WriteString(world);
-                }
+            p.WriteUUID(user.Id);
+            p.WriteString(user.Username);
 
-                WriteDimensionsAndBiomes(dimensions, biomes, joinPacket);
+            user.Send(p);
+        }
 
-                Dimension currentDimension = dimensions.First();
-                WriteDimension(currentDimension, joinPacket);
-                joinPacket.WriteString(currentDimension.Name); // World name identifier
+        private void SendJoinGame(MinecraftUser user)
+        {
+            using var joinPacket = new JoinGamePacket();
 
-                joinPacket.WriteInt64(_gameConfiguration.Value.Seed); // Seed
-                joinPacket.WriteVarInt32((int)_serverConfiguration.Value.MaxPlayers); // Max players
-                                                                                      // TODO: define constants for rendering distances
-                joinPacket.WriteVarInt32(Math.Clamp(_gameConfiguration.Value.RenderingDistance, 2, 32)); // Render distance (2-32 chunks)
-                joinPacket.WriteBoolean(_serverConfiguration.Value.ReducedDebugInfo); // Reduced debug info
-                joinPacket.WriteBoolean(_gameConfiguration.Value.DisplayRespawnScreen); // Respawn screen
-                joinPacket.WriteBoolean(_serverConfiguration.Value.Debug); // Is debug
-                joinPacket.WriteBoolean(_serverConfiguration.Value.FlatTerrain); // is flat terrain
-                user.Send(joinPacket);
+            joinPacket.WriteInt32(1); // EntityID
+            joinPacket.WriteBoolean(_gameConfiguration.Value.IsHardcore); // Is hardcore
+            joinPacket.WriteByte((byte)ServerGameModeType.Creative); // GameMode
+            joinPacket.WriteSByte((sbyte)ServerGameModeType.Survival); // Previous game mode
+
+            var worldList = new[] { "minecraft:world" };
+
+            joinPacket.WriteVarInt32(worldList.Length); // World count
+            foreach (string world in worldList)
+            {
+                joinPacket.WriteString(world);
             }
 
-            // TODO: login to Mojang API
+            WriteDimensionsAndBiomes(_registry.Dimensions, _registry.Biomes, joinPacket);
+
+            Dimension currentDimension = _registry.Dimensions.First();
+            WriteDimension(currentDimension, joinPacket);
+            joinPacket.WriteString(currentDimension.Name); // World name identifier
+
+            joinPacket.WriteInt64(_gameConfiguration.Value.Seed); // Seed
+            joinPacket.WriteVarInt32((int)_serverConfiguration.Value.MaxPlayers); // Max players
+            joinPacket.WriteVarInt32(Math.Clamp(_gameConfiguration.Value.RenderingDistance, RedstoneContants.MinimumRenderDistance, RedstoneContants.MaximumRenderDistance)); // Render distance (2-32 chunks)
+            joinPacket.WriteBoolean(_serverConfiguration.Value.ReducedDebugInfo); // Reduced debug info
+            joinPacket.WriteBoolean(_gameConfiguration.Value.DisplayRespawnScreen); // Respawn screen
+            joinPacket.WriteBoolean(_serverConfiguration.Value.Debug); // Is debug
+            joinPacket.WriteBoolean(_serverConfiguration.Value.FlatTerrain); // is flat terrain
+
+            user.Send(joinPacket);
         }
 
-        private IEnumerable<Dimension> LoadDimensions()
+        private void SendPlayerInfo(MinecraftUser user, PlayerInfoActionType actionType)
         {
-            return JsonSerializer.Deserialize<IEnumerable<Dimension>>(File.ReadAllText("/opt/redstone/data/dimensions.json"));
+            using var packet = new PlayerInfoPacket();
+
+            packet.WriteVarInt32((int)actionType);
+            packet.WriteVarInt32((int)_server.ConnectedPlayersCount);
+
+            foreach (MinecraftUser connectedPlayer in _server.ConnectedPlayers)
+            {
+                packet.WriteUUID(connectedPlayer.Id);
+
+                if (actionType == PlayerInfoActionType.Add)
+                {
+                    packet.WriteString(connectedPlayer.Username);
+                    packet.WriteVarInt32(0); // Optional properties
+                    packet.WriteVarInt32((int)_gameConfiguration.Value.Mode);
+                    packet.WriteVarInt32(0); // ping
+                    packet.WriteBoolean(false); // Has display name
+
+                    // if has display name then
+                    // packet.WriteString(DisplayName);
+                }
+                else if (actionType == PlayerInfoActionType.UpdateLatency)
+                {
+                    packet.WriteVarInt32(0); // ping
+                }
+            }
+
+            user.Send(packet);
         }
-        private IEnumerable<Biome> LoadBiomes()
+
+        private void SendUpdateViewPosition(MinecraftUser user)
         {
-            return JsonSerializer.Deserialize<IEnumerable<Biome>>(File.ReadAllText("/opt/redstone/data/biomes.json"));
+            // TODO: get chunk position according to current user's position.
+            using var packet = new UpdateViewPositionPacket(0, 0);
+
+            user.Send(packet);
+        }
+
+        private void SendChunkData(MinecraftUser user)
+        {
+            using var packet = new ChunkDataPacket();
+
+            packet.WriteInt32(0); // Chunk X
+            packet.WriteInt32(0); // Chunk Z
+            packet.WriteBoolean(true); // full chunk
+
+            int mask = 0;
+
+            // if full chunk
+            for (int i = 0; i < 16; i++)
+            {
+                mask |= 1 << i;
+            }
+
+            packet.WriteVarInt32(mask);
+
+            // TODO: heightmap
+
+
+
+            user.Send(packet);
         }
 
         private void WriteDimensionsAndBiomes(IEnumerable<Dimension> dimensions, IEnumerable<Biome> biomes, IMinecraftPacket packet)

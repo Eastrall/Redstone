@@ -9,10 +9,19 @@ namespace Redstone.Server
     /// </summary>
     public interface IRedstoneServer
     {
+        /// <summary>
+        /// Gets the connected players list.
+        /// </summary>
         IEnumerable<MinecraftUser> ConnectedPlayers { get; }
 
+        /// <summary>
+        /// Gets the number of players connected.
+        /// </summary>
         uint ConnectedPlayersCount { get; }
 
+        /// <summary>
+        /// Gets the server encryption key.
+        /// </summary>
         RSAParameters ServerEncryptionKey { get; }
 
         /// <summary>

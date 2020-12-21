@@ -2,7 +2,7 @@
 using Redstone.NBT.Serialization;
 using System.Diagnostics;
 
-namespace Redstone.Common.Codecs.Biomes
+namespace Redstone.Common.Structures.Biomes
 {
     [DebuggerDisplay("{Name} (Id = {Id})")]
     public class Biome

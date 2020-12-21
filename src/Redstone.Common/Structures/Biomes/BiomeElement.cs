@@ -1,7 +1,7 @@
 ﻿using Redstone.NBT;
 using Redstone.NBT.Serialization;
 
-namespace Redstone.Common.Codecs.Biomes
+namespace Redstone.Common.Structures.Biomes
 {
     public class BiomeElement
     {

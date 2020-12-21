@@ -6,6 +6,10 @@ namespace Redstone.Server
 {
     public static class RedstoneContants
     {
+        public const int MinimumRenderDistance = 2;
+        public const int MaximumRenderDistance = 32;
+        public const int DefaultRenderDistance = 8;
+
         public const string DefaultFaviconFileName = "Redstone.Server.Resources.DefaultFavicon.png";
 
         private static string _defaultFavicon;

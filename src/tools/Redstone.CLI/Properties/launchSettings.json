@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Redstone.CLI": {
+      "commandName": "Project",
+      "commandLineArgs": "registries convert \"D:\\Projects\\Minecraft\\official\\generated\\reports\\registries.json\" \"minecraft:block\" -t CSharpEnum -n \"BlockType\" -ns \"Redstone.Common\""
+    }
+  }
+}

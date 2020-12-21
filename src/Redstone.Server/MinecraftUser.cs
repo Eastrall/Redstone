@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Redstone.Protocol;
 using Redstone.Protocol.Abstractions;
 using Redstone.Protocol.Handlers;
+using Redstone.Protocol.Handlers.Exceptions;
 using Redstone.Protocol.Packets.Game;
 using Redstone.Protocol.Packets.Handskake;
 using Redstone.Protocol.Packets.Login;
@@ -20,6 +21,8 @@ namespace Redstone.Server
 
         public MinecraftUserStatus Status { get; internal set; } = MinecraftUserStatus.Handshaking;
 
+        public string Username { get; internal set; }
+
         public MinecraftUser(ILogger<MinecraftUser> logger, IPacketHandler packetHandler)
         {
             _logger = logger;
@@ -33,14 +36,27 @@ namespace Redstone.Server
                 throw new InvalidOperationException("Incoming packet is not a Minecraft packet.");
             }
 
+            object packetHeader = GetMinecraftPacketType(packet.PacketId);
+
             try
             {
-                _logger.LogInformation($"Current minecraft client status: {Status} | Packet: 0x{packet.PacketId:X2}");
-                _packetHandler.Invoke(Status, GetMinecraftPacketType(packet.PacketId), this, packet);
+                _logger.LogTrace($"[{Status}] | Packet: {packetHeader} (0x{packet.PacketId:X2})");
+                _packetHandler.Invoke(Status, packetHeader, this, packet);
+            }
+            catch (HandlerActionNotFoundException)
+            {
+                if (Enum.IsDefined(packetHeader.GetType(), packet.PacketId))
+                {
+                    _logger.LogTrace($"[{Username}] Received an unimplemented {Status} packet {packetHeader} (0x{packet.PacketId:X2} from {Socket.RemoteEndPoint}");
+                }
+                else
+                {
+                    _logger.LogTrace($"[{Username}] Received an unknown {Status} packet: 0x{packet.PacketId:X2} from {Socket.RemoteEndPoint}");
+                }
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"An error occured while handling a message during '{Status}' state.");
+                _logger.LogError(e, $"An error occured while handling packet '{packetHeader}' during '{Status}' state.");
                 throw;
             }
 

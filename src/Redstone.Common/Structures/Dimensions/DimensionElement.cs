@@ -2,7 +2,7 @@
 using Redstone.NBT.Serialization;
 using System.Text.Json.Serialization;
 
-namespace Redstone.Common.Codecs.Dimensions
+namespace Redstone.Common.Structures.Dimensions
 {
     /// <summary>
     /// Describes the dimension element data structure.

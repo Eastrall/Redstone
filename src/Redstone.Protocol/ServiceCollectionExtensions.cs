@@ -25,7 +25,7 @@ namespace Redstone.Protocol
         /// If null, use the <see cref="Assembly.GetExecutingAssembly"/> method.
         /// </param>
         /// <returns>Service collection.</returns>
-        public static IServiceCollection AddMinecraftProtocol(this IServiceCollection services, IEnumerable<Assembly> handlersAssemblies = null)
+        public static IServiceCollection AddMinecraftProtocol(this IServiceCollection services, params Assembly[] handlersAssemblies)
         {
             services.AddSingleton<IMinecraftPacketEncryption, MinecraftPacketEncryption>();
 

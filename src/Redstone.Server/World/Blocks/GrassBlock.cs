@@ -1,9 +1,13 @@
-﻿using Redstone.Common;
+﻿using Redstone.Common.Structures.Blocks;
 
 namespace Redstone.Server.World.Blocks
 {
+    [BlockName("minecraft:grass")]
     public class GrassBlock : Block
     {
-        public override BlockType Type => BlockType.GrassBlock;
+        public GrassBlock(BlockData blockData) 
+            : base(blockData)
+        {
+        }
     }
 }

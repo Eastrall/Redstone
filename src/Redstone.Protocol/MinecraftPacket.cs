@@ -30,6 +30,13 @@ namespace Redstone.Protocol
         }
 
         /// <summary>
+        /// Creates a new empty <see cref="MinecraftPacket"/> stream in write-only mode.
+        /// </summary>
+        public MinecraftPacket()
+        {
+        }
+
+        /// <summary>
         /// Creates a new <see cref="MinecraftPacket"/> in write-only mode with a given packet id as an integer.
         /// </summary>
         /// <param name="packetId">Packet Id.</param>

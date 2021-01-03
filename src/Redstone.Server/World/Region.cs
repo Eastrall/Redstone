@@ -11,6 +11,7 @@ namespace Redstone.Server
         public const int ChunkAmount = Size / Chunk.Size;
         
         private readonly IChunk[] _chunks;
+        private readonly IServiceProvider _serviceProvider;
 
         public int X { get; }
 
@@ -18,10 +19,11 @@ namespace Redstone.Server
 
         public IEnumerable<IChunk> Chunks => _chunks;
 
-        public Region(int x, int z)
+        public Region(int x, int z, IServiceProvider serviceProvider)
         {
             X = x;
             Z = z;
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             _chunks = Enumerable.Repeat(default(IChunk), ChunkAmount * ChunkAmount).ToArray();
         }
 
@@ -32,7 +34,7 @@ namespace Redstone.Server
                 throw new InvalidOperationException($"Failed to add chunk at {x}/{z}. Chunk already exists.");
             }
 
-            var chunk = new Chunk(x, z);
+            var chunk = new Chunk(x, z, _serviceProvider);
 
             _chunks[GetChunkIndex(x, z)] = chunk;
 

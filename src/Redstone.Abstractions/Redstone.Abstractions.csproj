@@ -1,11 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Redstone.Common\Redstone.Common.csproj" />
+    <ProjectReference Include="..\Redstone.Protocol\Redstone.Protocol.csproj" />
   </ItemGroup>
 
 </Project>

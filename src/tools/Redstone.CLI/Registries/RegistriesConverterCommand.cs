@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
+using Redstone.Common.Extensions;
 
 namespace Redstone.CLI.Registries
 {
@@ -67,7 +68,7 @@ namespace Redstone.CLI.Registries
 
             IDictionary<string, int> registryValues = entriesElement.EnumerateObject()
                 .ToDictionary(
-                    x => ToPascalCase(x.Name.Replace("minecraft:", "").Trim()),
+                    x => x.Name.Replace("minecraft:", "").Trim().ToPascalCase(),
                     x => x.Value.GetProperty("protocol_id").GetInt32());
 
             IConverter codeConverter = GetConverter(registryValues);
@@ -96,13 +97,6 @@ namespace Redstone.CLI.Registries
                 RegistriesConverterType.CSharpEnum => new CSharpEnumConverter(Name, values, Namespace),
                 _ => throw new NotImplementedException()
             };
-        }
-
-        private string ToPascalCase(string input)
-        {
-            return input.Split('_', StringSplitOptions.RemoveEmptyEntries)
-                .Select(s => char.ToUpperInvariant(s[0]) + s[1..])
-                .Aggregate(string.Empty, (s1, s2) => s1 + s2);
         }
 
         private string GenerateOutputFile()

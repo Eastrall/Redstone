@@ -28,14 +28,18 @@ namespace Redstone.Server.Handlers.Login
         private readonly IOptions<GameConfiguration> _gameConfiguration;
         private readonly IRegistry _registry;
         private readonly IRedstoneServer _server;
+        private readonly IBlockFactory _blockFactory;
+        private readonly IServiceProvider _serviceProvider;
 
-        public LoginHandler(ILogger<LoginHandler> logger, IOptions<ServerConfiguration> serverConfiguration, IOptions<GameConfiguration> gameConfiguration, IRegistry registry, IRedstoneServer server)
+        public LoginHandler(ILogger<LoginHandler> logger, IOptions<ServerConfiguration> serverConfiguration, IOptions<GameConfiguration> gameConfiguration, IRegistry registry, IRedstoneServer server, IBlockFactory blockFactory, IServiceProvider serviceProvider)
         {
             _logger = logger;
             _serverConfiguration = serverConfiguration;
             _gameConfiguration = gameConfiguration;
             _registry = registry;
             _server = server;
+            _blockFactory = blockFactory;
+            _serviceProvider = serviceProvider;
         }
 
         [LoginPacketHandler(ServerLoginPacketType.LoginStart)]
@@ -158,35 +162,60 @@ namespace Redstone.Server.Handlers.Login
 
         private void SendChunkData(MinecraftUser user)
         {
-            var world = new WorldMap("minecraft:overworld");
+            var world = new WorldMap("minecraft:overworld", _serviceProvider);
             IRegion region = world.AddRegion(0, 0);
             IChunk chunk = region.AddChunk(0, 0);
-            IChunkSection chunkSection = chunk.GetSection(0);
+            //IChunkSection chunkSection = chunk.GetSection(0);
+            bool fullChunk = true;
 
-            chunkSection.SetBlock(0, 0, 0, new GrassBlock());
-            chunkSection.SetBlock(0, 0, 1, new GrassBlock());
-            chunkSection.SetBlock(0, 1, 1, new GrassBlock());
+            chunk.SetBlock(_blockFactory.CreateBlock<GrassBlock>(), 0, 0, 0);
+            chunk.SetBlock(_blockFactory.CreateBlock<GrassBlock>(), 0, 0, 1);
+            chunk.SetBlock(_blockFactory.CreateBlock<GrassBlock>(), 0, 1, 1);
             chunk.GenerateHeightMap();
 
             using var packet = new ChunkDataPacket();
 
             packet.WriteInt32(chunk.X); // Chunk X
             packet.WriteInt32(chunk.Z); // Chunk Z
-            packet.WriteBoolean(true); // full chunk
+            packet.WriteBoolean(fullChunk); // full chunk
 
             int mask = 0;
 
             // if full chunk
+            using var chunkStream = new MinecraftPacket();
             for (int i = 0; i < chunk.Sections.Count(); i++)
             {
-                mask |= 1 << i;
+                IChunkSection section = chunk.Sections.ElementAt(i);
+
+                if (fullChunk)
+                {
+                    mask |= 1 << i;
+                    section.Serialize(chunkStream);
+                }
             }
 
             packet.WriteVarInt32(mask);
 
-            // TODO: heightmap
+            // Heightmap serialization
+            var heightmapCompound = new NbtCompound("")
+            {
+                new NbtLongArray("MOTION_BLOCKING", chunk.Heightmap.ToArray())
+            };
+            var nbtFile = new NbtFile(heightmapCompound);
 
+            packet.WriteBytes(nbtFile.GetBuffer());
 
+            // Biomes
+            packet.WriteVarInt32(1024);
+            for (int i = 0; i < 1024; i++)
+            {
+                packet.WriteVarInt32(0);
+            }
+
+            packet.WriteBytes(chunkStream.GetBuffer());
+
+            packet.WriteVarInt32(0); // block count
+            // foreach block in blocks in chunk as NBT
 
             user.Send(packet);
         }

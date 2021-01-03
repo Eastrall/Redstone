@@ -8,14 +8,21 @@ namespace Redstone.Server
     public class WorldMap : IWorldMap
     {
         private readonly List<IRegion> _regions;
+        private readonly IServiceProvider _serviceProvider;
 
         public IEnumerable<IRegion> Regions => _regions;
 
         public string Name { get; }
 
-        public WorldMap(string worldName)
+        public WorldMap(string worldName, IServiceProvider serviceProvider)
         {
+            if (string.IsNullOrEmpty(worldName))
+            {
+                throw new ArgumentException($"'{nameof(worldName)}' cannot be null or empty", nameof(worldName));
+            }
+
             Name = worldName;
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             _regions = new List<IRegion>();
         }
 
@@ -26,7 +33,7 @@ namespace Redstone.Server
                 throw new InvalidOperationException($"Region {x}/{z} already exists.");
             }
 
-            var region = new Region(x, z);
+            var region = new Region(x, z, _serviceProvider);
 
             _regions.Add(region);
 

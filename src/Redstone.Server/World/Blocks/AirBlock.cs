@@ -1,9 +1,13 @@
-﻿using Redstone.Common;
+﻿using Redstone.Common.Structures.Blocks;
 
 namespace Redstone.Server.World.Blocks
 {
+    [BlockName("minecraft:air")]
     public class AirBlock : Block
     {
-        public override BlockType Type => BlockType.Air;
+        public AirBlock(BlockData blockData)
+            : base(blockData)
+        {
+        }
     }
 }

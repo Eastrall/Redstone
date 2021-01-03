@@ -13,18 +13,22 @@ namespace Redstone.Server
 
         private readonly IEnumerable<IChunkSection> _chunkSections;
         private readonly long[] _heightmap;
+        private readonly IServiceProvider _serviceProvider;
 
         public int X { get; }
 
         public int Z { get; }
 
+        public IEnumerable<long> Heightmap => _heightmap;
+
         public IEnumerable<IChunkSection> Sections => _chunkSections;
 
-        public Chunk(int x, int z)
+        public Chunk(int x, int z, IServiceProvider serviceProvider)
         {
             X = x;
             Z = z;
-            _chunkSections = Enumerable.Range(0, ChunkSectionAmount).Select(index => new ChunkSection(index)).ToList();
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+            _chunkSections = Enumerable.Range(0, ChunkSectionAmount).Select(index => new ChunkSection(index, _serviceProvider)).ToList();
             _heightmap = new long[Size * Size];
         }
 
@@ -63,6 +67,29 @@ namespace Redstone.Server
                     }
                 }
             }
+        }
+
+        public void SetBlock(IBlock block, int x, int y, int z)
+        {
+            if (y < 0 || y >= Height)
+            {
+                throw new InvalidOperationException($"Cannot set block. Invalid Y position.");
+            }
+
+            int sectionIndex = y / ChunkSectionAmount;
+            IChunkSection section = _chunkSections.ElementAt(sectionIndex);
+
+            if (section is null)
+            {
+                throw new InvalidOperationException($"Section at {sectionIndex} is null.");
+            }
+
+            section.SetBlock(block, x, y % ChunkSectionAmount, z);
+        }
+
+        public IBlock GetBlock(int x, int y, int z)
+        {
+            throw new NotImplementedException();
         }
     }
 }

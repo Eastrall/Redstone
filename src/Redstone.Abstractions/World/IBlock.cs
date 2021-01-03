@@ -1,4 +1,5 @@
 ﻿using Redstone.Common;
+using Redstone.Common.Structures.Blocks;
 
 namespace Redstone.Abstractions.World
 {
@@ -18,5 +19,10 @@ namespace Redstone.Abstractions.World
         /// Gets the block position.
         /// </summary>
         Position Position { get; }
+
+        /// <summary>
+        /// Gets the current block state.
+        /// </summary>
+        BlockStateData State { get; }
     }
 }

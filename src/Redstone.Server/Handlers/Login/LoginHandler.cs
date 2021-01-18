@@ -199,7 +199,7 @@ namespace Redstone.Server.Handlers.Login
             // Heightmap serialization
             var heightmapCompound = new NbtCompound("")
             {
-                new NbtLongArray("MOTION_BLOCKING", chunk.Heightmap.ToArray())
+                new NbtLongArray("MOTION_BLOCKING", chunk.Heightmap.ToArray()) // TODO: compacted long array with 9 bits per entry
             };
             var nbtFile = new NbtFile(heightmapCompound);
 

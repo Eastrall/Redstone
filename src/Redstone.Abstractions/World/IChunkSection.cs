@@ -5,7 +5,7 @@ namespace Redstone.Abstractions.World
     /// <summary>
     /// Provides a mechanism to manipulate a chunk section.
     /// </summary>
-    public interface IChunkSection
+    public interface IChunkSection : INetworkSerializable
     {
         /// <summary>
         /// Gets the chunk section index.
@@ -35,11 +35,5 @@ namespace Redstone.Abstractions.World
         /// </summary>
         /// <returns></returns>
         int GetBlockAmount();
-
-        /// <summary>
-        /// Serialize the current chunk section.
-        /// </summary>
-        /// <param name="packet">Packet stream.</param>
-        void Serialize(IMinecraftPacket packet);
     }
 }

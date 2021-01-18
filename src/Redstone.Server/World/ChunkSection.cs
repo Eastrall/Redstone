@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Redstone.Abstractions;
 using Redstone.Abstractions.World;
+using Redstone.Common.Collections;
 using Redstone.Protocol.Abstractions;
 using Redstone.Server.World.Blocks;
+using Redstone.Server.World.Palettes;
 using System;
 using System.Linq;
 
@@ -12,10 +14,13 @@ namespace Redstone.Server
     {
         public const int Size = 16;
         public const int TotalChunks = Size * Size * Size;
+        public const byte BitsPerBlock = 4;
 
         private readonly IBlock[] _blocks;
         private readonly IServiceProvider _serviceProvider;
         private readonly IBlockFactory _blockFactory;
+        private readonly CompactedLongArray _compactedBlockArray;
+        private readonly IPalette _palette;
 
         public int Index { get; }
 
@@ -30,23 +35,10 @@ namespace Redstone.Server
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             _blockFactory = _serviceProvider.GetRequiredService<IBlockFactory>();
             _blocks = Enumerable.Repeat(default(IBlock), TotalChunks).ToArray();
+            _compactedBlockArray = new CompactedLongArray(BitsPerBlock, TotalChunks);
+            _palette = new IndirectPalette(BitsPerBlock);
 
-            for (int x = 0; x < Size; x++)
-            {
-                for (int y = 0; y < Size; y++)
-                {
-                    for (int z = 0; z < Size; z++)
-                    {
-                        IBlock block = _blockFactory.CreateBlock<AirBlock>();
-
-                        block.Position.X = x;
-                        block.Position.Y = y;
-                        block.Position.Z = z;
-
-                        _blocks[GetBlockIndex(x, y, z)] = block;
-                    }
-                }
-            }
+            Fill<AirBlock>();
         }
 
         public IBlock GetBlock(int x, int y, int z) => _blocks[GetBlockIndex(x, y, z)];
@@ -64,10 +56,24 @@ namespace Redstone.Server
 
         private int GetBlockIndex(int x, int y, int z) => z + Size * (y + Size * x);
 
+        private void Fill<TBlock>() where TBlock : class, IBlock
+        {
+            for (int x = 0; x < Size; x++)
+            {
+                for (int y = 0; y < Size; y++)
+                {
+                    for (int z = 0; z < Size; z++)
+                    {
+                        SetBlock(_blockFactory.CreateBlock<TBlock>(), x, y, z);
+                    }
+                }
+            }
+        }
+
         public void Serialize(IMinecraftPacket packet)
         {
             packet.WriteVarInt32(GetBlockAmount());
-            packet.WriteByte(4); // bits per block
+            packet.WriteByte(BitsPerBlock); // bits per block
             // palette
             // data array length
             // data array

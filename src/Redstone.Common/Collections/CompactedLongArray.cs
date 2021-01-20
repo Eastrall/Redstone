@@ -23,6 +23,16 @@ namespace Redstone.Common.Collections
         /// </summary>
         public int Length { get; }
 
+        /// <summary>
+        /// Gets the real storage length.
+        /// </summary>
+        public int StorageLength => _storage.Length;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
         public long this[int index]
         {
             get => Get(index);
@@ -42,31 +52,27 @@ namespace Redstone.Common.Collections
 
         public long Get(int index)
         {
-            int startLongIndex = (int)Math.Floor((decimal)(index / _valuesPerLong));
+            int startLongIndex = (int)Math.Floor(((float)index / (float)_valuesPerLong));
             int indexInLong = (index - startLongIndex * _valuesPerLong) * BitsPerEntry;
-
-            int indexInStartLong;
-            ulong startLong;
 
             if (indexInLong >= 32)
             {
-                indexInStartLong = indexInLong - 32;
-                startLong = (ulong)_storage[startLongIndex * 2 + 1];
+                var indexInStartLong = indexInLong - 32;
+                var startLong = _storage[startLongIndex * 2 + 1];
 
-                return ((long)startLong >> indexInStartLong) & _valueMask;
+                return (long)((ulong)startLong >> indexInStartLong) & _valueMask;
             }
 
-            indexInStartLong = indexInLong;
-            startLong = (ulong)_storage[startLongIndex * 2];
-
-            var result = (long)startLong >> indexInStartLong;
-            var endBitOffset = indexInStartLong + BitsPerEntry;
+            var startLong2 = _storage[startLongIndex * 2];
+            var indexInStartLong2 = indexInLong;
+            var result = (long)((ulong)(startLong2 >> indexInStartLong2));
+            var endBitOffset = indexInStartLong2 + BitsPerEntry;
 
             if (endBitOffset > 32)
             {
                 // Value stretches across multiple longs
-                var endLong = (ulong)_storage[startLongIndex * 2 + 1];
-                result |= (long)endLong << (32 - indexInStartLong);
+                long endLong = _storage[startLongIndex * 2 + 1];
+                result |= endLong << (32 - indexInStartLong2);
             }
             return result & _valueMask;
         }
@@ -86,14 +92,15 @@ namespace Redstone.Common.Collections
                     ~(_valueMask << indexInStartLong)) |
                     ((value & _valueMask) << indexInStartLong));
 
-                _storage[startLongIndex * 2 + 1] = (long)(longValue >> 0);
+                _storage[startLongIndex * 2 + 1] = (long)(longValue);
                 return;
             }
 
             indexInStartLong = indexInLong;
-            longValue = (ulong)((_storage[startLongIndex * 2] & 
-                ~(_valueMask << indexInStartLong)) |
-                ((value & _valueMask) << indexInStartLong));
+
+            long storedValue = _storage[startLongIndex];
+
+            longValue = (ulong)((storedValue & ~(_valueMask << indexInStartLong)) | ((value & _valueMask) << indexInStartLong));
 
             // Clear bits of this value first
             _storage[startLongIndex * 2] = (long)longValue;

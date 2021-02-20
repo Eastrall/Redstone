@@ -1,4 +1,5 @@
 ﻿using Redstone.Abstractions.World;
+using Redstone.Common.Collections;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,16 +13,19 @@ namespace Redstone.Server
         public static readonly int ChunkSectionAmount = Height / ChunkSection.Size;
 
         private readonly IEnumerable<IChunkSection> _chunkSections;
-        private readonly long[] _heightmap;
+        private readonly CompactedLongArray _heightmap;
+        private readonly CompactedLongArray _worldSurfaceHeightmap;
         private readonly IServiceProvider _serviceProvider;
 
         public int X { get; }
 
         public int Z { get; }
 
-        public IEnumerable<long> Heightmap => _heightmap;
+        public IEnumerable<long> Heightmap => _heightmap.Storage;
 
         public IEnumerable<IChunkSection> Sections => _chunkSections;
+
+        public IEnumerable<long> WorldSurfaceHeightmap => _worldSurfaceHeightmap.Storage;
 
         public Chunk(int x, int z, IServiceProvider serviceProvider)
         {
@@ -29,7 +33,8 @@ namespace Redstone.Server
             Z = z;
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             _chunkSections = Enumerable.Range(0, ChunkSectionAmount).Select(index => new ChunkSection(index, _serviceProvider)).ToList();
-            _heightmap = new long[Size * Size];
+            _heightmap = new CompactedLongArray(9, 256);
+            _worldSurfaceHeightmap = new CompactedLongArray(9, 256);
         }
 
         public IChunkSection GetSection(int sectionIndex)
@@ -61,7 +66,7 @@ namespace Redstone.Server
                                 continue;
                             }
 
-                            _heightmap[z + (x * Size)] = (long)block.Position.Y * (section.Index + 1);
+                            _heightmap[z + (x * Size)] = (long)y * (section.Index + 1);
                             break;
                         }
                     }

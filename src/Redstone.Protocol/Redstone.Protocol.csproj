@@ -7,10 +7,12 @@
 
   <ItemGroup>
     <PackageReference Include="LiteNetwork.Server" Version="1.0.0-rc.6" />
-    <PackageReference Include="System.Text.Json" Version="5.0.0" />
+    <PackageReference Include="System.Text.Json" Version="5.0.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Redstone.Abstractions\Redstone.Abstractions.csproj" />
     <ProjectReference Include="..\Redstone.Common\Redstone.Common.csproj" />
+    <ProjectReference Include="..\Redstone.Protocol.Abstractions\Redstone.Protocol.Abstractions.csproj" />
   </ItemGroup>
 </Project>

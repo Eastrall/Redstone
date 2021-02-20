@@ -10,6 +10,8 @@ namespace Redstone.Abstractions.World
 
         IEnumerable<long> Heightmap { get; }
 
+        IEnumerable<long> WorldSurfaceHeightmap { get; }
+
         IEnumerable<IChunkSection> Sections { get; }
 
         IChunkSection GetSection(int sectionIndex);

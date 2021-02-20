@@ -40,14 +40,19 @@ namespace Redstone.Server
 
             try
             {
-                _logger.LogTrace($"[{Status}] | Packet: {packetHeader} (0x{packet.PacketId:X2})");
+                _logger.LogTrace($"[{Username}] [{Status}] | Packet: {packetHeader} (0x{packet.PacketId:X2})");
                 _packetHandler.Invoke(Status, packetHeader, this, packet);
             }
             catch (HandlerActionNotFoundException)
             {
+                if (!Socket.Connected)
+                {
+                    return Task.CompletedTask;
+                }
+
                 if (Enum.IsDefined(packetHeader.GetType(), packet.PacketId))
                 {
-                    _logger.LogTrace($"[{Username}] Received an unimplemented {Status} packet {packetHeader} (0x{packet.PacketId:X2} from {Socket.RemoteEndPoint}");
+                    _logger.LogTrace($"[{Username}] Received an unimplemented {Status} packet {packetHeader} (0x{packet.PacketId:X2}) from {Socket.RemoteEndPoint}");
                 }
                 else
                 {

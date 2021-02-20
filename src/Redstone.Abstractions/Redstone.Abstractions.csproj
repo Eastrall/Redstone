@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Redstone.Common\Redstone.Common.csproj" />
-    <ProjectReference Include="..\Redstone.Protocol\Redstone.Protocol.csproj" />
+    <ProjectReference Include="..\Redstone.Protocol.Abstractions\Redstone.Protocol.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>

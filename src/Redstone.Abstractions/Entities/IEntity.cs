@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Redstone.Common;
+using System;
 
 namespace Redstone.Abstractions.Entities
 {

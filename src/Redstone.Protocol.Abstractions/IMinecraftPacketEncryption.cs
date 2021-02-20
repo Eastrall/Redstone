@@ -1,5 +1,4 @@
-﻿using Redstone.Protocol.Cryptography;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 
 namespace Redstone.Protocol.Abstractions
 {
@@ -16,6 +15,6 @@ namespace Redstone.Protocol.Abstractions
         /// </remarks>
         RSAParameters GenerateEncryptionKeys();
 
-        MinecraftEncryptionDetails GenerateEncryption(RSAParameters parameters);
+        //MinecraftEncryptionDetails GenerateEncryption(RSAParameters parameters);
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Redstone.Abstractions
+namespace Redstone.Common
 {
     /// <summary>
     /// Provides a data structure that represents a 3D position in the world.

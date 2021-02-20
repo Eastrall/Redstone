@@ -1,4 +1,5 @@
 ﻿using LiteNetwork.Protocol;
+using Redstone.Common;
 using Redstone.Protocol.Abstractions;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,8 @@ namespace Redstone.Protocol
     /// </summary>
     public class MinecraftPacket : LitePacketStream, IMinecraftPacket
     {
+        public byte[] BaseBuffer => base.Buffer;
+
         public int PacketId { get; }
 
         /// <summary>
@@ -220,6 +223,28 @@ namespace Redstone.Protocol
             } while (valueToWrite != 0);
 
             return buffer.ToArray();
+        }
+
+        public Position ReadPosition()
+        {
+            ulong positionAsLong = ReadUInt64();
+            var position = new Position
+            {
+                X = positionAsLong >> 38,
+                Y = positionAsLong & 0xFFF,
+                Z = positionAsLong << 26 >> 38
+            };
+
+            return position;
+        }
+
+        public void WritePosition(Position position)
+        {
+            var x = (((int)position.X & 0x3FFFFFF) << 38);
+            var z = (((int)position.Z & 0x3FFFFFF) << 12);
+            var y = ((int)position.Y & 0xFFF);
+
+            WriteInt64(x | z | y);
         }
     }
 }

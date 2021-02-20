@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Redstone.Abstractions.Registry;
 using Redstone.Common.DependencyInjection;
-using Redstone.Common.Serialization;
+using Redstone.Common.Extensions;
 using Redstone.Common.Structures.Biomes;
 using Redstone.Common.Structures.Blocks;
 using Redstone.Common.Structures.Dimensions;
@@ -15,13 +15,13 @@ using System.Text.Json;
 namespace Redstone.Server.Registry
 {
     [Injectable(ServiceLifetime.Singleton)]
-    public class Registry : IRegistry
+    public class DataRegistry : IRegistry
     {
-        public const string DimensionRegistryPath = "/opt/redstone/data/dimensions.json";
-        public const string BiomesRegistryPath = "/opt/redstone/data/biomes.json";
-        public const string BlocksDataPath = "/opt/redstone/data/blocks.json";
+        public const string DimensionRegistryPath = "data/dimensions.json";
+        public const string BiomesRegistryPath = "data/biomes.json";
+        public const string BlocksDataPath = "data/blocks.json";
 
-        private readonly ILogger<Registry> _logger;
+        private readonly ILogger<DataRegistry> _logger;
         private bool _isLoaded;
 
         public IEnumerable<Dimension> Dimensions { get; private set; }
@@ -30,7 +30,7 @@ namespace Redstone.Server.Registry
 
         public IEnumerable<BlockData> Blocks { get; private set; }
 
-        public Registry(ILogger<Registry> logger)
+        public DataRegistry(ILogger<DataRegistry> logger)
         {
             _logger = logger;
         }
@@ -60,19 +60,26 @@ namespace Redstone.Server.Registry
 
         private void LoadDimensions()
         {
-            Dimensions = Common.Serialization.JsonSerializer.Deserialize<IEnumerable<Dimension>>(File.ReadAllText(DimensionRegistryPath));
+            string dimensionsPath = Path.Combine(EnvironmentExtensions.GetCurrentEnvironementDirectory(), DimensionRegistryPath);
+            string content = File.ReadAllText(dimensionsPath);
+
+            Dimensions = Common.Serialization.JsonSerializer.Deserialize<IEnumerable<Dimension>>(content);
             _logger.LogInformation($"{Dimensions.Count()} dimensions loaded!");
         }
 
         private void LoadBiomes()
         {
-            Biomes = Common.Serialization.JsonSerializer.Deserialize<IEnumerable<Biome>>(File.ReadAllText(BiomesRegistryPath));
+            string biomesPath = Path.Combine(EnvironmentExtensions.GetCurrentEnvironementDirectory(), BiomesRegistryPath);
+            string content = File.ReadAllText(biomesPath);
+
+            Biomes = Common.Serialization.JsonSerializer.Deserialize<IEnumerable<Biome>>(content);
             _logger.LogInformation($"{Biomes.Count()} biomes loaded!");
         }
 
         private void LoadBlocksData()
         {
-            using var blocksFile = File.OpenRead(BlocksDataPath);
+            string blocksPath = Path.Combine(EnvironmentExtensions.GetCurrentEnvironementDirectory(), BlocksDataPath);
+            using var blocksFile = File.OpenRead(blocksPath);
             JsonDocument blocksDocument = JsonDocument.Parse(blocksFile);
 
             var blocks = new List<BlockData>();

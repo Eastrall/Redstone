@@ -1,4 +1,6 @@
-﻿namespace Redstone.Abstractions.World
+﻿using Redstone.Common;
+
+namespace Redstone.Abstractions.World
 {
     /// <summary>
     /// Provides a mechanism to create blocks.
@@ -6,20 +8,10 @@
     public interface IBlockFactory
     {
         /// <summary>
-        /// Creates a <typeparamref name="TBlock"/> instance at default position (0,0,0).
+        /// Creates a new block of the given type.
         /// </summary>
-        /// <typeparam name="TBlock">Block type.</typeparam>
+        /// <param name="blockType">Block type.</param>
         /// <returns>New block.</returns>
-        TBlock CreateBlock<TBlock>() where TBlock : class, IBlock;
-
-        /// <summary>
-        /// Creates a new <typeparamref name="TBlock"/>> instance at the given position.
-        /// </summary>
-        /// <typeparam name="TBlock">Block type.</typeparam>
-        /// <param name="x">X coordinate.</param>
-        /// <param name="y">Y coordinate.</param>
-        /// <param name="z">Z coordinate.</param>
-        /// <returns>New block.</returns>
-        TBlock CreateBlock<TBlock>(int x, int y, int z) where TBlock : class, IBlock;
+        IBlock CreateBlock(BlockType blockType);
     }
 }

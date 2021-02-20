@@ -5,6 +5,8 @@
         ChunkData = 0x20,
         JoinGame = 0x24,
         PlayerInfo = 0x32,
-        UpdateViewPosition = 0x40
+        PlayerPositionAndLook = 0x34,
+        UpdateViewPosition = 0x40,
+        SpawnPosition = 0x42
     }
 }

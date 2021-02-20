@@ -1,4 +1,5 @@
-﻿using Redstone.Protocol.Abstractions;
+﻿using Redstone.Common.IO;
+using Redstone.Protocol.Abstractions;
 
 namespace Redstone.Abstractions.World
 {
@@ -34,6 +35,12 @@ namespace Redstone.Abstractions.World
         /// Gets the total amount of non-air blocks in the current chunk section.
         /// </summary>
         /// <returns></returns>
-        int GetBlockAmount();
+        short GetBlockAmount();
+
+        /// <summary>
+        /// Serialize the current chunk section into a basic minecraft stream.
+        /// </summary>
+        /// <param name="stream"></param>
+        void Serialize(MinecraftStream stream);
     }
 }

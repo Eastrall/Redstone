@@ -1,4 +1,5 @@
 ﻿using LiteNetwork.Protocol.Abstractions;
+using Redstone.Common;
 using System;
 
 namespace Redstone.Protocol.Abstractions
@@ -35,6 +36,12 @@ namespace Redstone.Protocol.Abstractions
         long ReadVarInt64();
 
         /// <summary>
+        /// Reads an integer from the packet stream and transforms it into a <see cref="Position"/> object.
+        /// </summary>
+        /// <returns>Position.</returns>
+        Position ReadPosition();
+
+        /// <summary>
         /// Writes an Universal Unique IDentifier into the packet stream.
         /// </summary>
         /// <param name="value"></param>
@@ -51,5 +58,11 @@ namespace Redstone.Protocol.Abstractions
         /// </summary>
         /// <param name="value">Numeric long value.</param>
         void WriteVarInt64(long value);
+
+        /// <summary>
+        /// Writes a the given position as an integer into the packet stream.
+        /// </summary>
+        /// <param name="position">Position.</param>
+        void WritePosition(Position position);
     }
 }

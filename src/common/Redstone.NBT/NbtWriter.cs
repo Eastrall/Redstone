@@ -766,6 +766,20 @@ namespace Redstone.NBT
 
         #endregion
 
+        public void WriteLongArray(string tagName, long[] longDataArray)
+        {
+            CheckArray(longDataArray, 0, longDataArray.Length);
+            EnforceConstraints(tagName, NbtTagType.LongArray);
+
+            _writer.Write((byte)NbtTagType.LongArray);
+            _writer.Write(tagName);
+            _writer.Write(longDataArray.Length);
+
+            for (int i = 0; i < longDataArray.Length; i++)
+            {
+                _writer.Write(longDataArray[i]);
+            }
+        }
 
         /// <summary>
         /// Writes a NbtTag object, and all of its child tags, to stream.

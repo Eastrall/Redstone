@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using NLog.Extensions.Hosting;
 using Redstone.Common.Configuration;
 using Redstone.Common.DependencyInjection;
+using Redstone.Common.Extensions;
 using Redstone.Protocol;
 using System;
 using System.Reflection;
@@ -21,8 +22,8 @@ namespace Redstone.Server
             IHost serverHost = new HostBuilder()
                 .ConfigureAppConfiguration((host, config) =>
                 {
-                    config.SetBasePath("/opt/redstone/config");
-                    config.AddYamlFile("server.yml", optional: false, reloadOnChange: true);
+                    config.SetBasePath(EnvironmentExtensions.GetCurrentEnvironementDirectory());
+                    config.AddYamlFile("config/server.yml", optional: false, reloadOnChange: true);
                     config.AddEnvironmentVariables();
                 })
                 .ConfigureLogging(builder =>

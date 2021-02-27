@@ -5,17 +5,17 @@ namespace Redstone.Common.Tests.Collections
 {
     public class CompactedLongArrayTest
     {
-        //[Theory]
-        //[InlineData(4, 4096, 4)]
-        //[InlineData(4, 4096, 8)]
-        //[InlineData(4, 4096, 10)]
-        //[InlineData(4, 4096, 12)]
-        //[InlineData(4, 4096, 15)]
-        //[InlineData(8, 1024, 4)]
-        //[InlineData(8, 1024, 8)]
-        //[InlineData(8, 1024, 10)]
-        //[InlineData(8, 1024, 12)]
-        //[InlineData(8, 1024, 15)]
+        [Theory]
+        [InlineData(4, 4096, 4)]
+        [InlineData(4, 4096, 8)]
+        [InlineData(4, 4096, 10)]
+        [InlineData(4, 4096, 12)]
+        [InlineData(4, 4096, 15)]
+        [InlineData(8, 1024, 4)]
+        [InlineData(8, 1024, 8)]
+        [InlineData(8, 1024, 10)]
+        [InlineData(8, 1024, 12)]
+        [InlineData(8, 1024, 15)]
         public void CompactedLongArrayIndexerTest(byte bitsPerEntry, int capacity, int value)
         {
             var array = new CompactedLongArray(bitsPerEntry, capacity);
@@ -34,17 +34,17 @@ namespace Redstone.Common.Tests.Collections
             }
         }
 
-        //[Theory]
-        //[InlineData(4, 4096, 4)]
-        //[InlineData(4, 4096, 8)]
-        //[InlineData(4, 4096, 10)]
-        //[InlineData(4, 4096, 12)]
-        //[InlineData(4, 4096, 15)]
-        //[InlineData(8, 1024, 4)]
-        //[InlineData(8, 1024, 8)]
-        //[InlineData(8, 1024, 10)]
-        //[InlineData(8, 1024, 12)]
-        //[InlineData(8, 1024, 15)]
+        [Theory]
+        [InlineData(4, 4096, 4)]
+        [InlineData(4, 4096, 8)]
+        [InlineData(4, 4096, 10)]
+        [InlineData(4, 4096, 12)]
+        [InlineData(4, 4096, 15)]
+        [InlineData(8, 1024, 4)]
+        [InlineData(8, 1024, 8)]
+        [InlineData(8, 1024, 10)]
+        [InlineData(8, 1024, 12)]
+        [InlineData(8, 1024, 15)]
         public void CompactedLongArrayMethodsTest(byte bitsPerEntry, int capacity, int value)
         {
             var array = new CompactedLongArray(bitsPerEntry, capacity);

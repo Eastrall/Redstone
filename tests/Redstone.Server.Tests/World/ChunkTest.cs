@@ -47,7 +47,7 @@ namespace Redstone.Server.Tests.World
         [Fact]
         public void CreateChunkWithNoServiceProviderTest()
         {
-            Assert.Throws<ArgumentNullException>(() => new Chunk(0, 0, _serviceProvider));
+            Assert.Throws<ArgumentNullException>(() => new Chunk(0, 0, null));
         }
 
         [Fact]

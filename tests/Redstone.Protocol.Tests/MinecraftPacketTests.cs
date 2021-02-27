@@ -94,10 +94,9 @@ namespace Redstone.Protocol.Tests
         {
             using var packet = new MinecraftPacket(0);
 
-            packet.Seek(1, System.IO.SeekOrigin.Begin); // Seek to skip packet header byte
             packet.WriteVarInt32(valueToWrite);
 
-            Assert.Equal(expectedContent, packet.GetBuffer().Skip(1).Take(expectedContent.Length)); // Skip 1 byte to skip packet header
+            Assert.Equal(expectedContent, packet.BaseBuffer);
         }
 
         [Theory]
@@ -106,10 +105,9 @@ namespace Redstone.Protocol.Tests
         {
             using var packet = new MinecraftPacket(0);
 
-            packet.Seek(1, System.IO.SeekOrigin.Begin); // Seek to skip packet header byte
             packet.WriteVarInt64(valueToWrite);
 
-            Assert.Equal(expectedContent, packet.GetBuffer().Skip(1).Take(expectedContent.Length)); // Skip 1 byte to skip packet header
+            Assert.Equal(expectedContent, packet.BaseBuffer);
         }
 
         [Theory]
@@ -118,10 +116,18 @@ namespace Redstone.Protocol.Tests
         {
             using var packet = new MinecraftPacket(0);
 
-            packet.Seek(1, System.IO.SeekOrigin.Begin); // Seek to skip packet header byte
             packet.WriteUUID(valueToWrite);
 
-            Assert.Equal(expectedContent, packet.GetBuffer().Skip(1).Take(expectedContent.Length)); // Skip 1 byte to skip packet header
+            // FIX: little/big Endian
+            if (BitConverter.IsLittleEndian)
+            {
+                byte[] firstLong = expectedContent.Take(8).Reverse().ToArray();
+                byte[] secondLong = expectedContent.Skip(8).Reverse().ToArray();
+
+                expectedContent = firstLong.Concat(secondLong).ToArray();
+            }
+
+            Assert.Equal(expectedContent, packet.BaseBuffer);
         }
     }
 }

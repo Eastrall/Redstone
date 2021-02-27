@@ -14,6 +14,8 @@ namespace Redstone.Server.World
 
         public bool IsAir => Type is BlockType.Air or BlockType.CaveAir or BlockType.VoidAir;
 
+        public bool IsFluid => Type is BlockType.Water or BlockType.Lava;
+
         public BlockType Type => _blockData.Type;
 
         public Position Position { get; }

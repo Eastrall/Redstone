@@ -4,7 +4,9 @@ using Moq;
 using Redstone.Abstractions.Registry;
 using Redstone.Abstractions.World;
 using Redstone.Common;
+using Redstone.Common.Structures.Blocks;
 using Redstone.Server.Registry;
+using Redstone.Server.World;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -23,21 +25,37 @@ namespace Redstone.Server.Tests.World
         public ChunkTest()
         {
             _registry = new DataRegistry(new Mock<ILogger<DataRegistry>>().Object);
-            _serviceProvider = new Mock<IServiceProvider>().Object;
+            _serviceProvider = new ServiceCollection()
+                .AddSingleton<IBlockFactory>(s =>
+                {
+                    var mock = new Mock<IBlockFactory>();
+
+                    mock.Setup(x => x.CreateBlock(It.IsAny<BlockType>()))
+                        .Returns<BlockType>(x =>
+                        {
+                            return new Block(new BlockData(x.ToString(), null, new[]
+                            {
+                                new BlockStateData((int)x, true, new Dictionary<string, string>())
+                            }));
+                        });
+
+                    return mock.Object;
+                })
+                .BuildServiceProvider();
         }
 
         [Fact]
         public void CreateChunkWithNoServiceProviderTest()
         {
-            Assert.Throws<ArgumentNullException>(() => new ChunkOld(0, 0, null));
+            Assert.Throws<ArgumentNullException>(() => new Chunk(0, 0, _serviceProvider));
         }
 
-        //[Fact]
+        [Fact]
         public void ChunkFilledWithAirTest()
         {
             _registry.Load();
 
-            var chunk = new ChunkOld(0, 0, _serviceProvider);
+            var chunk = new Chunk(0, 0, _serviceProvider);
 
             Assert.NotNull(chunk);
             Assert.Equal(0, chunk.X);
@@ -45,11 +63,11 @@ namespace Redstone.Server.Tests.World
 
             foreach (IChunkSection section in chunk.Sections)
             {
-                for (int x = 0; x < ChunkSectionOld.Size; x++)
+                for (int x = 0; x < ChunkSection.Size; x++)
                 {
-                    for (int y = 0; y < ChunkSectionOld.Size; y++)
+                    for (int y = 0; y < ChunkSection.Size; y++)
                     {
-                        for (int z = 0; z < ChunkSectionOld.Size; z++)
+                        for (int z = 0; z < ChunkSection.Size; z++)
                         {
                             IBlock block = section.GetBlock(x, y, z);
 

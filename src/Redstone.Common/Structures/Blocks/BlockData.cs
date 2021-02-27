@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Redstone.Common.Structures.Blocks
 {
@@ -36,9 +37,14 @@ namespace Redstone.Common.Structures.Blocks
         /// <param name="blockStates">Block available states.</param>
         public BlockData(string name, IEnumerable<BlockPropertyData> properties, IEnumerable<BlockStateData> blockStates)
         {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentNullException(nameof(name), "Block data name cannot be null or empty.");
+            }
+
             Name = name;
-            Properties = properties;
-            States = blockStates;
+            Properties = properties ?? Enumerable.Empty<BlockPropertyData>();
+            States = blockStates ?? Enumerable.Empty<BlockStateData>();
 
             if (!Enum.TryParse(name.Replace("minecraft:", "").Trim().ToPascalCase(), out BlockType type))
             {

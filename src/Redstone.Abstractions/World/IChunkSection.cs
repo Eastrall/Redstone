@@ -36,11 +36,5 @@ namespace Redstone.Abstractions.World
         /// </summary>
         /// <returns></returns>
         short GetBlockAmount();
-
-        /// <summary>
-        /// Serialize the current chunk section into a basic minecraft stream.
-        /// </summary>
-        /// <param name="stream"></param>
-        void Serialize(MinecraftStream stream);
     }
 }

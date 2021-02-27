@@ -5,7 +5,7 @@ server:
   description: 'An awesome Minecraft server powered by Redstone!'
   use-encryption: false
   mode: 'offline'
-  debug: true
+  debug: false
   reduced-debug-info: false
   flat-terrain: true
 

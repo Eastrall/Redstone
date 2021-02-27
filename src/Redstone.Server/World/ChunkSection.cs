@@ -1,222 +1,115 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Redstone.Abstractions.Registry;
 using Redstone.Abstractions.World;
 using Redstone.Common;
 using Redstone.Common.Collections;
-using Redstone.Common.IO;
 using Redstone.Protocol.Abstractions;
+using Redstone.Server.World.Palettes;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
-namespace Redstone.Server
+namespace Redstone.Server.World
 {
     public class ChunkSection : IChunkSection
     {
-        public const int Size = 16;
-        public const int TotalChunks = Size * Size * Size;
-        public const byte BitsPerBlock = 4;
+        public const byte DefaultBitsPerBlock = 4;
+        public const int MaximumBlockAmount = 4096;
 
-        private readonly IBlock[] _blocks;
         private readonly IServiceProvider _serviceProvider;
         private readonly IBlockFactory _blockFactory;
-        private readonly CompactedLongArray _compactedBlockArray;
-        //private readonly IPalette _palette;
-
-        // Test palette
-        private readonly List<int> _palette;
+        private readonly CompactedLongArray _blockStorage;
+        private readonly IPalette _palette;
 
         public int Index { get; }
 
         public ChunkSection(int index, IServiceProvider serviceProvider)
         {
-            if (index < 0 || index >= Size)
-            {
-                throw new ArgumentException($"Index '{index}' is not a valid chunk section index.", nameof(index));
-            }
-
             Index = index;
-            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+            _serviceProvider = serviceProvider; 
             _blockFactory = _serviceProvider.GetRequiredService<IBlockFactory>();
-            _blocks = Enumerable.Repeat(default(IBlock), TotalChunks).ToArray();
-            _compactedBlockArray = new CompactedLongArray(BitsPerBlock, TotalChunks);
-            //_palette = new IndirectPalette(BitsPerBlock);
+            _blockStorage = new CompactedLongArray(DefaultBitsPerBlock, MaximumBlockAmount);
 
-            _palette = new List<int>();
-
-            Fill(BlockType.Air);
-        }
-
-        public IBlock GetBlock(int x, int y, int z) => _blocks[GetBlockIndex(x, y, z)];
-
-        public void SetBlock(IBlock block, int x, int y, int z)
-        {
-            int stateId = block.State.Id;
-            int blockIndex = GetBlockIndex(x, y, z);
-            int palettedIndex = 0;
-
-            if (_palette is not null)
+            if (DefaultBitsPerBlock <= 8)
             {
-                int indexInPalette = _palette.IndexOf(stateId);
-                if (indexInPalette >= 0)
-                {
-                    // exists
-                    palettedIndex = indexInPalette;
-                }
-                else
-                {
-                    // doesn't exists
-                    _palette.Add(stateId);
-                    palettedIndex = _palette.Count - 1;
-
-                    int bitsPerValue = NeededBits(palettedIndex);
-
-                    if (bitsPerValue > _compactedBlockArray.BitsPerEntry)
-                    {
-                        if (bitsPerValue < 14) // move to const
-                        {
-                            // resize
-                        }
-                        else
-                        {
-                            // switch to global palette
-                        }
-                    }
-                }
+                _palette = new IndirectBlockStatePalette(Math.Max((byte)4, DefaultBitsPerBlock));
             }
             else
             {
-                // USE GLOBAL
+                _palette = new DirectBlockStatePalette(_serviceProvider.GetRequiredService<IRegistry>());
             }
 
-            _compactedBlockArray[blockIndex] = palettedIndex;
-
-            block.Position.X = x;
-            block.Position.Y = y;
-            block.Position.Z = z;
-
-            _blocks[blockIndex] = block;
+            FillWithAir();
         }
 
-        public short GetBlockAmount() => (short)_blocks.Count(block => block is not null && !block.IsAir);
-
-        private int GetBlockIndex(int x, int y, int z) => (y << 8) | (z << 4) | x;
-
-        private int NeededBits(int value) => Convert.ToString(value, 2).Length;
-
-        private void Fill(BlockType blockType)
+        public IBlock GetBlock(int x, int y, int z)
         {
-            for (int x = 0; x < Size; x++)
-            {
-                for (int y = 0; y < Size; y++)
-                {
-                    for (int z = 0; z < Size; z++)
-                    {
-                        SetBlock(_blockFactory.CreateBlock(blockType), x, y, z);
-                    }
-                }
-            }
+            y %= 16;
+            int storageId = _blockStorage[GetBlockIndex(x, y, z)];
+
+            return _palette.GetStateFromIndex(storageId);
         }
 
-        public void Serialize(MinecraftStream packet)
+        public short GetBlockAmount()
         {
-            packet.WriteInt16(GetBlockAmount());
-            packet.WriteByte(_compactedBlockArray.BitsPerEntry); // bits per block
-
-            var bitsPerBlock = _compactedBlockArray.BitsPerEntry;
-
-            if (_palette is not null)
+            short validBlockCount = 0;
+            
+            for (int x = 0; x < 16; x++)
             {
-                packet.WriteVarInt32(_palette.Count);
-                foreach (int value in _palette)
+                for (int y = 0; y < 16; y++)
                 {
-                    packet.WriteVarInt32(value);
-                }
-            }
-
-            int dataLength = (16 * 16 * 16) * bitsPerBlock / 64; // See tips section for an explanation of this calculation
-            UInt64[] data = new UInt64[dataLength];
-            uint individualValueMask = (uint)((1 << bitsPerBlock) - 1);
-
-            for (int y = 0; y < Size; y++)
-            {
-                for (int z = 0; z < Size; z++)
-                {
-                    for (int x = 0; x < Size; x++)
+                    for (int z = 0; z < 16; z++)
                     {
-                        int blockNumber = (((y * Size) + z) * Size) + x;
-                        int startLong = (blockNumber * bitsPerBlock) / 64;
-                        int startOffset = (blockNumber * bitsPerBlock) % 64;
-                        int endLong = ((blockNumber + 1) * bitsPerBlock - 1) / 64;
-
                         IBlock block = GetBlock(x, y, z);
-                        //BlockState state = section.GetState(x, y, z);
 
-                        UInt64 value = (ulong)block.State.Id;
-                        value &= individualValueMask;
-
-                        data[startLong] |= (value << startOffset);
-
-                        if (startLong != endLong)
+                        if (!block.IsAir)
                         {
-                            data[endLong] = (value >> (64 - startOffset));
+                            validBlockCount++;
                         }
                     }
                 }
             }
-            // data array length
-            packet.WriteVarInt32(data.Length);
 
-            // data array
-            for (int i = 0; i < data.Length; i++)
-            {
-                packet.WriteUInt64(data[i]);
-            }
+            return validBlockCount;
+        }
 
+        public void SetBlock(IBlock block, int x, int y, int z)
+        {
+            y %= 16;
+            var blockIndex = GetBlockIndex(x, y, z);
 
-            // palette
+            int paletteIndex = _palette.GetIdFromState(block);
 
-            //if (_palette is not null)
-            //{
-            //    packet.WriteVarInt32(_palette.Count);
-            //    foreach (int value in _palette)
-            //    {
-            //        packet.WriteVarInt32(value);
-            //    }
-            //}
-
-            //// data array length
-            //packet.WriteVarInt32(_compactedBlockArray.Length);
-
-            //// data array
-            //for (int i = 0; i < _compactedBlockArray.Storage.Length; i++)
-            //{
-            //    packet.WriteInt64(_compactedBlockArray.Storage[i]);
-            //}
+            _blockStorage[blockIndex] = paletteIndex;
         }
 
         public void Serialize(IMinecraftPacket packet)
         {
             packet.WriteInt16(GetBlockAmount());
-            packet.WriteByte(_compactedBlockArray.BitsPerEntry); // bits per block
-            // palette
+            packet.WriteByte(DefaultBitsPerBlock);
 
-            if (_palette is not null)
+            _palette.Serialize(packet);
+
+            packet.WriteVarInt32(_blockStorage.Storage.Length);
+
+            long[] storage = _blockStorage.Storage;
+            for (int i = 0; i < storage.Length; i++)
             {
-                packet.WriteVarInt32(_palette.Count);
-                foreach (int value in _palette)
-                {
-                    packet.WriteVarInt32(value);
-                }
-            }
-
-            // data array length
-            packet.WriteVarInt32(_compactedBlockArray.Length);
-
-            // data array
-            for (int i = 0; i < _compactedBlockArray.Storage.Length; i++)
-            {
-                packet.WriteInt64(_compactedBlockArray.Storage[i]);
+                packet.WriteInt64(storage[i]);
             }
         }
+
+        private void FillWithAir()
+        {
+            for (int x = 0; x < 16; x++)
+            {
+                for (int y = 0; y < 16; y++)
+                {
+                    for (int z = 0; z < 16; z++)
+                    {
+                        SetBlock(_blockFactory.CreateBlock(BlockType.Air), x, y, z);
+                    }
+                }
+            }
+        }
+
+        public static int GetBlockIndex(int x, int y, int z) => ((y * 16) + z) * 16 + x;
     }
 }

@@ -29,7 +29,7 @@ namespace Redstone.Server.Tests.World
         [Fact]
         public void CreateChunkWithNoServiceProviderTest()
         {
-            Assert.Throws<ArgumentNullException>(() => new Chunk(0, 0, null));
+            Assert.Throws<ArgumentNullException>(() => new ChunkOld(0, 0, null));
         }
 
         //[Fact]
@@ -37,7 +37,7 @@ namespace Redstone.Server.Tests.World
         {
             _registry.Load();
 
-            var chunk = new Chunk(0, 0, _serviceProvider);
+            var chunk = new ChunkOld(0, 0, _serviceProvider);
 
             Assert.NotNull(chunk);
             Assert.Equal(0, chunk.X);
@@ -45,11 +45,11 @@ namespace Redstone.Server.Tests.World
 
             foreach (IChunkSection section in chunk.Sections)
             {
-                for (int x = 0; x < ChunkSection.Size; x++)
+                for (int x = 0; x < ChunkSectionOld.Size; x++)
                 {
-                    for (int y = 0; y < ChunkSection.Size; y++)
+                    for (int y = 0; y < ChunkSectionOld.Size; y++)
                     {
-                        for (int z = 0; z < ChunkSection.Size; z++)
+                        for (int z = 0; z < ChunkSectionOld.Size; z++)
                         {
                             IBlock block = section.GetBlock(x, y, z);
 

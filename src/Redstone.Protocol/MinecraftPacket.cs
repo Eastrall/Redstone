@@ -1,8 +1,11 @@
 ﻿using LiteNetwork.Protocol;
 using Redstone.Common;
+using Redstone.Common.IO;
 using Redstone.Protocol.Abstractions;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 
 namespace Redstone.Protocol
 {
@@ -22,13 +25,13 @@ namespace Redstone.Protocol
         {
             get
             {
-                var packetSizeBuffer = ConvertInt32ToVarInt32Buffer((int)Length);
-                var packetBuffer = new byte[packetSizeBuffer.Length + Length];
+                using var stream = new MinecraftStream();
 
-                Array.Copy(packetSizeBuffer, packetBuffer, packetSizeBuffer.Length);
-                Array.Copy(base.Buffer, 0, packetBuffer, packetSizeBuffer.Length, Length);
+                stream.WriteVarInt32(GetVarInt32Length(PacketId) + (int)Length);
+                stream.WriteVarInt32(PacketId);
+                stream.WriteBytes(BaseBuffer);
 
-                return packetBuffer;
+                return stream.Buffer;
             }
         }
 
@@ -46,7 +49,6 @@ namespace Redstone.Protocol
         public MinecraftPacket(int packetId)
         {
             PacketId = packetId;
-            WriteVarInt32(packetId);
         }
 
         /// <summary>
@@ -67,6 +69,22 @@ namespace Redstone.Protocol
         {
             PacketId = packetId;
         }
+
+        public override void WriteInt16(short value) => InternalWriteBytes(BitConverter.GetBytes(value));
+
+        public override void WriteUInt16(ushort value) => InternalWriteBytes(BitConverter.GetBytes(value));
+
+        public override void WriteInt32(int value) => InternalWriteBytes(BitConverter.GetBytes(value));
+
+        public override void WriteUInt32(uint value) => InternalWriteBytes(BitConverter.GetBytes(value));
+
+        public override void WriteInt64(long value) => InternalWriteBytes(BitConverter.GetBytes(value));
+
+        public override void WriteUInt64(ulong value) => InternalWriteBytes(BitConverter.GetBytes(value));
+
+        public override void WriteSingle(float value) => InternalWriteBytes(BitConverter.GetBytes(value));
+
+        public override void WriteDouble(double value) => InternalWriteBytes(BitConverter.GetBytes(value));
 
         public override void WriteBytes(byte[] values)
         {
@@ -167,21 +185,21 @@ namespace Redstone.Protocol
 
         public void WriteVarInt32(int value)
         {
-            var valueToWrite = (uint)value;
+            var unsigned = (uint)value;
 
             do
             {
-                var temp = (byte)(valueToWrite & 127);
+                var temp = (byte)(unsigned & 127);
 
-                valueToWrite >>= 7;
+                unsigned >>= 7;
 
-                if (valueToWrite != 0)
+                if (unsigned != 0)
                 {
-                    temp |= sbyte.MaxValue + 1;
+                    temp |= 128;
                 }
 
                 WriteByte(temp);
-            } while (valueToWrite != 0);
+            } while (unsigned != 0);
         }
 
         public void WriteVarInt64(long value)
@@ -196,33 +214,11 @@ namespace Redstone.Protocol
 
                 if (valueToWrite != 0)
                 {
-                    temp |= sbyte.MaxValue + 1;
+                    temp |= 128;
                 }
 
                 WriteByte(temp);
             } while (valueToWrite != 0);
-        }
-
-        private byte[] ConvertInt32ToVarInt32Buffer(int value)
-        {
-            var buffer = new List<byte>();
-            var valueToWrite = (uint)value;
-
-            do
-            {
-                var temp = (byte)(valueToWrite & 127);
-
-                valueToWrite >>= 7;
-
-                if (valueToWrite != 0)
-                {
-                    temp |= sbyte.MaxValue + 1;
-                }
-
-                buffer.Add(temp);
-            } while (valueToWrite != 0);
-
-            return buffer.ToArray();
         }
 
         public Position ReadPosition()
@@ -245,6 +241,66 @@ namespace Redstone.Protocol
             var y = ((int)position.Y & 0xFFF);
 
             WriteInt64(x | z | y);
+        }
+
+        public void Dump(string fileName, PacketDumpMode dumpMode)
+        {
+            var dumpContent = dumpMode switch
+            {
+                PacketDumpMode.Default => string.Join(Environment.NewLine, BaseBuffer),
+                PacketDumpMode.UTF8String => Encoding.UTF8.GetString(BaseBuffer),
+                _ => null,
+            };
+
+            if (!string.IsNullOrEmpty(dumpContent))
+            {
+                File.WriteAllText(fileName, dumpContent);
+            }
+        }
+
+        private void InternalWriteBytes(byte[] values)
+        {
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(values);
+            }
+
+            WriteBytes(values);
+        }
+
+        private static byte[] ConvertInt32ToVarInt32Buffer(int value)
+        {
+            var buffer = new List<byte>();
+            var valueToWrite = (uint)value;
+
+            do
+            {
+                var temp = (byte)(valueToWrite & 127);
+
+                valueToWrite >>= 7;
+
+                if (valueToWrite != 0)
+                {
+                    temp |= 128;
+                }
+
+                buffer.Add(temp);
+            } while (valueToWrite != 0);
+
+            return buffer.ToArray();
+        }
+
+        private static int GetVarInt32Length(int value)
+        {
+            int amount = 0;
+            
+            do
+            {
+                value >>= 7;
+                amount++;
+            } while (value != 0);
+
+            return amount;
         }
     }
 }

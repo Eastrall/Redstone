@@ -44,7 +44,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Redstone.Common.Tests", "te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Redstone.Protocol.Abstractions", "src\Redstone.Protocol.Abstractions\Redstone.Protocol.Abstractions.csproj", "{49509634-8E0C-4022-9A7F-C3DF4153A374}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Redstone.Server.Tests", "tests\Redstone.Server.Tests\Redstone.Server.Tests.csproj", "{99807451-6474-46CF-99C5-732A834B39FE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Redstone.Server.Tests", "tests\Redstone.Server.Tests\Redstone.Server.Tests.csproj", "{99807451-6474-46CF-99C5-732A834B39FE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

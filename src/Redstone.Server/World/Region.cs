@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Redstone.Server
+namespace Redstone.Server.World
 {
     public class Region : IRegion
     {

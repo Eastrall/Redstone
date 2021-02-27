@@ -2,6 +2,7 @@
 {
     public enum ClientPlayPacketType : byte
     {
+        PluginMessage = 0x17,
         ChunkData = 0x20,
         JoinGame = 0x24,
         PlayerInfo = 0x32,

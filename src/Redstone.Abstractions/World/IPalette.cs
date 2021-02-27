@@ -1,16 +1,15 @@
-﻿using Redstone.Common.Structures.Blocks;
-using Redstone.Protocol.Abstractions;
+﻿using Redstone.Protocol.Abstractions;
 
 namespace Redstone.Abstractions.World
 {
     public interface IPalette
     {
-        byte BitsPerBlock { get; }
+        bool IsFull { get; }
 
-        int GetIdFromState(BlockStateData state);
+        int GetIdFromState(IBlock blockState);
 
-        BlockStateData GetStateFromId(int id);
+        IBlock GetStateFromIndex(int index);
 
-        void Serialize(IMinecraftPacket packet);
+        void Serialize(IMinecraftPacket stream);
     }
 }

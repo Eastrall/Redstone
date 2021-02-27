@@ -28,7 +28,7 @@ namespace Redstone.Server
                 })
                 .ConfigureLogging(builder =>
                 {
-                    builder.AddFilter("LiteNetwork", LogLevel.Warning);
+                    builder.AddFilter("LiteNetwork", LogLevel.Trace);
                     builder.SetMinimumLevel(LogLevel.Trace);
                 })
                 .ConfigureServices((context, services) =>

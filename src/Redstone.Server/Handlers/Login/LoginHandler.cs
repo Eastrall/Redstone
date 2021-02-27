@@ -4,7 +4,6 @@ using Redstone.Abstractions.Registry;
 using Redstone.Abstractions.World;
 using Redstone.Common;
 using Redstone.Common.Configuration;
-using Redstone.Common.IO;
 using Redstone.Common.Structures.Biomes;
 using Redstone.Common.Structures.Dimensions;
 using Redstone.NBT;
@@ -15,6 +14,7 @@ using Redstone.Protocol.Abstractions;
 using Redstone.Protocol.Handlers;
 using Redstone.Protocol.Packets.Game.Client;
 using Redstone.Protocol.Packets.Login;
+using Redstone.Server.World;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,25 +51,28 @@ namespace Redstone.Server.Handlers.Login
 
             if (_serverConfiguration.Value.Mode == ServerModeType.Offline)
             {
+                var position = new Position(8, 2, 8);
+
                 SendLoginSucess(user);
                 user.Status = MinecraftUserStatus.Play;
                 SendJoinGame(user);
+                SendServerBrand(user);
                 // TODO: held item changed
                 // TODO: declare recipes
                 // TODO: Tags
                 // TODO: Entity status
                 // TODO: declare commands
                 // TODO: Unlock recipes
-                // TODO: Player position and look
+                SendPlayerPositionAndLook(user, position);
                 SendPlayerInfo(user, PlayerInfoActionType.Add); 
                 SendPlayerInfo(user, PlayerInfoActionType.UpdateLatency);
                 SendUpdateViewPosition(user);
                 // TODO: Update light
                 SendChunkData(user);
+                SendUpdateViewPosition(user);
                 // TODO: World border
-                SendSpawnPosition(user);
-                SendPlayerPositionAndLook(user);
-
+                SendSpawnPosition(user, position);
+                SendPlayerPositionAndLook(user, position);
             }
             else
             {
@@ -121,6 +124,15 @@ namespace Redstone.Server.Handlers.Login
             user.Send(joinPacket);
         }
 
+        private void SendServerBrand(MinecraftUser user)
+        {
+            using var serverBrandPacket = new PluginMessagePacket("minecraft:brand");
+
+            serverBrandPacket.WriteString("redstone");
+
+            user.Send(serverBrandPacket);
+        }
+
         private void SendPlayerInfo(MinecraftUser user, PlayerInfoActionType actionType)
         {
             using var packet = new PlayerInfoPacket();
@@ -165,22 +177,19 @@ namespace Redstone.Server.Handlers.Login
             var world = new WorldMap("minecraft:overworld", _serviceProvider);
             IRegion region = world.AddRegion(0, 0);
             IChunk chunk = region.AddChunk(0, 0);
-            //IChunkSection chunkSection = chunk.GetSection(0);
-            bool fullChunk = true;
 
             for (int x = 0; x < 16; x++)
             {
                 for (int z = 0; z < 16; z++)
                 {
-                    IBlock block = _blockFactory.CreateBlock(BlockType.Grass);
-                    chunk.SetBlock(block, x, 0, z);
+                    var block = _blockFactory.CreateBlock(BlockType.Dirt);
+                    chunk.SetBlock(block, x, 1, z);
                 }
             }
 
-            //chunk.SetBlock(_blockFactory.CreateBlock<GrassBlock>(), 0, 0, 0);
-            //chunk.SetBlock(_blockFactory.CreateBlock<GrassBlock>(), 0, 0, 1);
-            //chunk.SetBlock(_blockFactory.CreateBlock<GrassBlock>(), 0, 1, 1);
             chunk.GenerateHeightMap();
+
+            bool fullChunk = true;
 
             using var packet = new ChunkDataPacket();
 
@@ -191,10 +200,10 @@ namespace Redstone.Server.Handlers.Login
             int mask = 0;
 
             // if full chunk
-            using var chunkStream = new MinecraftStream();
+            using var chunkStream = new MinecraftPacket();
             for (int i = 0; i < chunk.Sections.Count(); i++)
             {
-                IChunkSection section = chunk.Sections.ElementAt(i);
+                var section = chunk.Sections.ElementAt(i) as ChunkSection;
 
                 if (fullChunk)
                 {
@@ -205,15 +214,18 @@ namespace Redstone.Server.Handlers.Login
 
             packet.WriteVarInt32(mask);
 
-            // Heightmap serialization
-            //var heightmapCompound = new NbtCompound("")
-            //{
-            //    new NbtLongArray("MOTION_BLOCKING", chunk.Heightmap.ToArray())
-            //};
-            //var nbtFile = new NbtFile(heightmapCompound);
+            //// Heightmap serialization
+            ////var heightmapCompound = new NbtCompound("")
+            ////{
+            ////    new NbtLongArray("MOTION_BLOCKING", chunk.Heightmap.ToArray()),
+            ////    new NbtLongArray("WORLD_SURFACE", chunk.WorldSurfaceHeightmap.ToArray())
+            ////};
+            ////var nbtFile = new NbtFile(heightmapCompound);
+
 
             var writer = new NbtWriter(packet, "");
             writer.WriteLongArray("MOTION_BLOCKING", chunk.Heightmap.ToArray());
+            //writer.WriteLongArray("OCEAN_FLOOR", chunk.Heightmaps[HeightmapType.OceanFloor].data.Storage.Cast<long>().ToArray());
             writer.WriteLongArray("WORLD_SURFACE", chunk.WorldSurfaceHeightmap.ToArray());
             writer.EndCompound();
             writer.Finish();
@@ -221,41 +233,44 @@ namespace Redstone.Server.Handlers.Login
             //packet.WriteBytes(nbtFile.GetBuffer());
 
             // Biomes
-            packet.WriteVarInt32(1024);
-            for (int i = 0; i < 1024; i++)
+            if (fullChunk)
             {
-                packet.WriteVarInt32(4);
+                packet.WriteVarInt32(1024);
+                for (int i = 0; i < 1024; i++)
+                {
+                    packet.WriteVarInt32(0);
+                }
             }
 
             chunkStream.Position = 0;
 
             packet.WriteVarInt32((int)chunkStream.Length);
-            packet.WriteBytes(chunkStream.Buffer);
-            //packet.WriteBytes(chunkStream.GetBuffer());
+            packet.WriteBytes(chunkStream.BaseBuffer);
 
             packet.WriteVarInt32(0); // block count
-            // foreach block in blocks in chunk as NBT
+            // TODO: foreach block in blocks in chunk as NBT
 
             user.Send(packet);
         }
 
-        private void SendSpawnPosition(MinecraftUser user)
+        private void SendSpawnPosition(MinecraftUser user, Position position)
         {
-            using var packet = new SpawnPositionPacket(new Position(0, 1, 0));
+            using var packet = new SpawnPositionPacket(position);
 
             user.Send(packet);
         }
 
-        private void SendPlayerPositionAndLook(MinecraftUser user)
+        private void SendPlayerPositionAndLook(MinecraftUser user, Position position)
         {
             using var packet = new PlayerPositionAndLookPacket();
 
-            packet.WriteDouble(0); // x
-            packet.WriteDouble(1); // y
-            packet.WriteDouble(0); // z
+            packet.WriteDouble(position.X); // x
+            packet.WriteDouble(position.Y); // y
+            packet.WriteDouble(position.Z); // z
             packet.WriteSingle(0); // yaw
             packet.WriteSingle(0); // pitch
-            packet.WriteByte(0x01 | 0x02 | 0x04); // position flags (x|y|z)
+            packet.WriteByte(0);
+            //packet.WriteByte(0x01 | 0x02 | 0x04); // position flags (x|y|z)
             packet.WriteVarInt32(0); // teleport id
 
             user.Send(packet);

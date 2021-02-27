@@ -64,5 +64,12 @@ namespace Redstone.Protocol.Abstractions
         /// </summary>
         /// <param name="position">Position.</param>
         void WritePosition(Position position);
+
+        /// <summary>
+        /// Dumps the current packet stream into a file as a UTF-8 string.
+        /// </summary>
+        /// <param name="fileName">Dump output file name.</param>
+        /// <param name="dumpMode">Dump mode.</param>
+        void Dump(string fileName, PacketDumpMode dumpMode);
     }
 }

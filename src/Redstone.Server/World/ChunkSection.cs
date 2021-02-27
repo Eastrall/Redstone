@@ -1,4 +1,5 @@
-﻿using Redstone.Abstractions.Registry;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Redstone.Abstractions.Registry;
 using Redstone.Abstractions.World;
 using Redstone.Common;
 using Redstone.Common.Collections;
@@ -11,6 +12,7 @@ namespace Redstone.Server.World
     public class ChunkSection : IChunkSection
     {
         public const byte DefaultBitsPerBlock = 4;
+        public const int Size = 16;
         public const int MaximumBlockAmount = 4096;
 
         private readonly IServiceProvider _serviceProvider;
@@ -41,7 +43,7 @@ namespace Redstone.Server.World
 
         public IBlock GetBlock(int x, int y, int z)
         {
-            y %= 16;
+            y %= Size;
             int storageId = _blockStorage[GetBlockIndex(x, y, z)];
 
             return _palette.GetStateFromIndex(storageId);
@@ -51,11 +53,11 @@ namespace Redstone.Server.World
         {
             short validBlockCount = 0;
             
-            for (int x = 0; x < 16; x++)
+            for (int x = 0; x < Size; x++)
             {
-                for (int y = 0; y < 16; y++)
+                for (int y = 0; y < Size; y++)
                 {
-                    for (int z = 0; z < 16; z++)
+                    for (int z = 0; z < Size; z++)
                     {
                         IBlock block = GetBlock(x, y, z);
 
@@ -72,7 +74,7 @@ namespace Redstone.Server.World
 
         public void SetBlock(IBlock block, int x, int y, int z)
         {
-            y %= 16;
+            y %= Size;
             var blockIndex = GetBlockIndex(x, y, z);
 
             int paletteIndex = _palette.GetIdFromState(block);
@@ -98,11 +100,11 @@ namespace Redstone.Server.World
 
         private void FillWithAir()
         {
-            for (int x = 0; x < 16; x++)
+            for (int x = 0; x < Size; x++)
             {
-                for (int y = 0; y < 16; y++)
+                for (int y = 0; y < Size; y++)
                 {
-                    for (int z = 0; z < 16; z++)
+                    for (int z = 0; z < Size; z++)
                     {
                         SetBlock(_blockFactory.CreateBlock(BlockType.Air), x, y, z);
                     }
@@ -110,6 +112,6 @@ namespace Redstone.Server.World
             }
         }
 
-        public static int GetBlockIndex(int x, int y, int z) => ((y * 16) + z) * 16 + x;
+        public static int GetBlockIndex(int x, int y, int z) => ((y * Size) + z) * Size + x;
     }
 }

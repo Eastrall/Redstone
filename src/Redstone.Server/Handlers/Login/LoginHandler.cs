@@ -49,10 +49,15 @@ namespace Redstone.Server.Handlers.Login
 
             _logger.LogInformation($"{user.Username} trying to log-in");
 
+            user.Player.SetName(user.Username);
+            user.Player.Position.X = 8;
+            user.Player.Position.Y = 2;
+            user.Player.Position.Z = 8;
+            // TODO: initialize current player
+            // TODO: Read player data from storage (DB or file-system)
+
             if (_serverConfiguration.Value.Mode == ServerModeType.Offline)
             {
-                var position = new Position(8, 2, 8);
-
                 SendLoginSucess(user);
                 user.Status = MinecraftUserStatus.Play;
                 SendJoinGame(user);
@@ -63,7 +68,7 @@ namespace Redstone.Server.Handlers.Login
                 // TODO: Entity status
                 // TODO: declare commands
                 // TODO: Unlock recipes
-                SendPlayerPositionAndLook(user, position);
+                SendPlayerPositionAndLook(user, user.Player.Position);
                 SendPlayerInfo(user, PlayerInfoActionType.Add); 
                 SendPlayerInfo(user, PlayerInfoActionType.UpdateLatency);
                 SendUpdateViewPosition(user);
@@ -71,8 +76,8 @@ namespace Redstone.Server.Handlers.Login
                 SendChunkData(user);
                 SendUpdateViewPosition(user);
                 // TODO: World border
-                SendSpawnPosition(user, position);
-                SendPlayerPositionAndLook(user, position);
+                SendSpawnPosition(user, Position.Zero);
+                SendPlayerPositionAndLook(user, user.Player.Position);
             }
             else
             {
@@ -94,7 +99,7 @@ namespace Redstone.Server.Handlers.Login
         {
             using var joinPacket = new JoinGamePacket();
 
-            joinPacket.WriteInt32(1); // EntityID
+            joinPacket.WriteInt32(user.Player.EntityId); // EntityID
             joinPacket.WriteBoolean(_gameConfiguration.Value.IsHardcore); // Is hardcore
             joinPacket.WriteByte((byte)ServerGameModeType.Creative); // GameMode
             joinPacket.WriteSByte((sbyte)ServerGameModeType.Survival); // Previous game mode
@@ -188,6 +193,9 @@ namespace Redstone.Server.Handlers.Login
             }
 
             chunk.GenerateHeightMap();
+
+            world.StartUpdate();
+            world.AddPlayer(user.Player);
 
             bool fullChunk = true;
 

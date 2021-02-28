@@ -1,6 +1,7 @@
 ﻿using LiteNetwork.Protocol.Abstractions;
 using LiteNetwork.Server;
 using Microsoft.Extensions.Logging;
+using Redstone.Abstractions.Entities;
 using Redstone.Protocol;
 using Redstone.Protocol.Abstractions;
 using Redstone.Protocol.Handlers;
@@ -9,24 +10,41 @@ using Redstone.Protocol.Packets.Game;
 using Redstone.Protocol.Packets.Handskake;
 using Redstone.Protocol.Packets.Login;
 using Redstone.Protocol.Packets.Status;
+using Redstone.Server.Entities;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Redstone.Server
 {
+    [DebuggerDisplay("{Username ?? \"[undefined]\"}: {Status}")]
     public class MinecraftUser : LiteServerUser
     {
         private readonly ILogger<MinecraftUser> _logger;
         private readonly IPacketHandler _packetHandler;
+        private readonly IPlayer _player;
 
         public MinecraftUserStatus Status { get; internal set; } = MinecraftUserStatus.Handshaking;
 
         public string Username { get; internal set; }
 
+        public IPlayer Player => _player;
+
         public MinecraftUser(ILogger<MinecraftUser> logger, IPacketHandler packetHandler)
         {
             _logger = logger;
             _packetHandler = packetHandler;
+            _player = new Player(this);
+        }
+
+        public void Disconnect(string reason = null)
+        {
+            if (!string.IsNullOrWhiteSpace(reason))
+            {
+                _logger.LogInformation($"{Username} disconnected. Reason: {reason}");
+            }
+
+            Socket.Close();
         }
 
         public override Task HandleMessageAsync(ILitePacketStream incomingPacketStream)
@@ -82,6 +100,12 @@ namespace Redstone.Server
         protected override void OnDisconnected()
         {
             _logger.LogInformation($"Client '{Id}' disconnected.");
+
+            if (Status == MinecraftUserStatus.Play)
+            {
+                Player.Map.RemovePlayer(Player);
+                // TODO: save current player
+            }
         }
 
         private object GetMinecraftPacketType(int packetId)

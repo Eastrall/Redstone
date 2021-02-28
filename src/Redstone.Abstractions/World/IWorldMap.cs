@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Redstone.Abstractions.Entities;
+using System;
 using System.Collections.Generic;
 
 namespace Redstone.Abstractions.World
@@ -17,6 +18,11 @@ namespace Redstone.Abstractions.World
         /// Gets the world map regions.
         /// </summary>
         IEnumerable<IRegion> Regions { get; }
+        
+        /// <summary>
+        /// Gets the players present in the current world map.
+        /// </summary>
+        IEnumerable<IPlayer> Players { get; }
 
         /// <summary>
         /// Adds a new region at the given x,z position.
@@ -42,5 +48,35 @@ namespace Redstone.Abstractions.World
         /// <param name="z">Z coordinate.</param>
         /// <returns>True if the region exists; false otherwise.</returns>
         bool ContainsRegion(int x, int z);
+
+        /// <summary>
+        /// Adds a player to the world map.
+        /// </summary>
+        /// <param name="player">Player to add.</param>
+        void AddPlayer(IPlayer player);
+
+        /// <summary>
+        /// Removes a player from the current world map.
+        /// </summary>
+        /// <param name="player">Player to remove.</param>
+        /// <returns>Removed player.</returns>
+        IPlayer RemovePlayer(IPlayer player);
+
+        /// <summary>
+        /// Gets a player from the current world map.
+        /// </summary>
+        /// <param name="playerId">Player id.</param>
+        /// <returns>Player if found; null otherwise.</returns>
+        IPlayer GetPlayer(Guid playerId);
+
+        /// <summary>
+        /// Starts the world map update process.
+        /// </summary>
+        void StartUpdate();
+
+        /// <summary>
+        /// Stops the world map update process.
+        /// </summary>
+        void StopUpdate();
     }
 }

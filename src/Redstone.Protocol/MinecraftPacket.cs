@@ -5,6 +5,7 @@ using Redstone.Protocol.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Redstone.Protocol
@@ -95,6 +96,22 @@ namespace Redstone.Protocol
 
             Write(values, 0, values.Length);
         }
+
+        public override short ReadInt16() => InternalRead<short>();
+
+        public override ushort ReadUInt16() => InternalRead<ushort>();
+
+        public override int ReadInt32() => InternalRead<int>();
+
+        public override uint ReadUInt32() => InternalRead<uint>();
+
+        public override long ReadInt64() => InternalRead<long>();
+
+        public override ulong ReadUInt64() => InternalRead<ulong>();
+
+        public override float ReadSingle() => InternalRead<float>();
+
+        public override double ReadDouble() => InternalRead<double>();
 
         public override string ReadString()
         {
@@ -268,26 +285,66 @@ namespace Redstone.Protocol
             WriteBytes(values);
         }
 
-        private static byte[] ConvertInt32ToVarInt32Buffer(int value)
+        private TValue InternalRead<TValue>() where TValue : struct, IConvertible
         {
-            var buffer = new List<byte>();
-            var valueToWrite = (uint)value;
-
-            do
+            if (typeof(TValue).IsPrimitive)
             {
-                var temp = (byte)(valueToWrite & 127);
+                var buffer = new byte[GetTypeSize<TValue>()];
 
-                valueToWrite >>= 7;
+                Read(buffer, 0, buffer.Length);
 
-                if (valueToWrite != 0)
+                if (BitConverter.IsLittleEndian)
                 {
-                    temp |= 128;
+                    Array.Reverse(buffer);
                 }
 
-                buffer.Add(temp);
-            } while (valueToWrite != 0);
+                return ConvertToPrimitiveValue<TValue>(buffer);
+            }
 
-            return buffer.ToArray();
+            throw new NotImplementedException($"Cannot read a {typeof(TValue)} value from the stream.");
+        }
+
+        private static int GetTypeSize<TValue>() where TValue : struct, IConvertible
+        {
+            return Type.GetTypeCode(typeof(TValue)) switch
+            {
+                TypeCode.Byte => sizeof(byte),
+                TypeCode.SByte => sizeof(sbyte),
+                TypeCode.Boolean => sizeof(bool),
+                TypeCode.Char => sizeof(char),
+                TypeCode.Int16 => sizeof(short),
+                TypeCode.UInt16 => sizeof(ushort),
+                TypeCode.Int32 => sizeof(int),
+                TypeCode.UInt32 => sizeof(uint),
+                TypeCode.Int64 => sizeof(long),
+                TypeCode.UInt64 => sizeof(ulong),
+                TypeCode.Single => sizeof(float),
+                TypeCode.Double => sizeof(double),
+                _ => throw new NotImplementedException(),
+            };
+        }
+
+        private static TValue ConvertToPrimitiveValue<TValue>(byte[] buffer) where TValue : struct, IConvertible
+        {
+            object @object = Type.GetTypeCode(typeof(TValue)) switch
+            {
+                TypeCode.Byte => buffer.Single(),
+                TypeCode.SByte => (sbyte)buffer.Single(),
+                TypeCode.Boolean => BitConverter.ToBoolean(buffer),
+                TypeCode.Char => BitConverter.ToChar(buffer),
+                TypeCode.Int16 => BitConverter.ToInt16(buffer),
+                TypeCode.UInt16 => BitConverter.ToUInt16(buffer),
+                TypeCode.Int32 => BitConverter.ToInt32(buffer),
+                TypeCode.UInt32 => BitConverter.ToUInt32(buffer),
+                TypeCode.Int64 => BitConverter.ToInt64(buffer),
+                TypeCode.UInt64 => BitConverter.ToUInt64(buffer),
+                TypeCode.Single => BitConverter.ToSingle(buffer),
+                TypeCode.Double => BitConverter.ToDouble(buffer),
+                _ => throw new NotImplementedException(),
+            };
+
+
+            return (TValue)@object;
         }
 
         private static int GetVarInt32Length(int value)

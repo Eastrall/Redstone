@@ -1,4 +1,6 @@
-﻿using Redstone.Common.Collections;
+﻿using Bogus;
+using Redstone.Common.Collections;
+using System.Collections.Generic;
 using Xunit;
 
 namespace Redstone.Common.Tests.Collections
@@ -60,6 +62,38 @@ namespace Redstone.Common.Tests.Collections
             for (int i = 0; i < capacity; i++)
             {
                 Assert.Equal(value, array.Get(i));
+            }
+        }
+
+        [Theory]
+        [InlineData(4, 5)]
+        [InlineData(6, 8)]
+        [InlineData(10, 11)]
+        [InlineData(8, 6)]
+        public void ResizeCompactedLongArrayTest(byte bitsPerEntry, byte newBitsPerEntry)
+        {
+            var faker = new Faker();
+            var array = new CompactedLongArray(bitsPerEntry, 4096);
+            var listOfValues = new List<int>();
+
+            for (int i = 0; i < 4096; i++)
+            {
+                int value = faker.Random.Int(0, 15);
+
+                listOfValues.Add(value);
+                array.Set(i, value);
+            }
+
+            Assert.Equal(bitsPerEntry, array.BitsPerEntry);
+            array.Resize(newBitsPerEntry);
+            Assert.Equal(newBitsPerEntry, array.BitsPerEntry);
+
+            for (int i = 0; i < 4096; i++)
+            {
+                int value = array.Get(i);
+                int savedValue = listOfValues[i];
+
+                Assert.Equal(savedValue, value);
             }
         }
     }

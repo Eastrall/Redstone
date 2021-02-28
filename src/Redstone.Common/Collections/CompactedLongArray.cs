@@ -1,4 +1,7 @@
-﻿namespace Redstone.Common.Collections
+﻿using Redstone.Common.Extensions;
+using System;
+
+namespace Redstone.Common.Collections
 {
     /// <summary>
     /// Provides a mechanism to store multiple numeric values inside a single long.
@@ -31,18 +34,18 @@
             70409299, 70409299, 0, 69273666, 69273666, 0, 68174084, 68174084, 0, int.MinValue,
             0, 5};
 
-        private readonly long _maxEntryValue;
-        private readonly byte _valuesPerLong;
-        private readonly int _magicIndex;
-        private readonly long _divideMul;
-        private readonly long _divideAdd;
-        private readonly int _divideShift;
-        private readonly long[] _storage;
+        private long _maxEntryValue;
+        private byte _valuesPerLong;
+        private int _magicIndex;
+        private long _divideMul;
+        private long _divideAdd;
+        private int _divideShift;
+        private long[] _storage;
 
-        public int BitsPerEntry { get; }
+        public int BitsPerEntry { get; private set; }
 
         /// <summary>
-        /// Gets the compacted array length.
+        /// Gets the compacted array length in number of bits.
         /// </summary>
         public int Length { get; }
 
@@ -65,22 +68,13 @@
         /// <summary>
         /// Creates a new <see cref="CompactedLongArray"/> instance.
         /// </summary>
-        /// <param name="bitsPerEntryIn">Number of bits per single entry.</param>
-        /// <param name="arraySizeIn">Array size.</param>
-        public CompactedLongArray(int bitsPerEntryIn, int arraySizeIn)
+        /// <param name="bitsPerEntry">Number of bits per single entry.</param>
+        /// <param name="length">Array length in number of bits.</param>
+        public CompactedLongArray(int bitsPerEntry, int length)
         {
-            Length = arraySizeIn;
-            BitsPerEntry = bitsPerEntryIn;
-            _maxEntryValue = (1L << bitsPerEntryIn) - 1L;
-            _valuesPerLong = (byte)(64 / bitsPerEntryIn);
-            _magicIndex = 3 * (_valuesPerLong - 1);
-            _divideMul = CompactedMagicNumbers[_magicIndex] & 0xffffffffL;
-            _divideAdd = CompactedMagicNumbers[_magicIndex + 1] & 0xffffffffL;
-            _divideShift = CompactedMagicNumbers[_magicIndex + 2];
+            Length = length;
 
-            int size = (Length + _valuesPerLong - 1) / _valuesPerLong;
-
-            _storage = new long[size];
+            InitializeStorage(bitsPerEntry);
         }
 
         /// <summary>
@@ -108,6 +102,51 @@
             int bitIndex = GetBitIndex(index, cellIndex);
 
             _storage[cellIndex] = _storage[cellIndex] & ~(_maxEntryValue << bitIndex) | (value & _maxEntryValue) << bitIndex;
+        }
+
+        /// <summary>
+        /// Resizes the current compaceted long array.
+        /// </summary>
+        /// <param name="bitsPerEntry">Amount of bits per entry.</param>
+        public void Resize(int bitsPerEntry)
+        {
+            var newArray = new CompactedLongArray(bitsPerEntry, Length);
+
+            for (int i = 0; i < Length; i++)
+            {
+                int value = Get(i);
+
+                if (value.NeededBits() > bitsPerEntry)
+                {
+                    throw new InvalidOperationException("Existing value in compacted array cannot be set. Mostly because it cannot fit in the given new bits per entry.");
+                }
+
+                newArray.Set(i, value);
+            }
+
+            InitializeStorage(bitsPerEntry);
+            _storage = newArray.Storage;
+        }
+
+        private void InitializeStorage(int bitsPerEntry, long[] storage = null)
+        {
+            BitsPerEntry = bitsPerEntry;
+            _maxEntryValue = (1L << BitsPerEntry) - 1L;
+            _valuesPerLong = (byte)(64 / BitsPerEntry);
+            _magicIndex = 3 * (_valuesPerLong - 1);
+            _divideMul = CompactedMagicNumbers[_magicIndex] & 0xffffffffL;
+            _divideAdd = CompactedMagicNumbers[_magicIndex + 1] & 0xffffffffL;
+            _divideShift = CompactedMagicNumbers[_magicIndex + 2];
+
+            if (storage is null)
+            {
+                int size = (Length + _valuesPerLong - 1) / _valuesPerLong;
+                _storage = new long[size];
+            }
+            else
+            {
+                _storage = storage;
+            }
         }
 
         private int GetCellIndex(int index) => (int)(index * _divideMul + _divideAdd >> 32 >> _divideShift);

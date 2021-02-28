@@ -81,6 +81,15 @@ namespace Redstone.Protocol.Tests
         [MemberData(nameof(UUIDValues))]
         public void MinecraftPacketReadUUIDTest(Guid expectedValue, byte[] packetContent)
         {
+            // FIX: little/big Endian
+            if (BitConverter.IsLittleEndian)
+            {
+                byte[] firstLong = packetContent.Take(8).Reverse().ToArray();
+                byte[] secondLong = packetContent.Skip(8).Reverse().ToArray();
+
+                packetContent = firstLong.Concat(secondLong).ToArray();
+            }
+
             using var packet = new MinecraftPacket(0, packetContent);
 
             Guid value = packet.ReadUUID();

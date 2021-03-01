@@ -9,6 +9,7 @@ using Redstone.Server.Registry;
 using Redstone.Server.World;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Xunit;
 
@@ -21,26 +22,22 @@ namespace Redstone.Server.Tests.World
     {
         private readonly IRegistry _registry;
         private readonly IServiceProvider _serviceProvider;
+        private readonly Mock<IBlockFactory> _blockFactoryMock;
 
         public ChunkTest()
         {
+            _blockFactoryMock = new Mock<IBlockFactory>();
+            _blockFactoryMock.Setup(x => x.CreateBlock(It.IsAny<BlockType>()))
+                             .Returns<BlockType>(x =>
+                             {
+                                 return new Block(new BlockData(x.ToString(), null, new[]
+                                 {
+                                     new BlockStateData((int)x, true, new Dictionary<string, string>())
+                                 }));
+                             });
             _registry = new DataRegistry(new Mock<ILogger<DataRegistry>>().Object);
             _serviceProvider = new ServiceCollection()
-                .AddSingleton<IBlockFactory>(s =>
-                {
-                    var mock = new Mock<IBlockFactory>();
-
-                    mock.Setup(x => x.CreateBlock(It.IsAny<BlockType>()))
-                        .Returns<BlockType>(x =>
-                        {
-                            return new Block(new BlockData(x.ToString(), null, new[]
-                            {
-                                new BlockStateData((int)x, true, new Dictionary<string, string>())
-                            }));
-                        });
-
-                    return mock.Object;
-                })
+                .AddSingleton(s => _blockFactoryMock.Object)
                 .BuildServiceProvider();
         }
 
@@ -78,6 +75,10 @@ namespace Redstone.Server.Tests.World
                     }
                 }
             }
+
+            _blockFactoryMock.Verify(
+                x => x.CreateBlock(It.IsAny<BlockType>()), 
+                Times.Exactly(ChunkSection.MaximumBlockAmount * chunk.Sections.Count()));
         }
     }
 }

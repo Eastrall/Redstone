@@ -26,5 +26,27 @@ namespace Redstone.Common.Extensions
         {
             return Convert.ToString(value, 2).Length;
         }
+
+        /// <summary>
+        /// Converts a randian angle to degree.
+        /// </summary>
+        /// <param name="radians">Radian angle value.</param>
+        /// <returns>The radian angle converted to a degree angle.</returns>
+        public static float ToDegree(this float radians) => (float)(radians * (180.0f / Math.PI));
+
+        /// <summary>
+        /// Converts a degree angle to radian.
+        /// </summary>
+        /// <param name="degree">Degree angle value.</param>
+        /// <returns>Degree angle converted to a radian angle.</returns>
+        public static float ToRadian(this float degree) => (float)(degree * (Math.PI / 180.0f));
+
+        /// <summary>
+        /// Gives the percentage of a value.
+        /// </summary>
+        /// <param name="value">Reference value</param>
+        /// <param name="percents">Percentage wanted</param>
+        /// <returns></returns>
+        public static int Percentage(this int value, int percents) => (value * percents) / 100;
     }
 }

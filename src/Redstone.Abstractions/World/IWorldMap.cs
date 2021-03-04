@@ -70,6 +70,13 @@ namespace Redstone.Abstractions.World
         IPlayer GetPlayer(Guid playerId);
 
         /// <summary>
+        /// Gets a collection with the visible entities for the given entity.
+        /// </summary>
+        /// <param name="entity">Current entity.</param>
+        /// <returns>Collection of visible entities <see cref="IEntity"/> for the current entity.</returns>
+        IEnumerable<IEntity> GetVisibleEntities(IEntity entity);
+
+        /// <summary>
         /// Starts the world map update process.
         /// </summary>
         void StartUpdate();

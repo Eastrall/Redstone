@@ -17,6 +17,7 @@ namespace Redstone.Server.World
         private readonly ConcurrentDictionary<Guid, IPlayer> _players;
         private readonly List<IRegion> _regions;
         private readonly IServiceProvider _serviceProvider;
+        private readonly float _entityVisibilityRange = 45f;
 
         private bool _isUpdating;
         private Task _updateTask;
@@ -74,10 +75,22 @@ namespace Redstone.Server.World
         }
 
         public IPlayer RemovePlayer(IPlayer player)
-            => _players.TryRemove(player.Id, out IPlayer removedPlayer) ? removedPlayer : null;
+            => _players.TryRemove(player.Id, out IPlayer removedPlayer) ? removedPlayer : default;
 
         public IPlayer GetPlayer(Guid playerId)
-            => _players.TryGetValue(playerId, out IPlayer player) ? player : null;
+            => _players.TryGetValue(playerId, out IPlayer player) ? player : default;
+
+        public IEnumerable<IEntity> GetVisibleEntities(IEntity entity)
+        {
+            var entities = new List<IEntity>();
+
+            lock (_players)
+            {
+                entities.AddRange(GetVisibleEntities(entity, _players.Values, _entityVisibilityRange));
+            }
+
+            return entities;
+        }
 
         public void StartUpdate()
         {
@@ -118,10 +131,20 @@ namespace Redstone.Server.World
                     IPlayer currentPlayer = playerEntity.Value;
 
                     currentPlayer.KeepAlive();
+                    currentPlayer.LookAround();
                 }
 
                 // TODO: update monsters and animals
             }
+        }
+
+        private static IEnumerable<TEntity> GetVisibleEntities<TEntity>(IEntity currentEntity, IEnumerable<TEntity> entities, float visibilityRange)
+            where TEntity : IEntity
+        {
+            return from x in entities
+                   where x.EntityId != currentEntity.EntityId &&
+                         x.Position.IsInRange(currentEntity.Position, visibilityRange)
+                   select x;
         }
     }
 }

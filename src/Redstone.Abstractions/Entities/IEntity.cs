@@ -8,7 +8,7 @@ namespace Redstone.Abstractions.Entities
     /// <summary>
     /// Provides an interface that describes the base entity behavior.
     /// </summary>
-    public interface IEntity
+    public interface IEntity : IEquatable<IEntity>
     {
         /// <summary>
         /// Gets the entity unique id.
@@ -50,5 +50,22 @@ namespace Redstone.Abstractions.Entities
         /// Gets the visible entities from the current entity position.
         /// </summary>
         IEnumerable<IEntity> VisibleEntities { get; }
+
+        /// <summary>
+        /// The current entity looks around and updates the current entity visible entities list.
+        /// </summary>
+        void LookAround();
+
+        /// <summary>
+        /// Adds the given entity to the visible entities collection.
+        /// </summary>
+        /// <param name="entity">Entity that is visible by the current entity.</param>
+        void AddVisibleEntity(IEntity entity);
+
+        /// <summary>
+        /// Removes the given entity from the visible entities collection.
+        /// </summary>
+        /// <param name="entity">Entity that is not visible anymore by the current entity.</param>
+        void RemoveVisibleEntity(IEntity entity);
     }
 }

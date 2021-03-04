@@ -1,9 +1,6 @@
 ﻿using Redstone.Abstractions.Entities;
-using Redstone.Abstractions.World;
-using Redstone.Common;
 using Redstone.Protocol;
 using Redstone.Protocol.Packets.Game.Client;
-using Redstone.Server.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,26 +11,14 @@ using System.Threading.Tasks;
 namespace Redstone.Server.Entities
 {
     [DebuggerDisplay("{Name}")]
-    internal class Player : IPlayer
+    internal class Player : WorldEntity, IPlayer
     {
         private readonly MinecraftUser _user;
         private readonly Queue<long> _keepAliveIdQueue;
 
+        public override Guid Id => _user.Id;
+
         public string Name { get; private set; }
-
-        public Guid Id => _user.Id;
-
-        public int EntityId { get; } = RandomHelper.GenerateEntityObjectId();
-
-        public Position Position { get; } = new Position();
-
-        public float Angle { get; set; }
-
-        public float HeadAngle { get; set; }
-
-        public IWorldMap Map { get; internal set; }
-
-        public IEnumerable<IEntity> VisibleEntities { get; }
 
         public Player(MinecraftUser user)
         {
@@ -68,6 +53,18 @@ namespace Redstone.Server.Entities
             {
                 _user.Disconnect("Keep-alive id doesn't match.");
             }
+        }
+
+        public override void AddVisibleEntity(IEntity entity)
+        {
+            base.AddVisibleEntity(entity);
+            // TODO: send spawn packet
+        }
+
+        public override void RemoveVisibleEntity(IEntity entity)
+        {
+            base.RemoveVisibleEntity(entity);
+            // TODO: send despawn packet
         }
     }
 }

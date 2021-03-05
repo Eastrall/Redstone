@@ -1,5 +1,6 @@
 ﻿using Redstone.Abstractions.Entities;
 using Redstone.Protocol;
+using Redstone.Protocol.Abstractions;
 using Redstone.Protocol.Packets.Game.Client;
 using System;
 using System.Collections.Generic;
@@ -13,14 +14,14 @@ namespace Redstone.Server.Entities
     [DebuggerDisplay("{Name}")]
     internal class Player : WorldEntity, IPlayer
     {
-        private readonly MinecraftUser _user;
+        private readonly IMinecraftUser _user;
         private readonly Queue<long> _keepAliveIdQueue;
 
         public override Guid Id => _user.Id;
 
         public string Name { get; private set; }
 
-        public Player(MinecraftUser user)
+        public Player(IMinecraftUser user)
         {
             _user = user;
             _keepAliveIdQueue = new Queue<long>();

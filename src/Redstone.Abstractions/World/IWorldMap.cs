@@ -7,8 +7,13 @@ namespace Redstone.Abstractions.World
     /// <summary>
     /// Provides an abstraction to manage a minecraft world map.
     /// </summary>
-    public interface IWorldMap
+    public interface IWorldMap : IDisposable
     {
+        /// <summary>
+        /// Gets a boolean value that indicates if the current map is being updated.
+        /// </summary>
+        bool IsUpdating { get; }
+
         /// <summary>
         /// Gets the world map name.
         /// </summary>

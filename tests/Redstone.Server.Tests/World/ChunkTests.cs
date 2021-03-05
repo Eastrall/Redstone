@@ -18,13 +18,13 @@ namespace Redstone.Server.Tests.World
     /// <summary>
     /// Tests the chunk mechanism.
     /// </summary>
-    public class ChunkTest
+    public class ChunkTests
     {
         private readonly IRegistry _registry;
         private readonly IServiceProvider _serviceProvider;
         private readonly Mock<IBlockFactory> _blockFactoryMock;
 
-        public ChunkTest()
+        public ChunkTests()
         {
             _blockFactoryMock = new Mock<IBlockFactory>();
             _blockFactoryMock.Setup(x => x.CreateBlock(It.IsAny<BlockType>()))

@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 namespace Redstone.Server
 {
     [DebuggerDisplay("{Username ?? \"[undefined]\"}: {Status}")]
-    public class MinecraftUser : LiteServerUser
+    public class MinecraftUser : LiteServerUser, IMinecraftUser
     {
         private readonly ILogger<MinecraftUser> _logger;
         private readonly IPacketHandler _packetHandler;
@@ -37,7 +37,11 @@ namespace Redstone.Server
             _player = new Player(this);
         }
 
-        public void Disconnect(string reason = null)
+        public void Send(IMinecraftPacket packet) => base.Send(packet);
+
+        public void Disconnect() => Disconnect(null);
+
+        public void Disconnect(string reason)
         {
             if (!string.IsNullOrWhiteSpace(reason))
             {

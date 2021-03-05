@@ -28,11 +28,13 @@ namespace Redstone.Server.World
 
         public IEnumerable<IPlayer> Players => _players.Values.AsEnumerable();
 
+        public bool IsUpdating => _isUpdating;
+
         public string Name { get; }
 
         public WorldMap(string worldName, IServiceProvider serviceProvider)
         {
-            if (string.IsNullOrEmpty(worldName))
+            if (string.IsNullOrWhiteSpace(worldName))
             {
                 throw new ArgumentException($"'{nameof(worldName)}' cannot be null or empty", nameof(worldName));
             }
@@ -75,7 +77,9 @@ namespace Redstone.Server.World
         }
 
         public IPlayer RemovePlayer(IPlayer player)
-            => _players.TryRemove(player.Id, out IPlayer removedPlayer) ? removedPlayer : default;
+            => _players.TryRemove(player.Id, out IPlayer removedPlayer) ? 
+                removedPlayer : 
+                throw new InvalidOperationException($"Failed to remove player with id: {player.Id} from map {Name}. Player doesn't exist.");
 
         public IPlayer GetPlayer(Guid playerId)
             => _players.TryGetValue(playerId, out IPlayer player) ? player : default;
@@ -111,13 +115,20 @@ namespace Redstone.Server.World
 
         public void StopUpdate()
         {
-            if (_isUpdating)
+            if (!_isUpdating)
             {
-                _cancellationTokenSource.Cancel();
-                _updateTask.Dispose();
-                _updateTask = null;
-                _isUpdating = false;
+                throw new InvalidOperationException("Cannot stop update because the current map is not being updated.");
             }
+
+            _cancellationTokenSource.Cancel();
+            _isUpdating = false;
+        }
+
+        public void Dispose()
+        {
+            StopUpdate();
+            _players.Clear();
+            _regions.Clear();
         }
 
         private async Task Update()
@@ -136,6 +147,8 @@ namespace Redstone.Server.World
 
                 // TODO: update monsters and animals
             }
+
+            _updateTask.Dispose();
         }
 
         private static IEnumerable<TEntity> GetVisibleEntities<TEntity>(IEntity currentEntity, IEnumerable<TEntity> entities, float visibilityRange)

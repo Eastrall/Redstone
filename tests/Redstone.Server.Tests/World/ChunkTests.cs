@@ -57,6 +57,7 @@ namespace Redstone.Server.Tests.World
             Assert.NotNull(chunk);
             Assert.Equal(0, chunk.X);
             Assert.Equal(0, chunk.Z);
+            Assert.NotEmpty(chunk.Sections);
 
             foreach (IChunkSection section in chunk.Sections)
             {
@@ -79,6 +80,101 @@ namespace Redstone.Server.Tests.World
             _blockFactoryMock.Verify(
                 x => x.CreateBlock(It.IsAny<BlockType>()), 
                 Times.Exactly(ChunkSection.MaximumBlockAmount * chunk.Sections.Count()));
+        }
+
+        [Fact]
+        public void ChunkGetBlockTest()
+        {
+            var chunk = new Chunk(0, 0, _serviceProvider);
+            IBlock block = chunk.GetBlock(0, 0, 0);
+
+            Assert.NotNull(block);
+            Assert.IsType<Block>(block);
+            Assert.Equal(BlockType.Air, block.Type);
+            Assert.True(block.IsAir);
+        }
+
+        [Theory]
+        [InlineData(-1)]
+        [InlineData(300)]
+        [InlineData(-300)]
+        public void ChunkGetBlockAtInvalidSectionTest(int height)
+        {
+            var chunk = new Chunk(0, 0, _serviceProvider);
+            
+            Assert.Throws<InvalidOperationException>(() => chunk.GetBlock(0, height, 0));
+        }
+
+        [Fact]
+        public void ChunkGetSectionTest()
+        {
+            var chunk = new Chunk(0, 0, _serviceProvider);
+            IChunkSection section = chunk.GetSection(0);
+
+            Assert.NotNull(section);
+            Assert.IsType<ChunkSection>(section);
+            Assert.Equal(0, section.Index);
+        }
+
+        [Theory]
+        [InlineData(-1)]
+        [InlineData(300)]
+        [InlineData(-300)]
+        public void ChunkGetInvalidChunkSectionTest(int sectionIndex)
+        {
+            var chunk = new Chunk(0, 0, _serviceProvider);
+
+            Assert.Throws<InvalidOperationException>(() => chunk.GetSection(sectionIndex));
+        }
+
+        [Fact]
+        public void ChunkSetBlockTest()
+        {
+            var chunk = new Chunk(0, 0, _serviceProvider);
+            chunk.SetBlock(_blockFactoryMock.Object.CreateBlock(BlockType.Dirt), 0, 0, 0);
+
+            IBlock dirtBlock = chunk.GetBlock(0, 0, 0);
+
+            Assert.NotNull(dirtBlock);
+            Assert.IsType<Block>(dirtBlock);
+            Assert.False(dirtBlock.IsAir);
+            Assert.False(dirtBlock.IsFluid);
+            Assert.Equal(BlockType.Dirt, dirtBlock.Type);
+        }
+
+        [Theory]
+        [InlineData(-1)]
+        [InlineData(300)]
+        [InlineData(-300)]
+        public void ChunkSetBlockAtInvalidPositionTest(int blockY)
+        {
+            var chunk = new Chunk(0, 0, _serviceProvider);
+
+            Assert.Throws<InvalidOperationException>(
+                () => chunk.SetBlock(_blockFactoryMock.Object.CreateBlock(BlockType.Dirt), 0, blockY, 0));
+        }
+
+        [Fact]
+        public void ChunkGenerateEmptyHeightMapTest()
+        {
+            var chunk = new Chunk(0, 0, _serviceProvider);
+
+            chunk.GenerateHeightMap();
+
+            for (int i = 0; i < chunk.Heightmap.Count(); i++)
+            {
+                Assert.Equal(0, chunk.Heightmap.ElementAt(i));
+            }
+        }
+
+        [Fact]
+        public void ChunkGenerateHeightMapTest()
+        {
+            var chunk = new Chunk(0, 0, _serviceProvider);
+            chunk.SetBlock(_blockFactoryMock.Object.CreateBlock(BlockType.Dirt), 0, 1, 0);
+            chunk.GenerateHeightMap();
+
+            Assert.Equal(1, chunk.Heightmap.ElementAt(0));
         }
     }
 }

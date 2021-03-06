@@ -28,5 +28,12 @@ namespace Redstone.Server.Tests.Mocks
 
             return player;
         }
+
+        public static Mock<IPlayer> GeneratePlayerMock()
+        {
+            var playerMock = new Mock<IPlayer>();
+
+            return playerMock;
+        }
     }
 }

@@ -40,10 +40,10 @@ namespace Redstone.Server.World
 
             return chunk;
         }
-        public bool ContainsChunk(int x, int z) => GetChunk(x, z) != null;
+        public bool ContainsChunk(int x, int z) => GetChunk(x, z) is not null;
 
         public IChunk GetChunk(int x, int z) => _chunks[GetChunkIndex(x, z)];
 
-        private int GetChunkIndex(int x, int z) => z + (ChunkAmount * x);
+        private static int GetChunkIndex(int x, int z) => z + (ChunkAmount * x);
     }
 }

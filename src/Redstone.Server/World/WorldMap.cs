@@ -126,7 +126,11 @@ namespace Redstone.Server.World
 
         public void Dispose()
         {
-            StopUpdate();
+            if (_isUpdating)
+            {
+                StopUpdate();
+            }
+
             _players.Clear();
             _regions.Clear();
         }

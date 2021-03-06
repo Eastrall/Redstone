@@ -8,6 +8,7 @@ using Redstone.Server.Tests.Mocks;
 using Redstone.Server.World;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Redstone.Server.Tests.World
@@ -233,6 +234,41 @@ namespace Redstone.Server.Tests.World
             var map = new WorldMap(_mapName, _serviceProvider);
 
             Assert.Throws<InvalidOperationException>(() => map.StopUpdate());
+        }
+
+        [Fact]
+        public async Task WorldMapUpdatePlayersTest()
+        {
+            var player = PlayerEntityGenerator.GeneratePlayerMock();
+            var map = new WorldMap(_mapName, _serviceProvider);
+
+            map.StartUpdate();
+            map.AddPlayer(player.Object);
+
+            await Task.Delay(500);
+
+            player.Verify(x => x.KeepAlive(), Times.AtLeastOnce());
+            player.Verify(x => x.LookAround(), Times.AtLeastOnce());
+
+            map.StopUpdate();
+        }
+
+        [Fact]
+        public async Task WorldMapDisposeTest()
+        {
+            var player = PlayerEntityGenerator.GeneratePlayer(Guid.NewGuid());
+            var map = new WorldMap(_mapName, _serviceProvider);
+            
+            map.AddRegion(0, 0);
+            map.AddPlayer(player);
+            map.StartUpdate();
+
+            await Task.Delay(500);
+
+            map.Dispose();
+            Assert.False(map.IsUpdating);
+            Assert.Empty(map.Regions);
+            Assert.Empty(map.Players);
         }
     }
 }

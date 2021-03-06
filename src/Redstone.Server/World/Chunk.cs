@@ -33,7 +33,7 @@ namespace Redstone.Server.World
         {
             X = x;
             Z = z;
-            _serviceProvider = serviceProvider;
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             _chunkSections = Enumerable.Range(0, ChunkSectionAmount).Select(index => new ChunkSection(index, _serviceProvider)).ToList();
 
             _heightmap = new CompactedLongArray(9, 256);
@@ -43,18 +43,18 @@ namespace Redstone.Server.World
 
         public void GenerateHeightMap()
         {
-            for (int x = 0; x < 16; x++)
+            for (int x = 0; x < Size; x++)
             {
-                for (int z = 0; z < 16; z++)
+                for (int z = 0; z < Size; z++)
                 {
-                    for (int y = 255; y >= 0; y--)
+                    for (int y = Height; y >= 0; y--)
                     {
                         var block = GetBlock(x, y, z);
 
                         if (block.IsAir)
                             continue;
 
-                        _heightmap[x + z * 16] = y;
+                        _heightmap[x + z * Size] = y;
                         break;
                     }
                 }
@@ -63,23 +63,42 @@ namespace Redstone.Server.World
 
         public IBlock GetBlock(int x, int y, int z)
         {
-            int sectionIndex = y / 16;
-            IChunkSection section = _chunkSections.ElementAtOrDefault(sectionIndex); // TODO: check null
+            if (y < 0)
+            {
+                throw new InvalidOperationException($"Cannot get a block with a negative Y value.");
+            }
 
-            return section.GetBlock(x, y % 16, z);
+            int sectionIndex = GetSectionIndex(y);
+            IChunkSection section = GetSection(sectionIndex);
+
+            return section.GetBlock(x, y % Size, z);
         }
 
         public IChunkSection GetSection(int sectionIndex)
         {
-            return _chunkSections.ElementAtOrDefault(sectionIndex); // TODO: check null
+            IChunkSection section = _chunkSections.ElementAtOrDefault(sectionIndex);
+
+            if (section is null)
+            {
+                throw new InvalidOperationException($"Failed to get section with index '{sectionIndex}'.");
+            }
+
+            return section;
         }
 
         public void SetBlock(IBlock block, int x, int y, int z)
         {
-            int sectionIndex = y / 16;
-            IChunkSection section = _chunkSections.ElementAtOrDefault(sectionIndex); // TODO: check null
+            if (y < 0)
+            {
+                throw new InvalidOperationException($"Cannot get a block with a negative Y value.");
+            }
 
-            section.SetBlock(block, x, y % 16, z);
+            int sectionIndex = GetSectionIndex(y);
+            IChunkSection section = GetSection(sectionIndex);
+
+            section.SetBlock(block, x, y % Size, z);
         }
+
+        private static int GetSectionIndex(int y) => y / Size;
     }
 }

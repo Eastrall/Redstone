@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Redstone.Abstractions.Protocol;
 using Redstone.Abstractions.Registry;
 using Redstone.Abstractions.World;
 using Redstone.Common;
 using Redstone.Common.Collections;
-using Redstone.Protocol.Abstractions;
 using Redstone.Server.World.Palettes;
 using System;
 

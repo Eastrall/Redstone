@@ -1,4 +1,4 @@
-﻿using Redstone.Protocol.Abstractions;
+﻿using Redstone.Abstractions.Protocol;
 using Redstone.Protocol.Cryptography.ASN;
 using System.Security.Cryptography;
 

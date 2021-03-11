@@ -1,4 +1,6 @@
-﻿namespace Redstone.Protocol.Packets.Status.Client
+﻿using Redstone.Abstractions.Protocol;
+
+namespace Redstone.Protocol.Packets.Status.Client
 {
     /// <summary>
     /// Defines the Minecraft pong packet structure during <see cref="MinecraftUserStatus.Status"/> state.

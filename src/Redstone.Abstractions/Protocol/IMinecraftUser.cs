@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Redstone.Protocol.Abstractions
+namespace Redstone.Abstractions.Protocol
 {
     /// <summary>
     /// Provides a mechanism to handle a miencraft user connection.
@@ -11,6 +11,11 @@ namespace Redstone.Protocol.Abstractions
         /// Gets the Minecraft user id.
         /// </summary>
         Guid Id { get; }
+
+        /// <summary>
+        /// Gets the Miencraft user current status.
+        /// </summary>
+        MinecraftUserStatus Status { get; }
 
         /// <summary>
         /// Sends the given packet to the current user.

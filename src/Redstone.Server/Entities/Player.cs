@@ -1,6 +1,6 @@
 ﻿using Redstone.Abstractions.Entities;
+using Redstone.Abstractions.Protocol;
 using Redstone.Protocol;
-using Redstone.Protocol.Abstractions;
 using Redstone.Protocol.Packets.Game.Client;
 using System;
 using System.Collections.Generic;
@@ -26,6 +26,8 @@ namespace Redstone.Server.Entities
             _user = user;
             _keepAliveIdQueue = new Queue<long>();
         }
+
+        public void SendPacket(IMinecraftPacket packet) => _user.Send(packet);
 
         public void SetName(string newName, bool notifyOtherPlayers = false)
         {

@@ -1,4 +1,6 @@
-﻿namespace Redstone.Protocol.Handlers
+﻿using Redstone.Abstractions.Protocol;
+
+namespace Redstone.Protocol.Handlers
 {
     /// <summary>
     /// Provides a mechanism to invoke a packet handler.

@@ -1,4 +1,4 @@
-﻿using Redstone.Protocol.Abstractions;
+﻿using Redstone.Abstractions.Protocol;
 
 namespace Redstone.Protocol.Packets.Status.Server
 {

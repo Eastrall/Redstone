@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Redstone.Abstractions.Protocol;
 using Redstone.Abstractions.Registry;
 using Redstone.Abstractions.World;
 using Redstone.Common;
@@ -10,7 +11,6 @@ using Redstone.NBT;
 using Redstone.NBT.Serialization;
 using Redstone.NBT.Tags;
 using Redstone.Protocol;
-using Redstone.Protocol.Abstractions;
 using Redstone.Protocol.Handlers;
 using Redstone.Protocol.Packets.Game.Client;
 using Redstone.Protocol.Packets.Login;
@@ -101,7 +101,7 @@ namespace Redstone.Server.Handlers.Login
 
             joinPacket.WriteInt32(user.Player.EntityId); // EntityID
             joinPacket.WriteBoolean(_gameConfiguration.Value.IsHardcore); // Is hardcore
-            joinPacket.WriteByte((byte)ServerGameModeType.Creative); // GameMode
+            joinPacket.WriteByte((byte)_gameConfiguration.Value.Mode); // GameMode
             joinPacket.WriteSByte((sbyte)ServerGameModeType.Survival); // Previous game mode
 
             var worldList = new[] { "minecraft:world" };

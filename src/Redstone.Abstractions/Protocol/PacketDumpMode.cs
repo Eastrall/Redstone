@@ -1,4 +1,4 @@
-﻿namespace Redstone.Protocol.Abstractions
+﻿namespace Redstone.Abstractions.Protocol
 {
     public enum PacketDumpMode
     {

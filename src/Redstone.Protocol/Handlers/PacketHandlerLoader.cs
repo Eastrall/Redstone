@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Redstone.Abstractions.Protocol;
 using Redstone.Protocol.Handlers.Internal;
 using Redstone.Protocol.Handlers.Internal.Models;
 using System;

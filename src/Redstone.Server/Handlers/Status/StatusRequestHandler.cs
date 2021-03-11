@@ -1,4 +1,4 @@
-﻿using Redstone.Protocol.Abstractions;
+﻿using Redstone.Abstractions.Protocol;
 using Redstone.Protocol.Handlers;
 using Redstone.Protocol.Packets.Status;
 using Redstone.Protocol.Packets.Status.Client;
@@ -15,7 +15,7 @@ namespace Redstone.Server.Handlers.Status
         }
 
         [StatusPacketHandler(ServerStatusPacketType.Request)]
-        public void OnStatusRequest(MinecraftUser user, IMinecraftPacket _)
+        public void OnStatusRequest(IMinecraftUser user, IMinecraftPacket _)
         {
             using var responsePacket = new StatusResponsePacket(_server.GetServerStatus());
             

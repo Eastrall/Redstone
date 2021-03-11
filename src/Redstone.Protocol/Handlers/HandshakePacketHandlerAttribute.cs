@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Redstone.Abstractions.Protocol;
+using System;
 
 namespace Redstone.Protocol.Handlers
 {

@@ -1,4 +1,5 @@
-﻿using Redstone.Protocol.Handlers.Exceptions;
+﻿using Redstone.Abstractions.Protocol;
+using Redstone.Protocol.Handlers.Exceptions;
 using Redstone.Protocol.Handlers.Internal;
 using Redstone.Protocol.Handlers.Internal.Transformers;
 using System;

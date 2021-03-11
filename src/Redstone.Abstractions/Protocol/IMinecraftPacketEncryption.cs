@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace Redstone.Protocol.Abstractions
+namespace Redstone.Abstractions.Protocol
 {
     /// <summary>
     /// Provides a mechanism to manage minecraft packet encryption.

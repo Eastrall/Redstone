@@ -1,8 +1,8 @@
 ﻿using Bogus;
 using Moq;
 using Redstone.Abstractions.Entities;
+using Redstone.Abstractions.Protocol;
 using Redstone.Common;
-using Redstone.Protocol.Abstractions;
 using Redstone.Server.Entities;
 using System;
 

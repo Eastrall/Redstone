@@ -1,4 +1,4 @@
-﻿namespace Redstone.Protocol.Abstractions
+﻿namespace Redstone.Abstractions.Protocol
 {
     /// <summary>
     /// Provides a mechanism that allows packet serialization.

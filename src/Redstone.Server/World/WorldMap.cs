@@ -1,4 +1,5 @@
 ﻿using Redstone.Abstractions.Entities;
+using Redstone.Abstractions.Protocol;
 using Redstone.Abstractions.World;
 using Redstone.Server.Entities;
 using System;
@@ -133,6 +134,14 @@ namespace Redstone.Server.World
 
             _players.Clear();
             _regions.Clear();
+        }
+
+        public void Broadcast(IMinecraftPacket packet)
+        {
+            foreach (IPlayer player in _players.Values)
+            {
+                player.SendPacket(packet);
+            }
         }
 
         private async Task Update()

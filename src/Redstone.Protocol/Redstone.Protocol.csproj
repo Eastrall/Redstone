@@ -13,6 +13,5 @@
   <ItemGroup>
     <ProjectReference Include="..\Redstone.Abstractions\Redstone.Abstractions.csproj" />
     <ProjectReference Include="..\Redstone.Common\Redstone.Common.csproj" />
-    <ProjectReference Include="..\Redstone.Protocol.Abstractions\Redstone.Protocol.Abstractions.csproj" />
   </ItemGroup>
 </Project>

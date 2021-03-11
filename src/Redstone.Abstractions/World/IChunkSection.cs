@@ -1,5 +1,5 @@
-﻿using Redstone.Common.IO;
-using Redstone.Protocol.Abstractions;
+﻿using Redstone.Abstractions.Protocol;
+using Redstone.Common.IO;
 
 namespace Redstone.Abstractions.World
 {

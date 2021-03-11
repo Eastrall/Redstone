@@ -2,7 +2,7 @@
 using Redstone.Common;
 using System;
 
-namespace Redstone.Protocol.Abstractions
+namespace Redstone.Abstractions.Protocol
 {
     /// <summary>
     /// Provides a mechanism to read and write minecraft packets.

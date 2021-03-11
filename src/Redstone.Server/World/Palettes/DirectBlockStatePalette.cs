@@ -1,6 +1,6 @@
-﻿using Redstone.Abstractions.Registry;
+﻿using Redstone.Abstractions.Protocol;
+using Redstone.Abstractions.Registry;
 using Redstone.Abstractions.World;
-using Redstone.Protocol.Abstractions;
 using System.Linq;
 
 namespace Redstone.Server.World.Palettes

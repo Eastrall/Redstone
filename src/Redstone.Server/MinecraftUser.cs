@@ -2,8 +2,7 @@
 using LiteNetwork.Server;
 using Microsoft.Extensions.Logging;
 using Redstone.Abstractions.Entities;
-using Redstone.Protocol;
-using Redstone.Protocol.Abstractions;
+using Redstone.Abstractions.Protocol;
 using Redstone.Protocol.Handlers;
 using Redstone.Protocol.Handlers.Exceptions;
 using Redstone.Protocol.Packets.Game;

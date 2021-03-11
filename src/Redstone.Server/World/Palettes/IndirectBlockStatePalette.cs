@@ -1,5 +1,5 @@
-﻿using Redstone.Abstractions.World;
-using Redstone.Protocol.Abstractions;
+﻿using Redstone.Abstractions.Protocol;
+using Redstone.Abstractions.World;
 using System;
 
 namespace Redstone.Server.World.Palettes

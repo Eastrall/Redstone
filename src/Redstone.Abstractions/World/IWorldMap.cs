@@ -1,4 +1,5 @@
 ﻿using Redstone.Abstractions.Entities;
+using Redstone.Abstractions.Protocol;
 using System;
 using System.Collections.Generic;
 
@@ -90,5 +91,11 @@ namespace Redstone.Abstractions.World
         /// Stops the world map update process.
         /// </summary>
         void StopUpdate();
+
+        /// <summary>
+        /// Broadcasts a packet to every connected players on the current map.
+        /// </summary>
+        /// <param name="packet">Packet to broadcast.</param>
+        void Broadcast(IMinecraftPacket packet);
     }
 }

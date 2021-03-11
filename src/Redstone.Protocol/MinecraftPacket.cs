@@ -1,7 +1,7 @@
 ﻿using LiteNetwork.Protocol;
+using Redstone.Abstractions.Protocol;
 using Redstone.Common;
 using Redstone.Common.IO;
-using Redstone.Protocol.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.IO;

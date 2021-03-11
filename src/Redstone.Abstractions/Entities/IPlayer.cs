@@ -1,4 +1,6 @@
-﻿namespace Redstone.Abstractions.Entities
+﻿using Redstone.Abstractions.Protocol;
+
+namespace Redstone.Abstractions.Entities
 {
     /// <summary>
     /// Provides an interface that describes the player behavior.
@@ -9,6 +11,12 @@
         /// Gets the player name.
         /// </summary>
         string Name { get; }
+
+        /// <summary>
+        /// Sends a packet to the current player.
+        /// </summary>
+        /// <param name="packet">Packet to send.</param>
+        void SendPacket(IMinecraftPacket packet);
 
         /// <summary>
         /// Sets the current player name.

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Redstone.Protocol.Abstractions;
+using Redstone.Abstractions.Protocol;
 using Redstone.Protocol.Cryptography;
 using Redstone.Protocol.Handlers;
 using Redstone.Protocol.Handlers.Internal;

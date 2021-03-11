@@ -1,4 +1,4 @@
-﻿using Redstone.Protocol.Abstractions;
+﻿using Redstone.Abstractions.Protocol;
 using Redstone.Protocol.Handlers;
 using Redstone.Protocol.Packets.Status;
 using Redstone.Protocol.Packets.Status.Client;
@@ -9,7 +9,7 @@ namespace Redstone.Server.Handlers.Status
     public class StatusPingHandler
     {
         [StatusPacketHandler(ServerStatusPacketType.Ping)]
-        public void OnPing(MinecraftUser user, IMinecraftPacket packet)
+        public void OnPing(IMinecraftUser user, IMinecraftPacket packet)
         {
             var pingPacket = new StatusPingPacket(packet);
             using var pongPacket = new StatusPongPacket(pingPacket.Payload);

@@ -1,4 +1,4 @@
-﻿namespace Redstone.Protocol
+﻿namespace Redstone.Abstractions.Protocol
 {
     /// <summary>
     /// Describes the different states of a Minecraft user.

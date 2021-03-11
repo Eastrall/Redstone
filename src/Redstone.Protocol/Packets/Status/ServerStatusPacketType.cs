@@ -1,4 +1,6 @@
-﻿namespace Redstone.Protocol.Packets.Status
+﻿using Redstone.Abstractions.Protocol;
+
+namespace Redstone.Protocol.Packets.Status
 {
     /// <summary>
     /// Defines the packets ids that can be received by the server during the <see cref="MinecraftUserStatus.Status"/> state.

@@ -1,4 +1,4 @@
-﻿using Redstone.Protocol.Abstractions;
+﻿using Redstone.Abstractions.Protocol;
 using Redstone.Protocol.Handlers;
 using Redstone.Protocol.Packets.Game;
 

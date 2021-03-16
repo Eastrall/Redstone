@@ -73,7 +73,7 @@ namespace Redstone.Protocol.Handlers
                 return null;
             }
 
-            var parameters = new object[executor.MethodParameters.Count()];
+            var parameters = new object[executor.MethodParameters.Length];
 
             for (var i = 0; i < parameters.Length; i++)
             {

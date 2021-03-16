@@ -24,6 +24,11 @@
         public uint MaxPlayers { get; set; }
 
         /// <summary>
+        /// Gets or sets the server's name.
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
         /// Gets or sets the server's status description.
         /// </summary>
         public string Description { get; set; }

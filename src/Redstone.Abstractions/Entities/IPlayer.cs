@@ -13,6 +13,11 @@ namespace Redstone.Abstractions.Entities
         string Name { get; }
 
         /// <summary>
+        /// Gets the player's ping in milliseconds.
+        /// </summary>
+        int Ping { get; }
+
+        /// <summary>
         /// Sends a packet to the current player.
         /// </summary>
         /// <param name="packet">Packet to send.</param>

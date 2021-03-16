@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Redstone.Abstractions.Entities;
+using System;
 
 namespace Redstone.Abstractions.Protocol
 {
@@ -18,6 +19,22 @@ namespace Redstone.Abstractions.Protocol
         MinecraftUserStatus Status { get; }
 
         /// <summary>
+        /// Gets the Minecraft user name.
+        /// </summary>
+        string Username { get; }
+
+        /// <summary>
+        /// Gets the Minecraft user's player information.
+        /// </summary>
+        IPlayer Player { get; }
+
+        /// <summary>
+        /// Updates the Miencraft user's status.
+        /// </summary>
+        /// <param name="newStatus">User status.</param>
+        void UpdateStatus(MinecraftUserStatus newStatus);
+
+        /// <summary>
         /// Sends the given packet to the current user.
         /// </summary>
         /// <param name="packet">Packet to be sent.</param>
@@ -33,5 +50,11 @@ namespace Redstone.Abstractions.Protocol
         /// </summary>
         /// <param name="reason">Disconnect reason.</param>
         void Disconnect(string reason);
+
+        /// <summary>
+        /// Loads the current player's information.
+        /// </summary>
+        /// <param name="playerName">Player name to be loaded.</param>
+        void LoadPlayer(string playerName);
     }
 }

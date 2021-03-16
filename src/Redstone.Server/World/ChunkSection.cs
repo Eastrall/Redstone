@@ -72,6 +72,8 @@ namespace Redstone.Server.World
             return validBlockCount;
         }
 
+        public void SetBlock(BlockType blockType, int x, int y, int z) => SetBlock(_blockFactory.CreateBlock(blockType), x, y, z);
+
         public void SetBlock(IBlock block, int x, int y, int z)
         {
             y %= Size;

@@ -32,5 +32,19 @@
         /// This value is ranged between 2 and 32.
         /// </remarks>
         public int RenderingDistance { get; set; }
+
+        /// <summary>
+        /// Gets or sets the world level name.
+        /// </summary>
+        /// <remarks>
+        /// This value is used to identify the world data folder where the actual world
+        /// data is stored.
+        /// </remarks>
+        public string LevelName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the world map format.
+        /// </summary>
+        public WorldMapFormatType WorldMapFormat { get; set; }
     }
 }

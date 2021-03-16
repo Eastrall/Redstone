@@ -19,6 +19,8 @@ namespace Redstone.Server
     [DebuggerDisplay("{Username ?? \"[undefined]\"}: {Status}")]
     public class MinecraftUser : LiteServerUser, IMinecraftUser
     {
+        private bool _playerLoaded;
+
         private readonly ILogger<MinecraftUser> _logger;
         private readonly IPacketHandler _packetHandler;
         private readonly IPlayer _player;
@@ -36,6 +38,12 @@ namespace Redstone.Server
             _player = new Player(this);
         }
 
+        public void UpdateStatus(MinecraftUserStatus newStatus)
+        {
+            // TODO: do additionnal checks.
+            Status = newStatus;
+        }
+
         public void Send(IMinecraftPacket packet) => base.Send(packet);
 
         public void Disconnect() => Disconnect(null);
@@ -50,6 +58,22 @@ namespace Redstone.Server
             Socket.Close();
         }
 
+        public void LoadPlayer(string playerName)
+        {
+            if (_playerLoaded)
+            {
+                _logger.LogWarning($"Player is already loaded.");
+                return;
+            }
+
+            Username = playerName;
+
+            _player.SetName(playerName);
+            // TODO: load player information from storage
+
+            _playerLoaded = true;
+        }
+
         public override Task HandleMessageAsync(ILitePacketStream incomingPacketStream)
         {
             if (incomingPacketStream is not IMinecraftPacket packet)
@@ -61,7 +85,6 @@ namespace Redstone.Server
 
             try
             {
-                _logger.LogTrace($"[{Username}] [{Status}] | Packet: {packetHeader} (0x{packet.PacketId:X2})");
                 _packetHandler.Invoke(Status, packetHeader, this, packet);
             }
             catch (HandlerActionNotFoundException)

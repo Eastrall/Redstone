@@ -1,4 +1,5 @@
-﻿using Redstone.Common.Server;
+﻿using Redstone.Abstractions.Protocol;
+using Redstone.Common.Server;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 
@@ -12,7 +13,7 @@ namespace Redstone.Server
         /// <summary>
         /// Gets the connected players list.
         /// </summary>
-        IEnumerable<MinecraftUser> ConnectedPlayers { get; }
+        IEnumerable<IMinecraftUser> ConnectedPlayers { get; }
 
         /// <summary>
         /// Gets the number of players connected.

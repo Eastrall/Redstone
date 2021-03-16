@@ -28,38 +28,38 @@ namespace Redstone.Server.Handlers.Login
         private readonly IOptions<GameConfiguration> _gameConfiguration;
         private readonly IRegistry _registry;
         private readonly IRedstoneServer _server;
-        private readonly IBlockFactory _blockFactory;
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IWorldManager _worldManager;
 
-        public LoginHandler(ILogger<LoginHandler> logger, IOptions<ServerConfiguration> serverConfiguration, IOptions<GameConfiguration> gameConfiguration, IRegistry registry, IRedstoneServer server, IBlockFactory blockFactory, IServiceProvider serviceProvider)
+        public LoginHandler(ILogger<LoginHandler> logger, IOptions<ServerConfiguration> serverConfiguration, IOptions<GameConfiguration> gameConfiguration, IRegistry registry, IRedstoneServer server, IWorldManager worldManager)
         {
             _logger = logger;
             _serverConfiguration = serverConfiguration;
             _gameConfiguration = gameConfiguration;
             _registry = registry;
             _server = server;
-            _blockFactory = blockFactory;
-            _serviceProvider = serviceProvider;
+            _worldManager = worldManager;
         }
 
         [LoginPacketHandler(ServerLoginPacketType.LoginStart)]
-        public void OnLogin(MinecraftUser user, IMinecraftPacket packet)
+        public void OnLogin(IMinecraftUser user, IMinecraftPacket packet)
         {
-            user.Username = packet.ReadString();
+            string username = packet.ReadString();
+
+            // TODO: initialize current player
+            // TODO: Read player data from storage (DB or file-system)
+            user.LoadPlayer(username);
 
             _logger.LogInformation($"{user.Username} trying to log-in");
 
-            user.Player.SetName(user.Username);
+            // DEBUG
             user.Player.Position.X = 8;
             user.Player.Position.Y = 2;
             user.Player.Position.Z = 8;
-            // TODO: initialize current player
-            // TODO: Read player data from storage (DB or file-system)
 
             if (_serverConfiguration.Value.Mode == ServerModeType.Offline)
             {
                 SendLoginSucess(user);
-                user.Status = MinecraftUserStatus.Play;
+                user.UpdateStatus(MinecraftUserStatus.Play);
                 SendJoinGame(user);
                 SendServerBrand(user);
                 // TODO: held item changed
@@ -85,7 +85,7 @@ namespace Redstone.Server.Handlers.Login
             }
         }
 
-        private void SendLoginSucess(MinecraftUser user)
+        private void SendLoginSucess(IMinecraftUser user)
         {
             using var p = new MinecraftPacket(ClientLoginPacketType.LoginSuccess);
 
@@ -95,7 +95,7 @@ namespace Redstone.Server.Handlers.Login
             user.Send(p);
         }
 
-        private void SendJoinGame(MinecraftUser user)
+        private void SendJoinGame(IMinecraftUser user)
         {
             using var joinPacket = new JoinGamePacket();
 
@@ -129,7 +129,7 @@ namespace Redstone.Server.Handlers.Login
             user.Send(joinPacket);
         }
 
-        private void SendServerBrand(MinecraftUser user)
+        private void SendServerBrand(IMinecraftUser user)
         {
             using var serverBrandPacket = new PluginMessagePacket("minecraft:brand");
 
@@ -138,14 +138,14 @@ namespace Redstone.Server.Handlers.Login
             user.Send(serverBrandPacket);
         }
 
-        private void SendPlayerInfo(MinecraftUser user, PlayerInfoActionType actionType)
+        private void SendPlayerInfo(IMinecraftUser user, PlayerInfoActionType actionType)
         {
             using var packet = new PlayerInfoPacket();
 
             packet.WriteVarInt32((int)actionType);
             packet.WriteVarInt32((int)_server.ConnectedPlayersCount);
 
-            foreach (MinecraftUser connectedPlayer in _server.ConnectedPlayers.Where(x => x.Status == MinecraftUserStatus.Play))
+            foreach (IMinecraftUser connectedPlayer in _server.ConnectedPlayers.Where(x => x.Status == MinecraftUserStatus.Play))
             {
                 packet.WriteUUID(connectedPlayer.Id);
 
@@ -154,7 +154,7 @@ namespace Redstone.Server.Handlers.Login
                     packet.WriteString(connectedPlayer.Username);
                     packet.WriteVarInt32(0); // Optional properties
                     packet.WriteVarInt32((int)_gameConfiguration.Value.Mode);
-                    packet.WriteVarInt32(0); // ping
+                    packet.WriteVarInt32(connectedPlayer.Player.Ping);
                     packet.WriteBoolean(false); // Has display name
 
                     // if has display name then
@@ -162,14 +162,14 @@ namespace Redstone.Server.Handlers.Login
                 }
                 else if (actionType == PlayerInfoActionType.UpdateLatency)
                 {
-                    packet.WriteVarInt32(0); // ping
+                    packet.WriteVarInt32(connectedPlayer.Player.Ping);
                 }
             }
 
             user.Send(packet);
         }
 
-        private void SendUpdateViewPosition(MinecraftUser user)
+        private void SendUpdateViewPosition(IMinecraftUser user)
         {
             // TODO: get chunk position according to current user's position.
             using var packet = new UpdateViewPositionPacket(0, 0);
@@ -177,25 +177,13 @@ namespace Redstone.Server.Handlers.Login
             user.Send(packet);
         }
 
-        private void SendChunkData(MinecraftUser user)
+        private void SendChunkData(IMinecraftUser user)
         {
-            var world = new WorldMap("minecraft:overworld", _serviceProvider);
-            IRegion region = world.AddRegion(0, 0);
-            IChunk chunk = region.AddChunk(0, 0);
-
-            for (int x = 0; x < 16; x++)
-            {
-                for (int z = 0; z < 16; z++)
-                {
-                    var block = _blockFactory.CreateBlock(BlockType.Dirt);
-                    chunk.SetBlock(block, x, 1, z);
-                }
-            }
+            IChunk chunk = _worldManager.Overworld.GetRegion(0, 0).GetChunk(0, 0);
 
             chunk.GenerateHeightMap();
 
-            world.StartUpdate();
-            world.AddPlayer(user.Player);
+            _worldManager.Overworld.AddPlayer(user.Player);
 
             bool fullChunk = true;
 
@@ -261,14 +249,14 @@ namespace Redstone.Server.Handlers.Login
             user.Send(packet);
         }
 
-        private void SendSpawnPosition(MinecraftUser user, Position position)
+        private void SendSpawnPosition(IMinecraftUser user, Position position)
         {
             using var packet = new SpawnPositionPacket(position);
 
             user.Send(packet);
         }
 
-        private void SendPlayerPositionAndLook(MinecraftUser user, Position position)
+        private void SendPlayerPositionAndLook(IMinecraftUser user, Position position)
         {
             using var packet = new PlayerPositionAndLookPacket();
 

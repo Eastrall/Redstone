@@ -1,4 +1,5 @@
 ﻿using Redstone.Abstractions.World;
+using Redstone.Common;
 using Redstone.Common.Collections;
 using System;
 using System.Collections.Generic;
@@ -86,17 +87,26 @@ namespace Redstone.Server.World
             return section;
         }
 
+        public void SetBlock(BlockType blockType, int x, int y, int z)
+        {
+            GetChunkSection(y).SetBlock(blockType, x, y % Size, z);
+        }
+
         public void SetBlock(IBlock block, int x, int y, int z)
         {
-            if (y < 0)
+            GetChunkSection(y).SetBlock(block, x, y % Size, z);
+        }
+
+        private IChunkSection GetChunkSection(int yCoordinate)
+        {
+            if (yCoordinate < 0)
             {
                 throw new InvalidOperationException($"Cannot get a block with a negative Y value.");
             }
 
-            int sectionIndex = GetSectionIndex(y);
-            IChunkSection section = GetSection(sectionIndex);
+            int sectionIndex = GetSectionIndex(yCoordinate);
 
-            section.SetBlock(block, x, y % Size, z);
+            return GetSection(sectionIndex);
         }
 
         private static int GetSectionIndex(int y) => y / Size;

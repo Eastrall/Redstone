@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Redstone.Abstractions.Protocol;
 using Redstone.Abstractions.Registry;
+using Redstone.Abstractions.World;
 using Redstone.Common.Configuration;
 using Redstone.Common.Server;
 using System;
@@ -19,11 +20,13 @@ namespace Redstone.Server
         private readonly ILogger<RedstoneServer> _logger;
         private readonly IMinecraftPacketEncryption _packetEncryption;
         private readonly IOptions<ServerConfiguration> _serverConfiguration;
+        private readonly IOptions<GameConfiguration> _gameConfiguration;
         private readonly IRegistry _registry;
+        private readonly IWorldManager _worldManager;
 
         public RSAParameters ServerEncryptionKey { get; private set; }
 
-        public IEnumerable<MinecraftUser> ConnectedPlayers => ConnectedUsers;
+        public IEnumerable<IMinecraftUser> ConnectedPlayers => ConnectedUsers;
 
         public uint ConnectedPlayersCount => (uint)ConnectedUsers.Count(x => x.Status == MinecraftUserStatus.Play);
 
@@ -33,12 +36,15 @@ namespace Redstone.Server
             _logger = serviceProvider.GetRequiredService<ILogger<RedstoneServer>>();
             _packetEncryption = serviceProvider.GetRequiredService<IMinecraftPacketEncryption>();
             _serverConfiguration = serviceProvider.GetRequiredService<IOptions<ServerConfiguration>>();
+            _gameConfiguration = serviceProvider.GetRequiredService<IOptions<GameConfiguration>>();
             _registry = serviceProvider.GetRequiredService<IRegistry>();
+            _worldManager = serviceProvider.GetRequiredService<IWorldManager>();
         }
 
         protected override void OnBeforeStart()
         {
             _registry.Load();
+            _worldManager.Load(_gameConfiguration.Value.LevelName);
 
             _logger.LogInformation("Generating server encryption keys...");
             ServerEncryptionKey = _packetEncryption.GenerateEncryptionKeys();
@@ -53,7 +59,11 @@ namespace Redstone.Server
         {
             return new MinecraftServerStatus
             {
-                Version = new MinecraftServerVersion { Name = "Redstone dev", Protocol = 754 },
+                Version = new MinecraftServerVersion
+                {
+                    Name = _serverConfiguration.Value.Name,
+                    Protocol = 754
+                },
                 Players = new MinecraftServerPlayers
                 {
                     Max = _serverConfiguration.Value.MaxPlayers,

@@ -1,13 +1,9 @@
 ﻿using Redstone.Abstractions.Entities;
 using Redstone.Abstractions.Protocol;
-using Redstone.Protocol;
 using Redstone.Protocol.Packets.Game.Client;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Redstone.Server.Entities
 {
@@ -20,6 +16,8 @@ namespace Redstone.Server.Entities
         public override Guid Id => _user.Id;
 
         public string Name { get; private set; }
+
+        public int Ping { get; private set; }
 
         public Player(IMinecraftUser user)
         {
@@ -56,6 +54,8 @@ namespace Redstone.Server.Entities
             {
                 _user.Disconnect("Keep-alive id doesn't match.");
             }
+
+            Ping = DateTime.UtcNow.Millisecond - (int)nextKeepAliveId;
         }
 
         public override void AddVisibleEntity(IEntity entity)

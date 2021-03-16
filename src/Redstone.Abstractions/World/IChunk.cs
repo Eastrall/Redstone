@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Redstone.Common;
+using System.Collections.Generic;
 
 namespace Redstone.Abstractions.World
 {
@@ -19,6 +20,8 @@ namespace Redstone.Abstractions.World
         IBlock GetBlock(int x, int y, int z);
 
         IChunkSection GetSection(int sectionIndex);
+
+        void SetBlock(BlockType blockType, int x, int y, int z);
 
         void SetBlock(IBlock block, int x, int y, int z);
     }

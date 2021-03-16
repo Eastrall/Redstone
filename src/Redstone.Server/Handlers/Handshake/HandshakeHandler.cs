@@ -8,11 +8,11 @@ namespace Redstone.Server.Handlers.Handshake
     public class HandshakeHandler
     {
         [HandshakePacketHandler(ServerHandshakePacketType.Handshaking)]
-        public void OnHandshake(MinecraftUser user, IMinecraftPacket packet)
+        public void OnHandshake(IMinecraftUser user, IMinecraftPacket packet)
         {
             var handshake = new HandshakePacket(packet);
 
-            user.Status = handshake.NextState;
+            user.UpdateStatus(handshake.NextState);
         }
     }
 }

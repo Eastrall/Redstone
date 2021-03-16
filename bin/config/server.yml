@@ -2,6 +2,7 @@ server:
   max-players: 100
   ip: ''
   port: 25565
+  name: 'Redstone-Dev'
   description: 'An awesome Minecraft server powered by Redstone!'
   use-encryption: false
   mode: 'offline'
@@ -15,5 +16,7 @@ game:
   display-respawn-screen: true
   is-hardcore: false
   rendering-distance: 5
+  level-name: 'redstone-world'
+  world-map-format: 'anvil' # can be also 'redstone'
 
 # Additionnal configuration

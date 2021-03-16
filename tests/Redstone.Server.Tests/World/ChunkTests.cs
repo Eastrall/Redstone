@@ -142,6 +142,21 @@ namespace Redstone.Server.Tests.World
             Assert.Equal(BlockType.Dirt, dirtBlock.Type);
         }
 
+        [Fact]
+        public void ChunkSetBlockWithBlockTypeTest()
+        {
+            var chunk = new Chunk(0, 0, _serviceProvider);
+            chunk.SetBlock(BlockType.Dirt, 0, 0, 0);
+
+            IBlock dirtBlock = chunk.GetBlock(0, 0, 0);
+
+            Assert.NotNull(dirtBlock);
+            Assert.IsType<Block>(dirtBlock);
+            Assert.False(dirtBlock.IsAir);
+            Assert.False(dirtBlock.IsFluid);
+            Assert.Equal(BlockType.Dirt, dirtBlock.Type);
+        }
+
         [Theory]
         [InlineData(-1)]
         [InlineData(300)]

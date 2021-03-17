@@ -61,7 +61,13 @@ namespace Redstone.Server.Entities
         public override void AddVisibleEntity(IEntity entity)
         {
             base.AddVisibleEntity(entity);
-            // TODO: send spawn packet
+
+            using IMinecraftPacket packet = entity switch
+            {
+                IPlayer playerEntity => new SpawnPlayerPacket(playerEntity),
+                _ => throw new NotImplementedException()
+            };
+            SendPacket(packet);
         }
 
         public override void RemoveVisibleEntity(IEntity entity)

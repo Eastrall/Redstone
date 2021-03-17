@@ -66,6 +66,12 @@ namespace Redstone.Abstractions.Protocol
         void WritePosition(Position position);
 
         /// <summary>
+        /// Writes the given angle as a single byte into the the packet stream.
+        /// </summary>
+        /// <param name="angle">Angle.</param>
+        void WriteAngle(float angle);
+
+        /// <summary>
         /// Dumps the current packet stream into a file as a UTF-8 string.
         /// </summary>
         /// <param name="fileName">Dump output file name.</param>

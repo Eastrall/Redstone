@@ -260,6 +260,11 @@ namespace Redstone.Protocol
             WriteInt64(x | z | y);
         }
 
+        public void WriteAngle(float angle)
+        {
+            WriteByte((byte)(angle * 256f / 360f));
+        }
+
         public void Dump(string fileName, PacketDumpMode dumpMode)
         {
             var dumpContent = dumpMode switch

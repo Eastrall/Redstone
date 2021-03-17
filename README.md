@@ -21,6 +21,8 @@ The project has been created for learning purposes, about the network, game logi
 
 The goal is to provide a clean and simple API to develop highly performant Minecraft servers.
 
+Redstone uses a [`HostBuilder`](https://docs.microsoft.com/en-us/dotnet/core/extensions/generic-host) to benefit the use of using modern design patterns such as [Dependency Injection](https://docs.microsoft.com/en-us/dotnet/core/extensions/dependency-injection), [Logging](https://docs.microsoft.com/en-us/dotnet/core/extensions/logging) and [Configuration](https://docs.microsoft.com/en-us/dotnet/core/extensions/configuration) loading.
+
 <h4 align="center">:warning: This project is not affiliated with Mojang Studios. :warning:</h4>
 
 ## Getting started

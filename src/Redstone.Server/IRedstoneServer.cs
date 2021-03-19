@@ -30,5 +30,19 @@ namespace Redstone.Server
         /// </summary>
         /// <returns>Server status data structure.</returns>
         MinecraftServerStatus GetServerStatus();
+
+        /// <summary>
+        /// Gets an user identified by the given input username.
+        /// </summary>
+        /// <param name="username">User name.</param>
+        /// <returns>The user if found; null otherwise.</returns>
+        IMinecraftUser GetUser(string username);
+
+        /// <summary>
+        /// Checks if there is an user connected with the given input username.
+        /// </summary>
+        /// <param name="username">User name.</param>
+        /// <returns>True if an user with the same username is already connected; false otherwise.</returns>
+        bool HasUser(string username);
     }
 }

@@ -1,4 +1,5 @@
-﻿using Redstone.Abstractions.World;
+﻿using Redstone.Abstractions.Protocol;
+using Redstone.Abstractions.World;
 using Redstone.Common;
 using System;
 using System.Collections.Generic;
@@ -67,5 +68,17 @@ namespace Redstone.Abstractions.Entities
         /// </summary>
         /// <param name="entity">Entity that is not visible anymore by the current entity.</param>
         void RemoveVisibleEntity(IEntity entity);
+
+        /// <summary>
+        /// Sends a packet to the current entity.
+        /// </summary>
+        /// <param name="packet">Packet to send.</param>
+        void SendPacket(IMinecraftPacket packet);
+
+        /// <summary>
+        /// Sends a packet to all visible entities of the current entity.
+        /// </summary>
+        /// <param name="packet">Packet to send.</param>
+        void SendPacketToVisibleEntities(IMinecraftPacket packet);
     }
 }

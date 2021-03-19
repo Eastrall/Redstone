@@ -7,6 +7,7 @@ using Redstone.Common;
 using Redstone.Common.Configuration;
 using Redstone.Common.Structures.Biomes;
 using Redstone.Common.Structures.Dimensions;
+using Redstone.Common.Utilities;
 using Redstone.NBT;
 using Redstone.NBT.Serialization;
 using Redstone.NBT.Tags;
@@ -45,19 +46,21 @@ namespace Redstone.Server.Handlers.Login
         {
             string username = packet.ReadString();
 
-            // TODO: initialize current player
-            // TODO: Read player data from storage (DB or file-system)
-            user.LoadPlayer(username);
-
             _logger.LogInformation($"{user.Username} trying to log-in");
-
-            // DEBUG
-            user.Player.Position.X = 8;
-            user.Player.Position.Y = 2;
-            user.Player.Position.Z = 8;
 
             if (_serverConfiguration.Value.Mode == ServerModeType.Offline)
             {
+                Guid playerId = GuidUtilities.GenerateGuidFromString($"OfflinePlayer:{username}");
+
+                // TODO: initialize current player
+                // TODO: Read player data from storage (DB or file-system)
+                user.LoadPlayer(playerId, username);
+
+                // DEBUG
+                user.Player.Position.X = 8;
+                user.Player.Position.Y = 2;
+                user.Player.Position.Z = 8;
+
                 SendLoginSucess(user);
                 user.UpdateStatus(MinecraftUserStatus.Play);
                 SendJoinGame(user);
@@ -69,7 +72,7 @@ namespace Redstone.Server.Handlers.Login
                 // TODO: declare commands
                 // TODO: Unlock recipes
                 SendPlayerPositionAndLook(user, user.Player.Position);
-                SendPlayerInfo(user, PlayerInfoActionType.Add); 
+                SendPlayerInfo(user, PlayerInfoActionType.Add);
                 SendPlayerInfo(user, PlayerInfoActionType.UpdateLatency);
                 SendUpdateViewPosition(user);
                 // TODO: Update light

@@ -1,8 +1,10 @@
 ﻿using LiteNetwork.Protocol.Abstractions;
 using LiteNetwork.Server;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Redstone.Abstractions.Entities;
 using Redstone.Abstractions.Protocol;
+using Redstone.Common.Configuration;
 using Redstone.Protocol.Handlers;
 using Redstone.Protocol.Handlers.Exceptions;
 using Redstone.Protocol.Packets.Game;
@@ -19,11 +21,11 @@ namespace Redstone.Server
     [DebuggerDisplay("{Username ?? \"[undefined]\"}: {Status}")]
     public class MinecraftUser : LiteServerUser, IMinecraftUser
     {
-        private bool _playerLoaded;
-
         private readonly ILogger<MinecraftUser> _logger;
+        private readonly IOptions<ServerConfiguration> _serverOptions;
+        private readonly IRedstoneServer _server;
         private readonly IPacketHandler _packetHandler;
-        private readonly IPlayer _player;
+        private IPlayer _player;
 
         public MinecraftUserStatus Status { get; internal set; } = MinecraftUserStatus.Handshaking;
 
@@ -31,11 +33,12 @@ namespace Redstone.Server
 
         public IPlayer Player => _player;
 
-        public MinecraftUser(ILogger<MinecraftUser> logger, IPacketHandler packetHandler)
+        public MinecraftUser(ILogger<MinecraftUser> logger, IOptions<ServerConfiguration> serverOptions, IRedstoneServer server, IPacketHandler packetHandler)
         {
             _logger = logger;
+            _serverOptions = serverOptions;
+            _server = server;
             _packetHandler = packetHandler;
-            _player = new Player(this);
         }
 
         public void UpdateStatus(MinecraftUserStatus newStatus)
@@ -58,9 +61,15 @@ namespace Redstone.Server
             Socket.Close();
         }
 
-        public void LoadPlayer(string playerName)
+        public void LoadPlayer(Guid playerId, string playerName)
         {
-            if (_playerLoaded)
+            if (_server.HasUser(playerName))
+            {
+                Disconnect($"A player with the same name '{playerName}' is already connected.");
+                return;
+            }
+
+            if (_player is not null)
             {
                 _logger.LogWarning($"Player is already loaded.");
                 return;
@@ -68,10 +77,8 @@ namespace Redstone.Server
 
             Username = playerName;
 
-            _player.SetName(playerName);
+            _player = new Player(this, playerId, playerName);
             // TODO: load player information from storage
-
-            _playerLoaded = true;
         }
 
         public override Task HandleMessageAsync(ILitePacketStream incomingPacketStream)

@@ -13,19 +13,21 @@ namespace Redstone.Server.Entities
         private readonly IMinecraftUser _user;
         private readonly Queue<long> _keepAliveIdQueue;
 
-        public override Guid Id => _user.Id;
+        public override Guid Id { get; }
 
         public string Name { get; private set; }
 
         public int Ping { get; private set; }
 
-        public Player(IMinecraftUser user)
+        public Player(IMinecraftUser user, Guid id, string name)
         {
             _user = user;
+            Id = id;
+            Name = name;
             _keepAliveIdQueue = new Queue<long>();
         }
 
-        public void SendPacket(IMinecraftPacket packet) => _user.Send(packet);
+        public override void SendPacket(IMinecraftPacket packet) => _user.Send(packet);
 
         public void SetName(string newName, bool notifyOtherPlayers = false)
         {
@@ -65,6 +67,7 @@ namespace Redstone.Server.Entities
             using IMinecraftPacket packet = entity switch
             {
                 IPlayer playerEntity => new SpawnPlayerPacket(playerEntity),
+                // TODO: add other entity types
                 _ => throw new NotImplementedException()
             };
             SendPacket(packet);

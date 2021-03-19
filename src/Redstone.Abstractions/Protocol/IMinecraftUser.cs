@@ -54,7 +54,8 @@ namespace Redstone.Abstractions.Protocol
         /// <summary>
         /// Loads the current player's information.
         /// </summary>
+        /// <param name="playerId">Player id to be loaded.</param>
         /// <param name="playerName">Player name to be loaded.</param>
-        void LoadPlayer(string playerName);
+        void LoadPlayer(Guid playerId, string playerName);
     }
 }

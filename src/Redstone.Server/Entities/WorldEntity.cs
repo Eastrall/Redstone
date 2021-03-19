@@ -1,7 +1,9 @@
 ﻿using Redstone.Abstractions.Entities;
+using Redstone.Abstractions.Protocol;
 using Redstone.Abstractions.World;
 using Redstone.Common;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,10 +11,10 @@ namespace Redstone.Server.Entities
 {
     internal class WorldEntity : IEntity
     {
-        private static readonly object _entityIdGeneratorLock = new object();
+        private static readonly object _entityIdGeneratorLock = new();
         private static int _entityIdGenerator = 1;
 
-        private readonly IList<IEntity> _visibleEntities;
+        private readonly ConcurrentDictionary<Guid, IEntity> _visibleEntities;
 
         public virtual Guid Id { get; } = Guid.NewGuid();
 
@@ -26,7 +28,7 @@ namespace Redstone.Server.Entities
 
         public IWorldMap Map { get; internal set; }
 
-        public IEnumerable<IEntity> VisibleEntities => _visibleEntities;
+        public IEnumerable<IEntity> VisibleEntities => _visibleEntities.Values;
 
         public WorldEntity()
         {
@@ -35,14 +37,32 @@ namespace Redstone.Server.Entities
                 EntityId = _entityIdGenerator++;
             }
 
-            _visibleEntities = new List<IEntity>();
+            _visibleEntities = new ConcurrentDictionary<Guid, IEntity>();
+        }
+
+        public virtual void SendPacket(IMinecraftPacket packet)
+        {
+            // Nothing to do.
+        }
+
+        public virtual void SendPacketToVisibleEntities(IMinecraftPacket packet)
+        {
+            if (packet is null)
+            {
+                throw new ArgumentNullException(nameof(packet), "The packet is null.");
+            }
+
+            foreach (IEntity entity in VisibleEntities)
+            {
+                entity.SendPacket(packet);
+            }
         }
 
         public void LookAround()
         {
             IEnumerable<IEntity> currentVisibleEntities = Map.GetVisibleEntities(this);
-            IEnumerable<IEntity> appearingEntities = currentVisibleEntities.Except(_visibleEntities);
-            IEnumerable<IEntity> disapearingEntities = _visibleEntities.Except(currentVisibleEntities);
+            IEnumerable<IEntity> appearingEntities = currentVisibleEntities.Except(_visibleEntities.Values);
+            IEnumerable<IEntity> disapearingEntities = _visibleEntities.Values.Except(currentVisibleEntities);
 
             if (appearingEntities.Any() || disapearingEntities.Any())
             {
@@ -60,17 +80,17 @@ namespace Redstone.Server.Entities
 
         public virtual void AddVisibleEntity(IEntity entity)
         {
-            if (!_visibleEntities.Contains(entity))
+            if (!_visibleEntities.ContainsKey(entity.Id))
             {
-                _visibleEntities.Add(entity);
+                _visibleEntities.TryAdd(entity.Id, entity);
             }
         }
 
         public virtual void RemoveVisibleEntity(IEntity entity)
         {
-            if (_visibleEntities.Contains(entity))
+            if (_visibleEntities.ContainsKey(entity.Id))
             {
-                _visibleEntities.Remove(entity);
+                _visibleEntities.TryRemove(entity.Id, out _);
             }
         }
 

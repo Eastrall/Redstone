@@ -76,5 +76,9 @@ namespace Redstone.Server
                 Favicon = RedstoneContants.GetDefaultFavicon()
             };
         }
+
+        public IMinecraftUser GetUser(string username) => ConnectedUsers.FirstOrDefault(x => x.Username == username);
+
+        public bool HasUser(string username) => ConnectedUsers.Any(x => x.Username == username);
     }
 }

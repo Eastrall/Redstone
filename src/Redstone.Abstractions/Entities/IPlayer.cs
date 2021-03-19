@@ -18,12 +18,6 @@ namespace Redstone.Abstractions.Entities
         int Ping { get; }
 
         /// <summary>
-        /// Sends a packet to the current player.
-        /// </summary>
-        /// <param name="packet">Packet to send.</param>
-        void SendPacket(IMinecraftPacket packet);
-
-        /// <summary>
         /// Sets the current player name.
         /// </summary>
         /// <param name="newName">New name.</param>

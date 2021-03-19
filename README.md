@@ -39,3 +39,7 @@ Before getting started, you will need to install the following softwares in orde
 One you have checked out the repository, you can open the `Redstone.sln` solution in visual studio, set the `docker-compose` project as "Startup Project" and start the debug to get a working server in debug mode.
 
 Note: The configuration files of the project are located in the `bin/config` folder, located at the root directory of the project.
+
+## Thanks
+
+A huge thanks to [wiki.vg](https://wiki.vg/) community for the amazing work about the Minecraft protocol description and map/chunk formats!

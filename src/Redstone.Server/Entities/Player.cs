@@ -1,5 +1,6 @@
 ﻿using Redstone.Abstractions.Entities;
 using Redstone.Abstractions.Protocol;
+using Redstone.Common;
 using Redstone.Protocol.Packets.Game.Client;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,8 @@ namespace Redstone.Server.Entities
         public string Name { get; private set; }
 
         public int Ping { get; private set; }
+
+        public ServerGameModeType GameMode { get; internal set; }
 
         public Player(IMinecraftUser user, Guid id, string name)
         {
@@ -52,10 +55,10 @@ namespace Redstone.Server.Entities
         {
             var nextKeepAliveId = _keepAliveIdQueue.Dequeue();
 
-            if (nextKeepAliveId != keepAliveId)
-            {
-                _user.Disconnect("Keep-alive id doesn't match.");
-            }
+            //if (nextKeepAliveId != keepAliveId)
+            //{
+            //    _user.Disconnect("Keep-alive id doesn't match.");
+            //}
 
             Ping = DateTime.UtcNow.Millisecond - (int)nextKeepAliveId;
         }

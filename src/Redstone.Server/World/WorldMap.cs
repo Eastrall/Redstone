@@ -78,8 +78,8 @@ namespace Redstone.Server.World
         }
 
         public IPlayer RemovePlayer(IPlayer player)
-            => _players.TryRemove(player.Id, out IPlayer removedPlayer) ? 
-                removedPlayer : 
+            => _players.TryRemove(player.Id, out IPlayer removedPlayer) ?
+                removedPlayer :
                 throw new InvalidOperationException($"Failed to remove player with id: {player.Id} from map {Name}. Player doesn't exist.");
 
         public IPlayer GetPlayer(Guid playerId)
@@ -169,6 +169,8 @@ namespace Redstone.Server.World
         {
             return from x in entities
                    where x.EntityId != currentEntity.EntityId &&
+                         x.IsSpawned &&
+                         x.IsVisible &&
                          x.Position.IsInRange(currentEntity.Position, visibilityRange)
                    select x;
         }

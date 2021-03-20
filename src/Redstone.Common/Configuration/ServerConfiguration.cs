@@ -57,5 +57,13 @@
         /// Gets or sets a boolean value that indicates if the server is using a flat terrain.
         /// </summary>
         public bool FlatTerrain { get; set; }
+
+        /// <summary>
+        /// Gets or sets a boolean value that indiciates if the server allows debug using the same player name.
+        /// </summary>
+        /// <remarks>
+        /// If a two players have the same name, an auto-incremented value will be append to the end of each player.
+        /// </remarks>
+        public bool AllowMultiplayerDebug { get; set; }
     }
 }

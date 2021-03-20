@@ -23,7 +23,10 @@ namespace Redstone.Server.Handlers.Play
                 user.Player.HeadAngle, 
                 isOnGround);
 
+            using var entityHeadLookPacket = new EntityHeadLookPacket(user.Player.EntityId, user.Player.Angle);
+
             user.Player.SendPacketToVisibleEntities(entityRotationPacket);
+            user.Player.SendPacketToVisibleEntities(entityHeadLookPacket);
         }
     }
 }

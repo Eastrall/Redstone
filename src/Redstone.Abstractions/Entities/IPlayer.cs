@@ -1,4 +1,5 @@
 ﻿using Redstone.Abstractions.Protocol;
+using Redstone.Common;
 
 namespace Redstone.Abstractions.Entities
 {
@@ -16,6 +17,11 @@ namespace Redstone.Abstractions.Entities
         /// Gets the player's ping in milliseconds.
         /// </summary>
         int Ping { get; }
+
+        /// <summary>
+        /// Gets the current player's game mode.
+        /// </summary>
+        ServerGameModeType GameMode { get; }
 
         /// <summary>
         /// Sets the current player name.

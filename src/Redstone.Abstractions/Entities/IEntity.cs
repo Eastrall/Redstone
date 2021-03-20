@@ -22,6 +22,16 @@ namespace Redstone.Abstractions.Entities
         int EntityId { get; }
 
         /// <summary>
+        /// Gets or sets a boolean value that indicates if the current entity is spawned.
+        /// </summary>
+        bool IsSpawned { get; set; }
+
+        /// <summary>
+        /// Gets or sets a boolean value that indicates if the current entity is visible.
+        /// </summary>
+        bool IsVisible { get; set; }
+
+        /// <summary>
         /// Gets the entity position.
         /// </summary>
         Position Position { get; }

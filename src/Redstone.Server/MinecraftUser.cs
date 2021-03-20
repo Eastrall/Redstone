@@ -22,7 +22,7 @@ namespace Redstone.Server
     public class MinecraftUser : LiteServerUser, IMinecraftUser
     {
         private readonly ILogger<MinecraftUser> _logger;
-        private readonly IOptions<ServerConfiguration> _serverOptions;
+        private readonly IOptions<GameConfiguration> _gameConfiguration;
         private readonly IRedstoneServer _server;
         private readonly IPacketHandler _packetHandler;
         private IPlayer _player;
@@ -33,10 +33,10 @@ namespace Redstone.Server
 
         public IPlayer Player => _player;
 
-        public MinecraftUser(ILogger<MinecraftUser> logger, IOptions<ServerConfiguration> serverOptions, IRedstoneServer server, IPacketHandler packetHandler)
+        public MinecraftUser(ILogger<MinecraftUser> logger, IOptions<GameConfiguration> gameConfiguration, IRedstoneServer server, IPacketHandler packetHandler)
         {
             _logger = logger;
-            _serverOptions = serverOptions;
+            _gameConfiguration = gameConfiguration;
             _server = server;
             _packetHandler = packetHandler;
         }
@@ -63,12 +63,6 @@ namespace Redstone.Server
 
         public void LoadPlayer(Guid playerId, string playerName)
         {
-            if (_server.HasUser(playerName))
-            {
-                Disconnect($"A player with the same name '{playerName}' is already connected.");
-                return;
-            }
-
             if (_player is not null)
             {
                 _logger.LogWarning($"Player is already loaded.");
@@ -77,7 +71,11 @@ namespace Redstone.Server
 
             Username = playerName;
 
-            _player = new Player(this, playerId, playerName);
+            _player = new Player(this, playerId, playerName)
+            {
+                GameMode = _gameConfiguration.Value.Mode
+            };
+
             // TODO: load player information from storage
         }
 
@@ -132,12 +130,13 @@ namespace Redstone.Server
 
         protected override void OnDisconnected()
         {
-            _logger.LogInformation($"Client '{Id}' disconnected.");
+            _logger.LogInformation($"Client '{Id}' disconnected (Username: '{Username}').");
 
-            if (Status == MinecraftUserStatus.Play)
+            if (Status == MinecraftUserStatus.Play && Player.Map is not null)
             {
                 Player.Map.RemovePlayer(Player);
                 // TODO: save current player
+                // TODO: remove current player from other players cache (PlayerInfoPacket)
             }
         }
 

@@ -6,8 +6,8 @@
             : base(ClientPlayPacketType.EntityRotation)
         {
             WriteVarInt32(entityId);
-            WriteSingle(yawAngle);
-            WriteSingle(pitchAngle);
+            WriteAngle(yawAngle);
+            WriteAngle(pitchAngle);
             WriteBoolean(isOnGround);
         }
     }

@@ -26,6 +26,13 @@ namespace Redstone.Server
         RSAParameters ServerEncryptionKey { get; }
 
         /// <summary>
+        /// Sends the given packet to a given collection of users.
+        /// </summary>
+        /// <param name="users">Users.</param>
+        /// <param name="packet">Packet to send.</param>
+        void SendTo(IEnumerable<IMinecraftUser> users, IMinecraftPacket packet);
+
+        /// <summary>
         /// Gets the server status.
         /// </summary>
         /// <returns>Server status data structure.</returns>

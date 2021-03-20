@@ -20,6 +20,10 @@ namespace Redstone.Server.Entities
 
         public int EntityId { get; }
 
+        public bool IsSpawned { get; set; } = false;
+
+        public bool IsVisible { get; set; } = true;
+
         public Position Position { get; } = new Position();
 
         public float Angle { get; set; }
@@ -60,6 +64,11 @@ namespace Redstone.Server.Entities
 
         public void LookAround()
         {
+            if (!IsSpawned)
+            {
+                return;
+            }
+
             IEnumerable<IEntity> currentVisibleEntities = Map.GetVisibleEntities(this);
             IEnumerable<IEntity> appearingEntities = currentVisibleEntities.Except(_visibleEntities.Values);
             IEnumerable<IEntity> disapearingEntities = _visibleEntities.Values.Except(currentVisibleEntities);

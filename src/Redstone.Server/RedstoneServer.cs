@@ -26,7 +26,7 @@ namespace Redstone.Server
 
         public RSAParameters ServerEncryptionKey { get; private set; }
 
-        public IEnumerable<IMinecraftUser> ConnectedPlayers => ConnectedUsers;
+        public IEnumerable<IMinecraftUser> ConnectedPlayers => ConnectedUsers.Where(x => x.Status == MinecraftUserStatus.Play);
 
         public uint ConnectedPlayersCount => (uint)ConnectedUsers.Count(x => x.Status == MinecraftUserStatus.Play);
 
@@ -54,6 +54,9 @@ namespace Redstone.Server
         {
             _logger.LogInformation($"Server started and listening on port '{Configuration.Port}'.");
         }
+
+        public void SendTo(IEnumerable<IMinecraftUser> users, IMinecraftPacket packet) 
+            => base.SendTo(users.Cast<MinecraftUser>(), packet);
 
         public MinecraftServerStatus GetServerStatus()
         {

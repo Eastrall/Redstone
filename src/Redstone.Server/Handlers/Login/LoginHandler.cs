@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Redstone.Abstractions.Entities;
 using Redstone.Abstractions.Protocol;
 using Redstone.Abstractions.Registry;
 using Redstone.Abstractions.World;
@@ -50,6 +51,24 @@ namespace Redstone.Server.Handlers.Login
 
             if (_serverConfiguration.Value.Mode == ServerModeType.Offline)
             {
+                if (_serverConfiguration.Value.AllowMultiplayerDebug)
+                {
+                    int count = _server.ConnectedPlayers.Count(x => x.Username.StartsWith(username));
+
+                    if (count > 0)
+                    {
+                        username = $"{username} ({count})";
+                    }
+                }
+                else
+                {
+                    if (_server.HasUser(username))
+                    {
+                        user.Disconnect($"A player with the same name '{username}' is already connected.");
+                        return;
+                    }
+                }
+
                 Guid playerId = GuidUtilities.GenerateGuidFromString($"OfflinePlayer:{username}");
 
                 // TODO: initialize current player
@@ -81,6 +100,10 @@ namespace Redstone.Server.Handlers.Login
                 // TODO: World border
                 SendSpawnPosition(user, Position.Zero);
                 SendPlayerPositionAndLook(user, user.Player.Position);
+
+                NotifyPlayerJoin(user.Player);
+
+                user.Player.IsSpawned = true;
             }
             else
             {
@@ -143,31 +166,7 @@ namespace Redstone.Server.Handlers.Login
 
         private void SendPlayerInfo(IMinecraftUser user, PlayerInfoActionType actionType)
         {
-            using var packet = new PlayerInfoPacket();
-
-            packet.WriteVarInt32((int)actionType);
-            packet.WriteVarInt32((int)_server.ConnectedPlayersCount);
-
-            foreach (IMinecraftUser connectedPlayer in _server.ConnectedPlayers.Where(x => x.Status == MinecraftUserStatus.Play))
-            {
-                packet.WriteUUID(connectedPlayer.Id);
-
-                if (actionType == PlayerInfoActionType.Add)
-                {
-                    packet.WriteString(connectedPlayer.Username);
-                    packet.WriteVarInt32(0); // Optional properties
-                    packet.WriteVarInt32((int)_gameConfiguration.Value.Mode);
-                    packet.WriteVarInt32(connectedPlayer.Player.Ping);
-                    packet.WriteBoolean(false); // Has display name
-
-                    // if has display name then
-                    // packet.WriteString(DisplayName);
-                }
-                else if (actionType == PlayerInfoActionType.UpdateLatency)
-                {
-                    packet.WriteVarInt32(connectedPlayer.Player.Ping);
-                }
-            }
+            using var packet = new PlayerInfoPacket(actionType, _server.ConnectedPlayers.Select(x => x.Player));
 
             user.Send(packet);
         }
@@ -273,6 +272,15 @@ namespace Redstone.Server.Handlers.Login
             packet.WriteVarInt32(0); // teleport id
 
             user.Send(packet);
+        }
+
+        private void NotifyPlayerJoin(IPlayer player)
+        {
+            using var packet = new PlayerInfoPacket(PlayerInfoActionType.Add, player);
+
+            IEnumerable<IMinecraftUser> players = _server.ConnectedPlayers.Where(x => x.Player.Id != player.Id);
+
+            _server.SendTo(players, packet);
         }
 
         private void WriteDimensionsAndBiomes(IEnumerable<Dimension> dimensions, IEnumerable<Biome> biomes, IMinecraftPacket packet)

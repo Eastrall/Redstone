@@ -9,6 +9,7 @@ server:
   debug: false
   reduced-debug-info: false
   flat-terrain: true
+  allow-multiplayer-debug: true
 
 game:
   mode: 'creative'

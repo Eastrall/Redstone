@@ -44,6 +44,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Redstone.Common.Tests", "te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Redstone.Server.Tests", "tests\Redstone.Server.Tests\Redstone.Server.Tests.csproj", "{99807451-6474-46CF-99C5-732A834B39FE}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "bin", "bin", "{46C1A08C-358C-46ED-9BF0-6775EB7FECA9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "config", "config", "{FD528964-E563-42E8-A987-D3428B935409}"
+	ProjectSection(SolutionItems) = preProject
+		bin\config\server.yml = bin\config\server.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -116,6 +123,7 @@ Global
 		{4BCDE769-AFF9-4170-8233-47CCF315A991} = {BA86A6BD-A61C-4186-B970-42173A895F79}
 		{48D9667C-A715-4444-85F6-80B7344D2AFC} = {AE6964FA-6359-4548-A538-CE357A346E68}
 		{99807451-6474-46CF-99C5-732A834B39FE} = {AE6964FA-6359-4548-A538-CE357A346E68}
+		{FD528964-E563-42E8-A987-D3428B935409} = {46C1A08C-358C-46ED-9BF0-6775EB7FECA9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {978B7507-DC0B-478F-85D5-36AE4E3B0F9C}

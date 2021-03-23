@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Redstone.Abstractions.Entities;
+using Redstone.Abstractions.Protocol;
 using Redstone.Abstractions.World;
 using Redstone.Common;
 using Redstone.Common.DependencyInjection;
@@ -10,7 +12,7 @@ using System.IO;
 namespace Redstone.Server.World
 {
     [Injectable(ServiceLifetime.Singleton)]
-    internal class WorldManager : IWorldManager
+    internal class World : IWorld
     {
         public static readonly string MapPath = Path.Combine(EnvironmentExtensions.GetCurrentEnvironementDirectory(), "data", "world");
         private readonly IServiceProvider _serviceProvider;
@@ -24,7 +26,7 @@ namespace Redstone.Server.World
 
         public IWorldMap End { get; private set; }
 
-        public WorldManager(IServiceProvider serviceProvider)
+        public World(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
         }
@@ -70,6 +72,13 @@ namespace Redstone.Server.World
             // TODO: save maps
         }
 
+        public void SendToAll(IMinecraftPacket packet)
+        {
+            SendPacketToAllPlayers(Overworld, packet);
+            SendPacketToAllPlayers(Nether, packet);
+            SendPacketToAllPlayers(End, packet);
+        }
+
         public void Dispose()
         {
             Save();
@@ -80,8 +89,19 @@ namespace Redstone.Server.World
 
         private static void StopAndDisposeMap(IWorldMap map)
         {
-            map.StopUpdate();
-            map.Dispose();
+            if (map is not null)
+            {
+                map.StopUpdate();
+                map.Dispose();
+            }
+        }
+
+        private static void SendPacketToAllPlayers(IWorldMap map, IMinecraftPacket packet)
+        {
+            if (map is not null)
+            {
+                map.Broadcast(packet);
+            }
         }
     }
 }

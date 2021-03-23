@@ -2,6 +2,7 @@
 using Moq;
 using Redstone.Abstractions.Entities;
 using Redstone.Abstractions.Protocol;
+using Redstone.Abstractions.World;
 using Redstone.Common;
 using Redstone.Server.Entities;
 using System;
@@ -10,14 +11,17 @@ namespace Redstone.Server.Tests.Mocks
 {
     public static class PlayerEntityGenerator
     {
-        private static readonly Faker _faker = new Faker();
+        private static readonly Faker _faker = new();
 
         public static IPlayer GeneratePlayer(Guid guid)
         {
             var minecraftUserMock = new Mock<IMinecraftUser>();
             minecraftUserMock.SetupGet(x => x.Id).Returns(guid);
 
-            var player = new Player(minecraftUserMock.Object)
+            var serviceProviderMock = new Mock<IServiceProvider>();
+            serviceProviderMock.Setup(x => x.GetService(typeof(IWorld))).Returns(new Mock<IWorld>().Object);
+
+            var player = new Player(minecraftUserMock.Object, Guid.NewGuid(), _faker.Name.FirstName(), serviceProviderMock.Object)
             {
                 Angle = _faker.Random.Float(0, 360),
                 HeadAngle = _faker.Random.Float(0, 360)

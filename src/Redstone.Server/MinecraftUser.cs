@@ -4,16 +4,20 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Redstone.Abstractions.Entities;
 using Redstone.Abstractions.Protocol;
+using Redstone.Common;
 using Redstone.Common.Configuration;
 using Redstone.Protocol.Handlers;
 using Redstone.Protocol.Handlers.Exceptions;
 using Redstone.Protocol.Packets.Game;
+using Redstone.Protocol.Packets.Game.Client;
 using Redstone.Protocol.Packets.Handskake;
 using Redstone.Protocol.Packets.Login;
 using Redstone.Protocol.Packets.Status;
 using Redstone.Server.Entities;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Redstone.Server
@@ -25,6 +29,7 @@ namespace Redstone.Server
         private readonly IOptions<GameConfiguration> _gameConfiguration;
         private readonly IRedstoneServer _server;
         private readonly IPacketHandler _packetHandler;
+        private readonly IServiceProvider _serviceProvider;
         private IPlayer _player;
 
         public MinecraftUserStatus Status { get; internal set; } = MinecraftUserStatus.Handshaking;
@@ -33,12 +38,13 @@ namespace Redstone.Server
 
         public IPlayer Player => _player;
 
-        public MinecraftUser(ILogger<MinecraftUser> logger, IOptions<GameConfiguration> gameConfiguration, IRedstoneServer server, IPacketHandler packetHandler)
+        public MinecraftUser(ILogger<MinecraftUser> logger, IOptions<GameConfiguration> gameConfiguration, IRedstoneServer server, IPacketHandler packetHandler, IServiceProvider serviceProvider)
         {
             _logger = logger;
             _gameConfiguration = gameConfiguration;
             _server = server;
             _packetHandler = packetHandler;
+            _serviceProvider = serviceProvider;
         }
 
         public void UpdateStatus(MinecraftUserStatus newStatus)
@@ -70,8 +76,7 @@ namespace Redstone.Server
             }
 
             Username = playerName;
-
-            _player = new Player(this, playerId, playerName)
+            _player = new Player(this, playerId, playerName, _serviceProvider)
             {
                 GameMode = _gameConfiguration.Value.Mode
             };
@@ -136,7 +141,11 @@ namespace Redstone.Server
             {
                 Player.Map.RemovePlayer(Player);
                 // TODO: save current player
-                // TODO: remove current player from other players cache (PlayerInfoPacket)
+
+                using var playerInfoRemovePacket = new PlayerInfoPacket(PlayerInfoActionType.Remove, Player);
+                IEnumerable<IMinecraftUser> players = _server.ConnectedPlayers.Where(x => x.Player.Id != Player.Id);
+
+                _server.SendTo(players, playerInfoRemovePacket);
             }
         }
 

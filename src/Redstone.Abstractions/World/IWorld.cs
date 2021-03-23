@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Redstone.Abstractions.Protocol;
+using System;
 
 namespace Redstone.Abstractions.World
 {
     /// <summary>
-    /// Provides an abstraction to manage all minecraft world maps.
+    /// Provides a mechanism that represents a Minecraft world with several world maps.
     /// </summary>
-    public interface IWorldManager : IDisposable
+    public interface IWorld : IDisposable
     {
         /// <summary>
         /// Gets the world name.
@@ -37,5 +38,11 @@ namespace Redstone.Abstractions.World
         /// Saves the worlds.
         /// </summary>
         void Save();
+
+        /// <summary>
+        /// Sends the given packet to every players on the world.
+        /// </summary>
+        /// <param name="packet">Packet to send.</param>
+        void SendToAll(IMinecraftPacket packet);
     }
 }

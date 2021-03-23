@@ -30,9 +30,9 @@ namespace Redstone.Server.Handlers.Login
         private readonly IOptions<GameConfiguration> _gameConfiguration;
         private readonly IRegistry _registry;
         private readonly IRedstoneServer _server;
-        private readonly IWorldManager _worldManager;
+        private readonly IWorld _worldManager;
 
-        public LoginHandler(ILogger<LoginHandler> logger, IOptions<ServerConfiguration> serverConfiguration, IOptions<GameConfiguration> gameConfiguration, IRegistry registry, IRedstoneServer server, IWorldManager worldManager)
+        public LoginHandler(ILogger<LoginHandler> logger, IOptions<ServerConfiguration> serverConfiguration, IOptions<GameConfiguration> gameConfiguration, IRegistry registry, IRedstoneServer server, IWorld worldManager)
         {
             _logger = logger;
             _serverConfiguration = serverConfiguration;

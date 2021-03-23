@@ -59,7 +59,10 @@ namespace Redstone.Protocol.Handlers.Internal
 
                 if (!_cache.ContainsKey(handlerAction))
                 {
-                    _cache.Add(handlerAction, cacheEntry);
+                    if (!_cache.TryAdd(handlerAction, cacheEntry))
+                    {
+                        _cache.TryGetValue(handlerAction, out cacheEntry);
+                    }
                 }
             }
 

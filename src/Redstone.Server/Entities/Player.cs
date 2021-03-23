@@ -1,6 +1,7 @@
 ﻿using Redstone.Abstractions.Entities;
 using Redstone.Abstractions.Protocol;
 using Redstone.Common;
+using Redstone.Common.Utilities;
 using Redstone.Protocol.Packets.Game.Client;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,8 @@ namespace Redstone.Server.Entities
 
         public ServerGameModeType GameMode { get; internal set; }
 
-        public Player(IMinecraftUser user, Guid id, string name)
+        public Player(IMinecraftUser user, Guid id, string name, IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
             _user = user;
             Id = id;
@@ -44,7 +46,7 @@ namespace Redstone.Server.Entities
 
         public void KeepAlive()
         {
-            var keepAliveId = DateTime.UtcNow.Millisecond;
+            var keepAliveId = TimeUtilities.GetElapsedMilliseconds();
             _keepAliveIdQueue.Enqueue(keepAliveId);
 
             using var keepAlivePacket = new KeepAlivePacket(keepAliveId);
@@ -53,14 +55,18 @@ namespace Redstone.Server.Entities
 
         public void CheckKeepAlive(long keepAliveId)
         {
-            var nextKeepAliveId = _keepAliveIdQueue.Dequeue();
+            if (_keepAliveIdQueue.TryDequeue(out long nextKeepAliveId))
+            {
+                if (nextKeepAliveId != keepAliveId)
+                {
+                    _user.Disconnect("Keep-alive id doesn't match.");
+                }
 
-            //if (nextKeepAliveId != keepAliveId)
-            //{
-            //    _user.Disconnect("Keep-alive id doesn't match.");
-            //}
+                Ping = (int)(TimeUtilities.GetElapsedMilliseconds() - nextKeepAliveId);
 
-            Ping = DateTime.UtcNow.Millisecond - (int)nextKeepAliveId;
+                using var playerInfoLatencyPacket = new PlayerInfoPacket(PlayerInfoActionType.UpdateLatency, this);
+                World.SendToAll(playerInfoLatencyPacket);
+            }
         }
 
         public override void AddVisibleEntity(IEntity entity)

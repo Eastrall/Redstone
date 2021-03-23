@@ -22,7 +22,7 @@ namespace Redstone.Server
         private readonly IOptions<ServerConfiguration> _serverConfiguration;
         private readonly IOptions<GameConfiguration> _gameConfiguration;
         private readonly IRegistry _registry;
-        private readonly IWorldManager _worldManager;
+        private readonly IWorld _worldManager;
 
         public RSAParameters ServerEncryptionKey { get; private set; }
 
@@ -38,7 +38,7 @@ namespace Redstone.Server
             _serverConfiguration = serviceProvider.GetRequiredService<IOptions<ServerConfiguration>>();
             _gameConfiguration = serviceProvider.GetRequiredService<IOptions<GameConfiguration>>();
             _registry = serviceProvider.GetRequiredService<IRegistry>();
-            _worldManager = serviceProvider.GetRequiredService<IWorldManager>();
+            _worldManager = serviceProvider.GetRequiredService<IWorld>();
         }
 
         protected override void OnBeforeStart()

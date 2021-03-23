@@ -1,4 +1,5 @@
-﻿using Redstone.Abstractions.Entities;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Redstone.Abstractions.Entities;
 using Redstone.Abstractions.Protocol;
 using Redstone.Abstractions.World;
 using Redstone.Common;
@@ -15,6 +16,7 @@ namespace Redstone.Server.Entities
         private static int _entityIdGenerator = 1;
 
         private readonly ConcurrentDictionary<Guid, IEntity> _visibleEntities;
+        private readonly IServiceProvider _serviceProvider;
 
         public virtual Guid Id { get; } = Guid.NewGuid();
 
@@ -34,7 +36,9 @@ namespace Redstone.Server.Entities
 
         public IEnumerable<IEntity> VisibleEntities => _visibleEntities.Values;
 
-        public WorldEntity()
+        protected IWorld World { get; }
+
+        public WorldEntity(IServiceProvider serviceProvider)
         {
             lock (_entityIdGeneratorLock)
             {
@@ -42,6 +46,9 @@ namespace Redstone.Server.Entities
             }
 
             _visibleEntities = new ConcurrentDictionary<Guid, IEntity>();
+            _serviceProvider = serviceProvider;
+
+            World = _serviceProvider.GetRequiredService<IWorld>();
         }
 
         public virtual void SendPacket(IMinecraftPacket packet)

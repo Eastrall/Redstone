@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Hosting;
+using Redstone.Abstractions;
 using Redstone.Common.Configuration;
 using Redstone.Common.DependencyInjection;
 using Redstone.Common.Extensions;
@@ -28,7 +29,7 @@ namespace Redstone.Server
                 })
                 .ConfigureLogging(builder =>
                 {
-                    builder.AddFilter("LiteNetwork", LogLevel.Trace);
+                    builder.AddFilter("LiteNetwork", LogLevel.Warning);
                     builder.SetMinimumLevel(LogLevel.Trace);
                 })
                 .ConfigureServices((context, services) =>

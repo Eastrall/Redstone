@@ -9,6 +9,7 @@ namespace Redstone.Protocol.Handlers.Internal
 {
     internal sealed class HandlerActionInvokerCache : IDisposable
     {
+        private static readonly object _syncLock = new();
         private readonly IDictionary<object, HandlerActionInvokerCacheEntry> _cache;
         private readonly IHandlerActionCache _handlerCache;
         private readonly IHandlerFactory _handlerFactory;
@@ -59,9 +60,16 @@ namespace Redstone.Protocol.Handlers.Internal
 
                 if (!_cache.ContainsKey(handlerAction))
                 {
-                    if (!_cache.TryAdd(handlerAction, cacheEntry))
+                    lock (_syncLock)
                     {
-                        _cache.TryGetValue(handlerAction, out cacheEntry);
+                        if (!_cache.ContainsKey(handlerAction))
+                        {
+                            _cache.TryAdd(handlerAction, cacheEntry);
+                        }
+                        else
+                        {
+                            _cache.TryGetValue(handlerAction, out cacheEntry);
+                        }
                     }
                 }
             }

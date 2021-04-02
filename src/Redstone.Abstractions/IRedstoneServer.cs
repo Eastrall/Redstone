@@ -1,15 +1,21 @@
 ﻿using Redstone.Abstractions.Protocol;
 using Redstone.Common.Server;
+using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 
-namespace Redstone.Server
+namespace Redstone.Abstractions
 {
     /// <summary>
     /// Provides an interface to manage the Redstone server instance.
     /// </summary>
     public interface IRedstoneServer
     {
+        /// <summary>
+        /// Gets the server events.
+        /// </summary>
+        IRedstoneServerEvents Events { get; }
+
         /// <summary>
         /// Gets the connected players list.
         /// </summary>
@@ -51,5 +57,11 @@ namespace Redstone.Server
         /// <param name="username">User name.</param>
         /// <returns>True if an user with the same username is already connected; false otherwise.</returns>
         bool HasUser(string username);
+
+        /// <summary>
+        /// Disconnects the minecraft user identified by the given UserId.
+        /// </summary>
+        /// <param name="userId">Minecraft user id.</param>
+        void DisconnectUser(Guid userId);
     }
 }

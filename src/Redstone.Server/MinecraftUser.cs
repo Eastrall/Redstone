@@ -2,7 +2,9 @@
 using LiteNetwork.Server;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Redstone.Abstractions;
 using Redstone.Abstractions.Entities;
+using Redstone.Abstractions.Events;
 using Redstone.Abstractions.Protocol;
 using Redstone.Common;
 using Redstone.Common.Configuration;
@@ -64,7 +66,7 @@ namespace Redstone.Server
                 _logger.LogInformation($"{Username} disconnected. Reason: {reason}");
             }
 
-            Socket.Close();
+            _server.DisconnectUser(Id);
         }
 
         public void LoadPlayer(Guid playerId, string playerName)
@@ -142,10 +144,7 @@ namespace Redstone.Server
                 Player.Map.RemovePlayer(Player);
                 // TODO: save current player
 
-                using var playerInfoRemovePacket = new PlayerInfoPacket(PlayerInfoActionType.Remove, Player);
-                IEnumerable<IMinecraftUser> players = _server.ConnectedPlayers.Where(x => x.Player.Id != Player.Id);
-
-                _server.SendTo(players, playerInfoRemovePacket);
+                _server.Events.OnPlayerLeaveGame(new PlayerLeaveEventArgs(Player));
             }
         }
 

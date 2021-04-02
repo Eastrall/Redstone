@@ -3,6 +3,7 @@ using LiteNetwork.Server;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Redstone.Abstractions;
 using Redstone.Abstractions.Protocol;
 using Redstone.Abstractions.Registry;
 using Redstone.Abstractions.World;
@@ -24,6 +25,8 @@ namespace Redstone.Server
         private readonly IRegistry _registry;
         private readonly IWorld _worldManager;
 
+        public IRedstoneServerEvents Events { get; }
+
         public RSAParameters ServerEncryptionKey { get; private set; }
 
         public IEnumerable<IMinecraftUser> ConnectedPlayers => ConnectedUsers.Where(x => x.Status == MinecraftUserStatus.Play);
@@ -39,6 +42,7 @@ namespace Redstone.Server
             _gameConfiguration = serviceProvider.GetRequiredService<IOptions<GameConfiguration>>();
             _registry = serviceProvider.GetRequiredService<IRegistry>();
             _worldManager = serviceProvider.GetRequiredService<IWorld>();
+            Events = new RedstoneServerEvents(this);
         }
 
         protected override void OnBeforeStart()
@@ -65,7 +69,7 @@ namespace Redstone.Server
                 Version = new MinecraftServerVersion
                 {
                     Name = _serverConfiguration.Value.Name,
-                    Protocol = 754
+                    Protocol = _serverConfiguration.Value.ProtocolVersion
                 },
                 Players = new MinecraftServerPlayers
                 {

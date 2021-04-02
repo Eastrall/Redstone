@@ -28,6 +28,7 @@ namespace Redstone.Server.Tests.World
             _blockFactoryMock = new Mock<IBlockFactory>();
             _registry = new DataRegistry(new Mock<ILogger<DataRegistry>>().Object);
             _serviceProvider = new ServiceCollection()
+                .AddSingleton<ILogger<WorldMap>>(new Mock<ILogger<WorldMap>>().Object)
                 .AddSingleton(s => _blockFactoryMock.Object)
                 .BuildServiceProvider();
         }

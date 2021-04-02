@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Redstone.Abstractions.Entities;
+using Redstone.Abstractions;
+using Redstone.Abstractions.Events;
 using Redstone.Abstractions.Protocol;
 using Redstone.Abstractions.Registry;
 using Redstone.Abstractions.World;
@@ -55,7 +56,7 @@ namespace Redstone.Server.Handlers.Login
                 {
                     int count = _server.ConnectedPlayers.Count(x => x.Username.StartsWith(username));
 
-                    if (count > 0)
+                    if (count > 0 && _server.ConnectedPlayers.Any(x => x.Username.Equals(username)))
                     {
                         username = $"{username} ({count})";
                     }
@@ -82,6 +83,8 @@ namespace Redstone.Server.Handlers.Login
 
                 SendLoginSucess(user);
                 user.UpdateStatus(MinecraftUserStatus.Play);
+                _server.Events.OnPlayerJoinGame(new PlayerJoinEventArgs(user.Player));
+
                 SendJoinGame(user);
                 SendServerBrand(user);
                 // TODO: held item changed
@@ -100,8 +103,6 @@ namespace Redstone.Server.Handlers.Login
                 // TODO: World border
                 SendSpawnPosition(user, Position.Zero);
                 SendPlayerPositionAndLook(user, user.Player.Position);
-
-                NotifyPlayerJoin(user.Player);
 
                 user.Player.IsSpawned = true;
             }
@@ -159,7 +160,7 @@ namespace Redstone.Server.Handlers.Login
         {
             using var serverBrandPacket = new PluginMessagePacket("minecraft:brand");
 
-            serverBrandPacket.WriteString("redstone");
+            serverBrandPacket.WriteString(_serverConfiguration.Value.Name);
 
             user.Send(serverBrandPacket);
         }
@@ -272,15 +273,6 @@ namespace Redstone.Server.Handlers.Login
             packet.WriteVarInt32(0); // teleport id
 
             user.Send(packet);
-        }
-
-        private void NotifyPlayerJoin(IPlayer player)
-        {
-            using var packet = new PlayerInfoPacket(PlayerInfoActionType.Add, player);
-
-            IEnumerable<IMinecraftUser> players = _server.ConnectedPlayers.Where(x => x.Player.Id != player.Id);
-
-            _server.SendTo(players, packet);
         }
 
         private void WriteDimensionsAndBiomes(IEnumerable<Dimension> dimensions, IEnumerable<Biome> biomes, IMinecraftPacket packet)

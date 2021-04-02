@@ -4,6 +4,7 @@ server:
   port: 25565
   name: 'Redstone-Dev'
   description: 'An awesome Minecraft server powered by Redstone!'
+  protocol-version: 754
   use-encryption: false
   mode: 'offline'
   debug: false
@@ -18,6 +19,6 @@ game:
   is-hardcore: false
   rendering-distance: 5
   level-name: 'redstone-world'
-  world-map-format: 'anvil' # can be also 'redstone'
+  world-map-format: 'anvil' # 'anvil' | 'redstone'
 
 # Additionnal configuration

@@ -1,4 +1,6 @@
-﻿using Redstone.Abstractions.Entities;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Redstone.Abstractions.Entities;
 using Redstone.Abstractions.Protocol;
 using Redstone.Abstractions.World;
 using Redstone.Server.Entities;
@@ -18,6 +20,7 @@ namespace Redstone.Server.World
         private readonly ConcurrentDictionary<Guid, IPlayer> _players;
         private readonly List<IRegion> _regions;
         private readonly IServiceProvider _serviceProvider;
+        private readonly ILogger<WorldMap> _logger;
         private readonly float _entityVisibilityRange = 45f;
 
         private bool _isUpdating;
@@ -42,6 +45,7 @@ namespace Redstone.Server.World
 
             Name = worldName;
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+            _logger = _serviceProvider.GetRequiredService<ILogger<WorldMap>>();
             _regions = new List<IRegion>();
             _players = new ConcurrentDictionary<Guid, IPlayer>();
         }
@@ -66,14 +70,14 @@ namespace Redstone.Server.World
 
         public void AddPlayer(IPlayer player)
         {
-            if (!_players.TryAdd(player.Id, player))
-            {
-                throw new InvalidOperationException($"Cannot add player with id: {player.Id} to the current map. Player already exists.");
-            }
-
             if (player is Player playerEntity)
             {
                 playerEntity.Map = this;
+            }
+
+            if (!_players.TryAdd(player.Id, player))
+            {
+                throw new InvalidOperationException($"Cannot add player with id: {player.Id} to the current map. Player already exists.");
             }
         }
 
@@ -148,17 +152,24 @@ namespace Redstone.Server.World
         {
             while (!_cancellationToken.IsCancellationRequested)
             {
-                await Task.Delay(UpdateTickRate, _cancellationToken);
-
-                foreach (var playerEntity in _players)
+                try
                 {
-                    IPlayer currentPlayer = playerEntity.Value;
+                    await Task.Delay(UpdateTickRate, _cancellationToken);
 
-                    currentPlayer.KeepAlive();
-                    currentPlayer.LookAround();
+                    foreach (var playerEntity in _players)
+                    {
+                        IPlayer currentPlayer = playerEntity.Value;
+
+                        currentPlayer.KeepAlive();
+                        currentPlayer.LookAround();
+                    }
+
+                    // TODO: update monsters and animals
                 }
-
-                // TODO: update monsters and animals
+                catch (Exception e)
+                {
+                    _logger.LogError(e, $"An error occured while updating map '{Name}'");
+                }
             }
 
             _updateTask.Dispose();

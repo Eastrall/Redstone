@@ -1,9 +1,11 @@
 ﻿using Bogus;
+using Microsoft.Extensions.Options;
 using Moq;
 using Redstone.Abstractions.Entities;
 using Redstone.Abstractions.Protocol;
 using Redstone.Abstractions.World;
 using Redstone.Common;
+using Redstone.Common.Configuration;
 using Redstone.Server.Entities;
 using System;
 
@@ -20,6 +22,7 @@ namespace Redstone.Server.Tests.Mocks
 
             var serviceProviderMock = new Mock<IServiceProvider>();
             serviceProviderMock.Setup(x => x.GetService(typeof(IWorld))).Returns(new Mock<IWorld>().Object);
+            serviceProviderMock.Setup(x => x.GetService(typeof(IOptions<GameConfiguration>))).Returns(new Mock<IOptions<GameConfiguration>>().Object);
 
             var player = new Player(minecraftUserMock.Object, Guid.NewGuid(), _faker.Name.FirstName(), serviceProviderMock.Object)
             {

@@ -1,6 +1,9 @@
-﻿using Redstone.Abstractions.Entities;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Redstone.Abstractions.Entities;
 using Redstone.Abstractions.Protocol;
 using Redstone.Common;
+using Redstone.Common.Configuration;
 using Redstone.Common.Utilities;
 using Redstone.Protocol.Packets.Game.Client;
 using System;
@@ -14,6 +17,7 @@ namespace Redstone.Server.Entities
     {
         private readonly IMinecraftUser _user;
         private readonly Queue<long> _keepAliveIdQueue;
+        private readonly IOptions<GameConfiguration> _gameOptions;
 
         public override Guid Id { get; }
 
@@ -30,6 +34,7 @@ namespace Redstone.Server.Entities
             Id = id;
             Name = name;
             _keepAliveIdQueue = new Queue<long>();
+            _gameOptions = serviceProvider.GetRequiredService<IOptions<GameConfiguration>>();
         }
 
         public override void SendPacket(IMinecraftPacket packet) => _user.Send(packet);

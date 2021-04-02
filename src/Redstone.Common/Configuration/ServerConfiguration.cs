@@ -29,6 +29,11 @@
         public string Name { get; set; }
 
         /// <summary>
+        /// Gets or sets the server's protocol version.
+        /// </summary>
+        public ushort ProtocolVersion { get; set; }
+
+        /// <summary>
         /// Gets or sets the server's status description.
         /// </summary>
         public string Description { get; set; }

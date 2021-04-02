@@ -1,4 +1,5 @@
-﻿using Redstone.Abstractions.Protocol;
+﻿using Redstone.Abstractions;
+using Redstone.Abstractions.Protocol;
 using Redstone.Protocol.Handlers;
 using Redstone.Protocol.Packets.Status;
 using Redstone.Protocol.Packets.Status.Client;

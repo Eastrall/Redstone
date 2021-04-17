@@ -17,7 +17,7 @@ namespace Redstone.Server.Entities
     {
         private readonly IMinecraftUser _user;
         private readonly Queue<long> _keepAliveIdQueue;
-        private readonly IOptions<GameConfiguration> _gameOptions;
+        private readonly IOptions<GameOptions> _gameOptions;
 
         public override Guid Id { get; }
 
@@ -34,7 +34,7 @@ namespace Redstone.Server.Entities
             Id = id;
             Name = name;
             _keepAliveIdQueue = new Queue<long>();
-            _gameOptions = serviceProvider.GetRequiredService<IOptions<GameConfiguration>>();
+            _gameOptions = serviceProvider.GetRequiredService<IOptions<GameOptions>>();
         }
 
         public override void SendPacket(IMinecraftPacket packet) => _user.Send(packet);

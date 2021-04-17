@@ -1,7 +1,7 @@
 ﻿using Redstone.Abstractions.Protocol;
 using Redstone.Protocol.Handlers;
 using Redstone.Protocol.Packets.Game;
-using Redstone.Protocol.Packets.Game.Client;
+using System;
 
 namespace Redstone.Server.Handlers.Play
 {
@@ -14,19 +14,12 @@ namespace Redstone.Server.Handlers.Play
             float pitchAngle = packet.ReadSingle();
             bool isOnGround = packet.ReadBoolean();
 
-            user.Player.Angle = yawAngle;
-            user.Player.HeadAngle = pitchAngle;
+            if (user.Player.IsOnGround != isOnGround)
+            {
+                throw new InvalidOperationException("Player is not on ground.");
+            }
 
-            using var entityRotationPacket = new EntityRotationPacket(
-                user.Player.EntityId, 
-                user.Player.Angle, 
-                user.Player.HeadAngle, 
-                isOnGround);
-
-            using var entityHeadLookPacket = new EntityHeadLookPacket(user.Player.EntityId, user.Player.Angle);
-
-            user.Player.SendPacketToVisibleEntities(entityRotationPacket);
-            user.Player.SendPacketToVisibleEntities(entityHeadLookPacket);
+            user.Player.Rotate(yawAngle, pitchAngle);
         }
     }
 }

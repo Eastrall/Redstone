@@ -28,7 +28,7 @@ namespace Redstone.Server
     public class MinecraftUser : LiteServerUser, IMinecraftUser
     {
         private readonly ILogger<MinecraftUser> _logger;
-        private readonly IOptions<GameConfiguration> _gameConfiguration;
+        private readonly IOptions<GameOptions> _gameConfiguration;
         private readonly IRedstoneServer _server;
         private readonly IPacketHandler _packetHandler;
         private readonly IServiceProvider _serviceProvider;
@@ -40,7 +40,7 @@ namespace Redstone.Server
 
         public IPlayer Player => _player;
 
-        public MinecraftUser(ILogger<MinecraftUser> logger, IOptions<GameConfiguration> gameConfiguration, IRedstoneServer server, IPacketHandler packetHandler, IServiceProvider serviceProvider)
+        public MinecraftUser(ILogger<MinecraftUser> logger, IOptions<GameOptions> gameConfiguration, IRedstoneServer server, IPacketHandler packetHandler, IServiceProvider serviceProvider)
         {
             _logger = logger;
             _gameConfiguration = gameConfiguration;

@@ -3,7 +3,7 @@
     /// <summary>
     /// Provides a data structure for configuring the Redstone server.
     /// </summary>
-    public class ServerConfiguration
+    public class ServerOptions
     {
         /// <summary>
         /// Gets or sets the server's listening IP address.

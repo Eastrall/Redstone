@@ -22,7 +22,7 @@ namespace Redstone.Server.Tests.Mocks
 
             var serviceProviderMock = new Mock<IServiceProvider>();
             serviceProviderMock.Setup(x => x.GetService(typeof(IWorld))).Returns(new Mock<IWorld>().Object);
-            serviceProviderMock.Setup(x => x.GetService(typeof(IOptions<GameConfiguration>))).Returns(new Mock<IOptions<GameConfiguration>>().Object);
+            serviceProviderMock.Setup(x => x.GetService(typeof(IOptions<GameOptions>))).Returns(new Mock<IOptions<GameOptions>>().Object);
 
             var player = new Player(minecraftUserMock.Object, Guid.NewGuid(), _faker.Name.FirstName(), serviceProviderMock.Object)
             {

@@ -35,14 +35,14 @@ namespace Redstone.Server
                 .ConfigureServices((context, services) =>
                 {
                     services.AddOptions();
-                    services.Configure<ServerConfiguration>(context.Configuration.GetSection("server"));
-                    services.Configure<GameConfiguration>(context.Configuration.GetSection("game"));
+                    services.Configure<ServerOptions>(context.Configuration.GetSection("server"));
+                    services.Configure<GameOptions>(context.Configuration.GetSection("game"));
                     services.AddInjectableServices(Assembly.GetExecutingAssembly());
                     services.AddMinecraftProtocol(Assembly.GetExecutingAssembly());
                 })
                 .UseLiteServer<IRedstoneServer, RedstoneServer, MinecraftUser>((context, options) =>
                 {
-                    var serverConfiguration = context.Configuration.GetSection("server").Get<ServerConfiguration>();
+                    var serverConfiguration = context.Configuration.GetSection("server").Get<ServerOptions>();
 
                     if (serverConfiguration is null)
                     {

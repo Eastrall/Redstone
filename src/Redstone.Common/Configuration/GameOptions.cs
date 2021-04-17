@@ -3,7 +3,7 @@
     /// <summary>
     /// Provides a data structure to configure the Redstone server game settings.
     /// </summary>
-    public class GameConfiguration
+    public class GameOptions
     {
         /// <summary>
         /// Gets or sets the server game mode.

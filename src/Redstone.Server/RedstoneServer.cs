@@ -20,8 +20,8 @@ namespace Redstone.Server
     {
         private readonly ILogger<RedstoneServer> _logger;
         private readonly IMinecraftPacketEncryption _packetEncryption;
-        private readonly IOptions<ServerConfiguration> _serverConfiguration;
-        private readonly IOptions<GameConfiguration> _gameConfiguration;
+        private readonly IOptions<ServerOptions> _serverConfiguration;
+        private readonly IOptions<GameOptions> _gameConfiguration;
         private readonly IRegistry _registry;
         private readonly IWorld _worldManager;
 
@@ -38,8 +38,8 @@ namespace Redstone.Server
         {
             _logger = serviceProvider.GetRequiredService<ILogger<RedstoneServer>>();
             _packetEncryption = serviceProvider.GetRequiredService<IMinecraftPacketEncryption>();
-            _serverConfiguration = serviceProvider.GetRequiredService<IOptions<ServerConfiguration>>();
-            _gameConfiguration = serviceProvider.GetRequiredService<IOptions<GameConfiguration>>();
+            _serverConfiguration = serviceProvider.GetRequiredService<IOptions<ServerOptions>>();
+            _gameConfiguration = serviceProvider.GetRequiredService<IOptions<GameOptions>>();
             _registry = serviceProvider.GetRequiredService<IRegistry>();
             _worldManager = serviceProvider.GetRequiredService<IWorld>();
             Events = new RedstoneServerEvents(this);

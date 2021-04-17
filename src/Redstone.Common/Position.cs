@@ -62,6 +62,17 @@ namespace Redstone.Common
         }
 
         /// <summary>
+        /// Creates a new <see cref="Position"/> with the given coordinates.
+        /// </summary>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
+        /// <param name="z">Z coordinate.</param>
+        public Position(double x, double y, double z)
+            : this((float)x, (float)y, (float)z)
+        {
+        }
+
+        /// <summary>
         /// Checks if the current position is in a given range.
         /// </summary>
         /// <param name="range"></param>

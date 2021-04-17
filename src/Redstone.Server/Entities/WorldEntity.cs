@@ -3,6 +3,7 @@ using Redstone.Abstractions.Entities;
 using Redstone.Abstractions.Protocol;
 using Redstone.Abstractions.World;
 using Redstone.Common;
+using Redstone.Protocol.Packets.Game.Client;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -18,6 +19,8 @@ namespace Redstone.Server.Entities
         private readonly ConcurrentDictionary<Guid, IEntity> _visibleEntities;
         private readonly IServiceProvider _serviceProvider;
 
+        private Position _lastPosition;
+
         public virtual Guid Id { get; } = Guid.NewGuid();
 
         public int EntityId { get; }
@@ -25,6 +28,8 @@ namespace Redstone.Server.Entities
         public bool IsSpawned { get; set; } = false;
 
         public bool IsVisible { get; set; } = true;
+
+        public bool IsOnGround { get; private set; }
 
         public Position Position { get; } = new Position();
 
@@ -92,6 +97,65 @@ namespace Redstone.Server.Entities
                     RemoveVisibleEntity(disapearingEntity);
                 }
             }
+        }
+
+        public virtual void Move(Position destinationPosition, bool isOnGround)
+        {
+            if (!IsSpawned)
+            {
+                return;
+            }
+
+            var deltaX = ((destinationPosition.X * 32) - (Position.X * 32)) * 128;
+            var deltaY = ((destinationPosition.Y * 32) - (Position.Y * 32)) * 128;
+            var deltaZ = ((destinationPosition.Z * 32) - (Position.Z * 32)) * 128;
+            var delta = new Position(deltaX, deltaY, deltaZ);
+
+            Position.Copy(destinationPosition);
+
+            //_lastPosition.Copy(Position);
+            IsOnGround = true; // TODO: check block at current position. If not air then true, false otherwise.
+
+            using var movePacket = new EntityPositionPacket(this, delta);
+            SendPacketToVisibleEntities(movePacket);
+        }
+
+        public virtual void Rotate(float yawAngle, float pitchAngle)
+        {
+            if (!IsSpawned)
+            {
+                return;
+            }
+
+            Angle = yawAngle;
+            HeadAngle = pitchAngle;
+
+            using var entityRotationPacket = new EntityRotationPacket(EntityId, Angle, HeadAngle, IsOnGround);
+            using var entityHeadLookPacket = new EntityHeadLookPacket(EntityId, Angle);
+
+            SendPacketToVisibleEntities(entityRotationPacket);
+            SendPacketToVisibleEntities(entityHeadLookPacket);
+        }
+
+        public void MoveAndRotate(Position destinationPosition, float yawAngle, float pitchAngle, bool isOnGround)
+        {
+            if (!IsSpawned)
+            {
+                return;
+            }
+
+            var deltaX = ((destinationPosition.X * 32) - (Position.X * 32)) * 128;
+            var deltaY = ((destinationPosition.Y * 32) - (Position.Y * 32)) * 128;
+            var deltaZ = ((destinationPosition.Z * 32) - (Position.Z * 32)) * 128;
+            var delta = new Position(deltaX, deltaY, deltaZ);
+
+            Position.Copy(destinationPosition);
+            Angle = yawAngle;
+            HeadAngle = pitchAngle;
+            IsOnGround = true; // TODO: check block at current position. If not air then true, false otherwise.
+
+            using var entityMovePacket = new EntityPositionAndRotationPacket(this, delta);
+            SendPacketToVisibleEntities(entityMovePacket);
         }
 
         public virtual void AddVisibleEntity(IEntity entity)

@@ -30,6 +30,11 @@ namespace Redstone.Abstractions.Entities
         /// Gets or sets a boolean value that indicates if the current entity is visible.
         /// </summary>
         bool IsVisible { get; set; }
+        
+        /// <summary>
+        /// Gets a boolean value that indicates if the current entity is on ground.
+        /// </summary>
+        bool IsOnGround { get; }
 
         /// <summary>
         /// Gets the entity position.
@@ -66,6 +71,30 @@ namespace Redstone.Abstractions.Entities
         /// The current entity looks around and updates the current entity visible entities list.
         /// </summary>
         void LookAround();
+
+        /// <summary>
+        /// Moves the current entity to the given destination position and notifies other entities around.
+        /// </summary>
+        /// <param name="destinationPosition">Destination position.</param>
+        /// <param name="isOnGround">Boolean value that indicates if the entity is on ground.</param>
+        void Move(Position destinationPosition, bool isOnGround);
+
+        /// <summary>
+        /// Rotates the current entity using the given angles.
+        /// </summary>
+        /// <param name="yawAngle">Yaw angle.</param>
+        /// <param name="pitchAngle">Pitch angle.</param>
+        void Rotate(float yawAngle, float pitchAngle);
+
+        /// <summary>
+        /// Moves the current entity to the given destination position and rotates it using the given angles.
+        /// Also notifies the other entities around.
+        /// </summary>
+        /// <param name="destinationPosition">Destination position.</param>
+        /// <param name="yawAngle">Yaw angle.</param>
+        /// <param name="pitchAngle">Pitch angle.</param>
+        /// <param name="isOnGround">Boolean value that indicates if the entity is on ground.</param>
+        void MoveAndRotate(Position destinationPosition, float yawAngle, float pitchAngle, bool isOnGround);
 
         /// <summary>
         /// Adds the given entity to the visible entities collection.

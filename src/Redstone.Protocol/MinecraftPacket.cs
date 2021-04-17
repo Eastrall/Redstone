@@ -251,6 +251,15 @@ namespace Redstone.Protocol
             return position;
         }
 
+        public Position ReadAbsolutePosition()
+        {
+            var x = ReadDouble();
+            var y = ReadDouble();
+            var z = ReadDouble();
+
+            return new Position(x, y, z);
+        }
+
         public void WritePosition(Position position)
         {
             var x = (((int)position.X & 0x3FFFFFF) << 38);

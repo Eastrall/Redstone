@@ -42,6 +42,17 @@ namespace Redstone.Abstractions.Protocol
         Position ReadPosition();
 
         /// <summary>
+        /// Reads 3 double values from the packet stream and transform it into a <see cref="Position"/> object.
+        /// </summary>
+        /// <remarks>
+        /// The first double is the X coordinate.
+        /// The second double is the Y coordinate.
+        /// The third double is the Z coordinate.
+        /// </remarks>
+        /// <returns>Position.</returns>
+        Position ReadAbsolutePosition();
+
+        /// <summary>
         /// Writes an Universal Unique IDentifier into the packet stream.
         /// </summary>
         /// <param name="value"></param>

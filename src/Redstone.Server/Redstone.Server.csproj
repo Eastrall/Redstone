@@ -33,8 +33,8 @@
     <PackageReference Include="LiteNetwork.Server" Version="1.0.0-rc.6" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
-    <PackageReference Include="NLog" Version="4.7.8" />
-    <PackageReference Include="NLog.Extensions.Hosting" Version="1.7.1" />
+    <PackageReference Include="NLog" Version="4.7.9" />
+    <PackageReference Include="NLog.Extensions.Hosting" Version="1.7.2" />
   </ItemGroup>
 
   <ItemGroup>

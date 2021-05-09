@@ -20,5 +20,7 @@ game:
   rendering-distance: 5
   level-name: 'redstone-world'
   world-map-format: 'anvil' # 'anvil' | 'redstone'
+  chat:
+    format: '<{0}> {1}'
 
 # Additionnal configuration

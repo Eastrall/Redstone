@@ -2,11 +2,13 @@
 using Redstone.Abstractions.Protocol;
 using Redstone.Common;
 using Redstone.Common.IO;
+using Redstone.Common.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Redstone.Protocol
 {
@@ -273,6 +275,8 @@ namespace Redstone.Protocol
         {
             WriteByte((byte)(angle * 256f / 360f));
         }
+
+        public void WriteJson<TObject>(TObject @object) => WriteString(JsonSerializer.Serialize(@object));
 
         public void Dump(string fileName, PacketDumpMode dumpMode)
         {

@@ -42,5 +42,11 @@ namespace Redstone.Abstractions.Entities
         /// </summary>
         /// <param name="keepAliveId">Keep alive id.</param>
         void CheckKeepAlive(long keepAliveId);
+
+        /// <summary>
+        /// The current player speaks the given text and broadcast the message to every player on the world.
+        /// </summary>
+        /// <param name="text">Text that the player should speak/display on the chat.</param>
+        void Speak(string text);
     }
 }

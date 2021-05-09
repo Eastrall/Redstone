@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Text.Json.Serialization;
 using Xunit;
 
 namespace Redstone.Protocol.Tests
@@ -137,6 +139,32 @@ namespace Redstone.Protocol.Tests
             }
 
             Assert.Equal(expectedContent, packet.BaseBuffer);
+        }
+
+        [Fact]
+        public void MinecraftPacketWriteJsonTest()
+        {
+            const string json = "{\"text\":\"Hello world!\"}";
+            byte[] jsonBytes = Encoding.UTF8.GetBytes(json);
+            var jsonObject = new JsonPacketClass("Hello world!");
+
+            using var packet = new MinecraftPacket(0);
+
+            packet.WriteJson(jsonObject);
+
+            byte[] packetBytes = packet.BaseBuffer.Skip(1).ToArray();
+            Assert.Equal(jsonBytes, packetBytes);
+        }
+
+        private class JsonPacketClass
+        {
+            [JsonPropertyName("text")]
+            public string Text { get; set; }
+
+            public JsonPacketClass(string text)
+            {
+                Text = text;
+            }
         }
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Redstone.Abstractions.Entities;
 using Redstone.Abstractions.Protocol;
 using Redstone.Common;
+using Redstone.Common.Chat;
 using Redstone.Common.Configuration;
 using Redstone.Common.Utilities;
 using Redstone.Protocol.Packets.Game.Client;
@@ -72,6 +73,17 @@ namespace Redstone.Server.Entities
                 using var playerInfoLatencyPacket = new PlayerInfoPacket(PlayerInfoActionType.UpdateLatency, this);
                 World.SendToAll(playerInfoLatencyPacket);
             }
+        }
+
+        public void Speak(string text)
+        {
+            var chatMessage = new ChatMessage
+            {
+                Text = string.Format(_gameOptions.Value.Chat.Format, Name, text)
+            };
+            using var packet = new ChatMessagePacket(this, chatMessage, ChatMessageType.Chat);
+
+            World.SendToAll(packet);
         }
 
         public override void AddVisibleEntity(IEntity entity)

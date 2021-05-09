@@ -77,10 +77,17 @@ namespace Redstone.Abstractions.Protocol
         void WritePosition(Position position);
 
         /// <summary>
-        /// Writes the given angle as a single byte into the the packet stream.
+        /// Writes the given angle as a single byte into the packet stream.
         /// </summary>
         /// <param name="angle">Angle.</param>
         void WriteAngle(float angle);
+
+        /// <summary>
+        /// Serializes the given object as JSON and writes the serialized content into the packet stream.
+        /// </summary>
+        /// <typeparam name="TObject">Objec type.</typeparam>
+        /// <param name="object">Object to serialize.</param>
+        void WriteJson<TObject>(TObject @object);
 
         /// <summary>
         /// Dumps the current packet stream into a file as a UTF-8 string.

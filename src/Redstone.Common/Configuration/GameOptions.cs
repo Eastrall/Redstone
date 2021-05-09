@@ -46,5 +46,10 @@
         /// Gets or sets the world map format.
         /// </summary>
         public WorldMapFormatType WorldMapFormat { get; set; }
+
+        /// <summary>
+        /// Gets or sets the chat options.
+        /// </summary>
+        public ChatOptions Chat { get; set; }
     }
 }

@@ -39,6 +39,7 @@
         AdvancementTab = 0x22,
         SelectTrade = 0x23,
         SetBeaconEffect = 0x24,
-        Animation = 0x2C
+        Animation = 0x2C,
+        PlayerBlockPlacement = 0x2E
     }
 }

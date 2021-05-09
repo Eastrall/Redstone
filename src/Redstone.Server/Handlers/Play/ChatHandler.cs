@@ -16,7 +16,14 @@ namespace Redstone.Server.Handlers.Play
                 user.Disconnect("Chat message exceeds 256 characters.");
             }
 
-            // TODO: broadcast message on current map
+            if (message.StartsWith(RedstoneContants.CommandPrefix))
+            {
+                // TODO: interpret commands
+            }
+            else
+            {
+                user.Player.Speak(message);
+            }
         }
     }
 }

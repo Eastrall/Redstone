@@ -18,6 +18,7 @@ namespace Redstone.Common.Serialization
             _jsonDefaultOptions = new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
             };
             _jsonDefaultOptions.Converters.Add(new JsonStringEnumConverter());
         }

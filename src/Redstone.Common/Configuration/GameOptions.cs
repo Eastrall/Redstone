@@ -50,6 +50,6 @@
         /// <summary>
         /// Gets or sets the chat options.
         /// </summary>
-        public ChatOptions Chat { get; set; }
+        public ChatOptions Chat { get; set; } = new();
     }
 }

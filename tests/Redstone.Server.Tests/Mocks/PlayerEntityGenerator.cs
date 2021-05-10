@@ -7,6 +7,7 @@ using Redstone.Abstractions.World;
 using Redstone.Common;
 using Redstone.Common.Configuration;
 using Redstone.Server.Entities;
+using Redstone.Server.World;
 using System;
 
 namespace Redstone.Server.Tests.Mocks
@@ -15,16 +16,13 @@ namespace Redstone.Server.Tests.Mocks
     {
         private static readonly Faker _faker = new();
 
-        public static IPlayer GeneratePlayer(Guid guid)
+        public static IPlayer GeneratePlayer(Mock<IMinecraftUser> user, Mock<IWorld> world = null)
         {
-            var minecraftUserMock = new Mock<IMinecraftUser>();
-            minecraftUserMock.SetupGet(x => x.Id).Returns(guid);
-
             var serviceProviderMock = new Mock<IServiceProvider>();
-            serviceProviderMock.Setup(x => x.GetService(typeof(IWorld))).Returns(new Mock<IWorld>().Object);
-            serviceProviderMock.Setup(x => x.GetService(typeof(IOptions<GameOptions>))).Returns(new Mock<IOptions<GameOptions>>().Object);
+            serviceProviderMock.Setup(x => x.GetService(typeof(IWorld))).Returns(world?.Object ?? default);
+            serviceProviderMock.Setup(x => x.GetService(typeof(IOptions<GameOptions>))).Returns(Options.Create<GameOptions>(new()));
 
-            var player = new Player(minecraftUserMock.Object, Guid.NewGuid(), _faker.Name.FirstName(), serviceProviderMock.Object)
+            var player = new Player(user.Object, Guid.NewGuid(), _faker.Name.FirstName(), serviceProviderMock.Object)
             {
                 Angle = _faker.Random.Float(0, 360),
                 HeadAngle = _faker.Random.Float(0, 360)
@@ -36,9 +34,11 @@ namespace Redstone.Server.Tests.Mocks
             return player;
         }
 
-        public static Mock<IPlayer> GeneratePlayerMock()
+        public static Mock<IPlayer> GeneratePlayerMock(Mock<IWorld> world = null)
         {
             var playerMock = new Mock<IPlayer>();
+
+            playerMock.SetupGet(x => x.World).Returns(world?.Object ?? default);
 
             return playerMock;
         }

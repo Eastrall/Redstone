@@ -31,7 +31,7 @@ namespace Redstone.Server.Entities
 
         public bool IsOnGround { get; private set; }
 
-        public Position Position { get; } = new Position();
+        public Position Position { get; init; } = new Position();
 
         public float Angle { get; set; }
 
@@ -41,7 +41,7 @@ namespace Redstone.Server.Entities
 
         public IEnumerable<IEntity> VisibleEntities => _visibleEntities.Values;
 
-        protected IWorld World { get; }
+        public IWorld World { get; protected set; }
 
         public WorldEntity(IServiceProvider serviceProvider)
         {

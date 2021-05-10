@@ -50,13 +50,15 @@ namespace Redstone.Server.Entities
             }
         }
 
-        public void KeepAlive()
+        public long KeepAlive()
         {
             var keepAliveId = TimeUtilities.GetElapsedMilliseconds();
             _keepAliveIdQueue.Enqueue(keepAliveId);
 
             using var keepAlivePacket = new KeepAlivePacket(keepAliveId);
             _user.Send(keepAlivePacket);
+
+            return keepAliveId;
         }
 
         public void CheckKeepAlive(long keepAliveId)
@@ -66,6 +68,7 @@ namespace Redstone.Server.Entities
                 if (nextKeepAliveId != keepAliveId)
                 {
                     _user.Disconnect("Keep-alive id doesn't match.");
+                    return;
                 }
 
                 Ping = (int)(TimeUtilities.GetElapsedMilliseconds() - nextKeepAliveId);

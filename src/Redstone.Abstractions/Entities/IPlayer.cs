@@ -35,7 +35,8 @@ namespace Redstone.Abstractions.Entities
         /// <summary>
         /// Keeps the current player alive by sending a "keep-alive" packet.
         /// </summary>
-        void KeepAlive();
+        /// <returns>Keep-Alive id.</returns>
+        long KeepAlive();
 
         /// <summary>
         /// Checks if the given keep-alive id is the same has the one sent by the current player.

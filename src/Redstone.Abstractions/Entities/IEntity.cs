@@ -30,7 +30,7 @@ namespace Redstone.Abstractions.Entities
         /// Gets or sets a boolean value that indicates if the current entity is visible.
         /// </summary>
         bool IsVisible { get; set; }
-        
+
         /// <summary>
         /// Gets a boolean value that indicates if the current entity is on ground.
         /// </summary>
@@ -56,6 +56,11 @@ namespace Redstone.Abstractions.Entities
         /// This value represents the PITCH angle.
         /// </remarks>
         float HeadAngle { get; set; }
+
+        /// <summary>
+        /// Gets the current world.
+        /// </summary>
+        IWorld World { get; }
 
         /// <summary>
         /// Gets the current entity map.

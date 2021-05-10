@@ -137,7 +137,8 @@ namespace Redstone.Server.Tests.World
         public void WorldMapAddPlayerTest()
         {
             var minecraftUser = new MinecraftUserMock(Guid.NewGuid());
-            var player = PlayerEntityGenerator.GeneratePlayer(minecraftUser);
+            var worldMock = new WorldMock();
+            var player = PlayerEntityGenerator.GeneratePlayer(minecraftUser, worldMock);
             var map = new WorldMap(_mapName, _serviceProvider);
 
             map.AddPlayer(player);
@@ -151,7 +152,8 @@ namespace Redstone.Server.Tests.World
         public void WorldMapAddExistingPlayerTest()
         {
             var minecraftUser = new MinecraftUserMock(Guid.NewGuid());
-            var player = PlayerEntityGenerator.GeneratePlayer(minecraftUser);
+            var worldMock = new WorldMock();
+            var player = PlayerEntityGenerator.GeneratePlayer(minecraftUser, worldMock);
             var map = new WorldMap(_mapName, _serviceProvider);
 
             map.AddPlayer(player);
@@ -165,7 +167,8 @@ namespace Redstone.Server.Tests.World
         public void WorldMapRemovePlayerTest()
         {
             var minecraftUser = new MinecraftUserMock(Guid.NewGuid());
-            var player = PlayerEntityGenerator.GeneratePlayer(minecraftUser);
+            var worldMock = new WorldMock();
+            var player = PlayerEntityGenerator.GeneratePlayer(minecraftUser, worldMock);
             var map = new WorldMap(_mapName, _serviceProvider);
 
             map.AddPlayer(player);
@@ -180,7 +183,8 @@ namespace Redstone.Server.Tests.World
         public void WorldMapRemoveUnknownPlayerTest()
         {
             var minecraftUser = new MinecraftUserMock(Guid.NewGuid());
-            var player = PlayerEntityGenerator.GeneratePlayer(minecraftUser);
+            var worldMock = new WorldMock();
+            var player = PlayerEntityGenerator.GeneratePlayer(minecraftUser, worldMock);
             var map = new WorldMap(_mapName, _serviceProvider);
 
             Assert.Throws<InvalidOperationException>(() => map.RemovePlayer(player));
@@ -190,7 +194,8 @@ namespace Redstone.Server.Tests.World
         public void WorldMapGetPlayerTest()
         {
             var minecraftUser = new MinecraftUserMock(Guid.NewGuid());
-            var player = PlayerEntityGenerator.GeneratePlayer(minecraftUser);
+            var worldMock = new WorldMock();
+            var player = PlayerEntityGenerator.GeneratePlayer(minecraftUser, worldMock);
             var map = new WorldMap(_mapName, _serviceProvider);
 
             map.AddPlayer(player);
@@ -263,7 +268,8 @@ namespace Redstone.Server.Tests.World
         public async Task WorldMapDisposeTest()
         {
             var minecraftUser = new MinecraftUserMock(Guid.NewGuid());
-            var player = PlayerEntityGenerator.GeneratePlayer(minecraftUser);
+            var worldMock = new WorldMock();
+            var player = PlayerEntityGenerator.GeneratePlayer(minecraftUser, worldMock);
             var map = new WorldMap(_mapName, _serviceProvider);
             
             map.AddRegion(0, 0);

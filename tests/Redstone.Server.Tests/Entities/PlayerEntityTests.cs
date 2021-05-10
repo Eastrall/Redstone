@@ -35,7 +35,6 @@ namespace Redstone.Server.Tests.Entities
             long keepAliveId = player.KeepAlive();
             player.CheckKeepAlive(keepAliveId);
 
-            Assert.NotEqual(0, player.Ping);
             minecraftUser.Verify(x => x.Send(It.IsAny<KeepAlivePacket>()), Times.Once());
             worldMock.Verify(x => x.SendToAll(It.IsAny<PlayerInfoPacket>()), Times.Once());
         }

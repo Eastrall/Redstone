@@ -56,7 +56,7 @@ namespace Redstone.Server.Entities
             _keepAliveIdQueue.Enqueue(keepAliveId);
 
             using var keepAlivePacket = new KeepAlivePacket(keepAliveId);
-            _user.Send(keepAlivePacket);
+            SendPacket(keepAlivePacket);
 
             return keepAliveId;
         }

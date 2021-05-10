@@ -7,6 +7,7 @@ using Redstone.Protocol.Packets.Game.Client;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Redstone.Server.Entities
@@ -56,6 +57,7 @@ namespace Redstone.Server.Entities
             World = _serviceProvider.GetRequiredService<IWorld>();
         }
 
+        [ExcludeFromCodeCoverage]
         public virtual void SendPacket(IMinecraftPacket packet)
         {
             // Nothing to do.
@@ -76,7 +78,7 @@ namespace Redstone.Server.Entities
 
         public void LookAround()
         {
-            if (!IsSpawned)
+            if (!IsSpawned || !IsVisible)
             {
                 return;
             }

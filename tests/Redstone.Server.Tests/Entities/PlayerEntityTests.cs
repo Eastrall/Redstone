@@ -1,8 +1,12 @@
 ﻿using Bogus;
 using Moq;
+using Redstone.Abstractions.Entities;
+using Redstone.Common;
 using Redstone.Protocol.Packets.Game.Client;
 using Redstone.Server.Tests.Mocks;
+using Redstone.Server.World;
 using System;
+using System.Linq;
 using Xunit;
 
 namespace Redstone.Server.Tests.Entities
@@ -64,6 +68,107 @@ namespace Redstone.Server.Tests.Entities
             player.Speak(textToSpeak);
 
             worldMock.Verify(x => x.SendToAll(It.IsAny<ChatMessagePacket>()), Times.Once);
+        }
+
+        [Fact]
+        public void PlayerLookAroundTest()
+        {
+            var minecraftUser = new MinecraftUserMock(Guid.NewGuid());
+            var worldMock = new WorldMock();
+            var player = PlayerEntityGenerator.GeneratePlayer(minecraftUser, worldMock);
+            var otherPlayer = CreatePlayer("OtherPlayer");
+            var map = WorldMapMock.Create("minecraft:test");
+
+            player.Position.X = 4;
+            player.Position.Z = 4;
+            player.IsSpawned = true;
+            player.IsVisible = true;
+            otherPlayer.Position.X = 2;
+            otherPlayer.Position.Z = 2;
+            otherPlayer.IsSpawned = true;
+            otherPlayer.IsVisible = true;
+
+            map.AddRegion(0, 0);
+            map.AddPlayer(player);
+            map.AddPlayer(otherPlayer);
+
+            Assert.Empty(player.VisibleEntities);
+
+            player.LookAround();
+
+            Assert.NotEmpty(player.VisibleEntities);
+            Assert.Contains(otherPlayer, player.VisibleEntities);
+            minecraftUser.Verify(x => x.Send(It.IsAny<SpawnPlayerPacket>()), Times.Once());
+        }
+
+        [Fact]
+        public void PlayerLookAroundWithoutBeingSpawnedTest()
+        {
+            var minecraftUser = new MinecraftUserMock(Guid.NewGuid());
+            var worldMock = new WorldMock();
+            var player = PlayerEntityGenerator.GeneratePlayer(minecraftUser, worldMock);
+
+            player.IsSpawned = false;
+            player.IsVisible = false;
+            player.LookAround();
+
+            // Nothing to check since it's a normal behavior.
+        }
+
+        [Fact]
+        public void PlayerLookAroundWhileBeingInvisibleTest()
+        {
+            var minecraftUser = new MinecraftUserMock(Guid.NewGuid());
+            var worldMock = new WorldMock();
+            var player = PlayerEntityGenerator.GeneratePlayer(minecraftUser, worldMock);
+
+            player.IsSpawned = true;
+            player.IsVisible = false;
+            player.LookAround();
+
+            // Nothing to check since it's a normal behavior.
+        }
+
+        [Fact]
+        public void PlayerMoveTest()
+        {
+            var minecraftUser = new MinecraftUserMock(Guid.NewGuid());
+            var otherMinecraftUserMock = new MinecraftUserMock(Guid.NewGuid());
+            var worldMock = new WorldMock();
+            var player = PlayerEntityGenerator.GeneratePlayer(minecraftUser, worldMock);
+            var destinationPosition = new Position(3, 3, 8);
+            var otherPlayer = CreatePlayer("OtherPlayer", otherMinecraftUserMock);
+            var map = WorldMapMock.Create("minecraft:test");
+
+            map.AddPlayer(player);
+            map.AddPlayer(otherPlayer);
+
+            player.IsSpawned = true;
+            player.IsVisible = true;
+            otherPlayer.IsSpawned = true;
+            otherPlayer.IsVisible = true;
+
+            player.Position.X = 1;
+            player.Position.Z = 1;
+
+            player.LookAround();
+            otherPlayer.LookAround();
+
+            player.Move(destinationPosition, true);
+
+            Assert.Equal(destinationPosition, player.Position);
+            otherMinecraftUserMock.Verify(x => x.Send(It.IsAny<EntityPositionPacket>()), Times.Once());
+        }
+
+        private static IPlayer CreatePlayer(string name, MinecraftUserMock minecraftUserMock = null)
+        {
+            var minecraftUser = minecraftUserMock ?? new MinecraftUserMock(Guid.NewGuid());
+            var worldMock = new WorldMock();
+            IPlayer player = PlayerEntityGenerator.GeneratePlayer(minecraftUser, worldMock);
+
+            player.SetName(name);
+
+            return player;
         }
     }
 }

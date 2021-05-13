@@ -33,8 +33,8 @@ namespace Redstone.Server
 
         public uint ConnectedPlayersCount => (uint)ConnectedUsers.Count(x => x.Status == MinecraftUserStatus.Play);
 
-        public RedstoneServer(LiteServerConfiguration configuration, ILitePacketProcessor packetProcessor = null, IServiceProvider serviceProvider = null) 
-            : base(configuration, packetProcessor, serviceProvider)
+        public RedstoneServer(LiteServerOptions configuration, IServiceProvider serviceProvider = null) 
+            : base(configuration, serviceProvider)
         {
             _logger = serviceProvider.GetRequiredService<ILogger<RedstoneServer>>();
             _packetEncryption = serviceProvider.GetRequiredService<IMinecraftPacketEncryption>();
@@ -56,7 +56,7 @@ namespace Redstone.Server
 
         protected override void OnAfterStart()
         {
-            _logger.LogInformation($"Server started and listening on port '{Configuration.Port}'.");
+            _logger.LogInformation($"Server started and listening on port '{Options.Port}'.");
         }
 
         public void SendTo(IEnumerable<IMinecraftUser> users, IMinecraftPacket packet) 

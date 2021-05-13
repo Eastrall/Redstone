@@ -13,6 +13,7 @@ using Redstone.Protocol;
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
+using LiteNetwork.Common.Hosting;
 
 namespace Redstone.Server
 {
@@ -39,20 +40,23 @@ namespace Redstone.Server
                     services.Configure<GameOptions>(context.Configuration.GetSection("game"));
                     services.AddInjectableServices(Assembly.GetExecutingAssembly());
                     services.AddMinecraftProtocol(Assembly.GetExecutingAssembly());
-                })
-                .UseLiteServer<IRedstoneServer, RedstoneServer, MinecraftUser>((context, options) =>
-                {
-                    var serverConfiguration = context.Configuration.GetSection("server").Get<ServerOptions>();
-
-                    if (serverConfiguration is null)
+                    services.UseLiteNetwork(builder =>
                     {
-                        throw new InvalidProgramException($"Failed to load server settings.");
-                    }
+                        builder.AddLiteServer<IRedstoneServer, RedstoneServer, MinecraftUser>(options =>
+                        {
+                            var serverConfiguration = context.Configuration.GetSection("server").Get<ServerOptions>();
 
-                    options.Host = serverConfiguration.Ip;
-                    options.Port = serverConfiguration.Port;
-                    options.PacketProcessor = new MinecraftPacketProcessor();
-                    options.ReceiveStrategy = ReceiveStrategyType.Queued;
+                            if (serverConfiguration is null)
+                            {
+                                throw new InvalidProgramException($"Failed to load server settings.");
+                            }
+
+                            options.Host = serverConfiguration.Ip;
+                            options.Port = serverConfiguration.Port;
+                            options.PacketProcessor = new MinecraftPacketProcessor();
+                            options.ReceiveStrategy = ReceiveStrategyType.Queued;
+                        });
+                    });
                 })
                 .UseNLog()
                 .UseConsoleLifetime()

@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="LiteNetwork.Server" Version="1.0.0-rc.6" />
+    <PackageReference Include="LiteNetwork.Server" Version="1.0.0-rc.7" />
     <PackageReference Include="System.Text.Json" Version="5.0.2" />
   </ItemGroup>
 

@@ -40,6 +40,20 @@ One you have checked out the repository, you can open the `Redstone.sln` solutio
 
 Note: The configuration files of the project are located in the `bin/config` folder, located at the root directory of the project.
 
+## Available features
+
+- [x] Server status
+- [x] Login
+- [x] Player movements (Move, jump and rotation)
+- [x] Player visibility with other entities
+- Chat
+  - [x] Normal chat
+  - [ ] Commands
+- [ ] Inventory
+- [ ] Block placement
+- [ ] World generators
+- [ ] Crafting
+
 ## Thanks
 
 A huge thanks to [wiki.vg](https://wiki.vg/) community for the amazing work about the Minecraft protocol description and map/chunk formats!

@@ -39,7 +39,16 @@
         AdvancementTab = 0x22,
         SelectTrade = 0x23,
         SetBeaconEffect = 0x24,
+        HeldItemChange = 0x25,
+        UpdateCommandBlock = 0x26,
+        UpdateCommandBlockMinecart = 0x27,
+        CreativeInventoryAction = 0x28,
+        UpdateJigsawBlock = 0x29,
+        UpdateBlockStructure = 0x2A,
+        UpdateSign = 0x2B,
         Animation = 0x2C,
-        PlayerBlockPlacement = 0x2E
+        Spectate = 0x2D,
+        PlayerBlockPlacement = 0x2E,
+        UseItem = 0x2F
     }
 }

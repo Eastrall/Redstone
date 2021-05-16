@@ -11,14 +11,21 @@ namespace Redstone.Server.Components
         public byte ItemCount { get; set; }
 
         public ItemSlot()
-            : this(default, default)
         {
+            ItemId = null;
+            ItemCount = 0;
         }
 
         public ItemSlot(int itemId, byte itemCount)
         {
             ItemId = itemId;
             ItemCount = itemCount;
+        }
+
+        public void Reset()
+        {
+            ItemId = null;
+            ItemCount = 0;
         }
     }
 }

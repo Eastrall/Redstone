@@ -10,6 +10,8 @@ namespace Redstone.Abstractions.Components
 
         IItemSlot GetItem(int slotIndex);
 
-        void SetItem(IItemSlot itemSlot, int slotIndex);
+        void SetItem(int slotIndex, int itemId, byte quantity = 1);
+
+        void ClearItem(int slotIndex);
     }
 }

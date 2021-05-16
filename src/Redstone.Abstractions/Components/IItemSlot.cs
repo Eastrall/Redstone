@@ -16,5 +16,10 @@
         /// Gets or sets the item count of the current slot.
         /// </summary>
         byte ItemCount { get; set; }
+
+        /// <summary>
+        /// Resets the item slot.
+        /// </summary>
+        void Reset();
     }
 }

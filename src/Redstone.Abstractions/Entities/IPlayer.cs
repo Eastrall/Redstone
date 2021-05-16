@@ -1,4 +1,5 @@
-﻿using Redstone.Abstractions.Protocol;
+﻿using Redstone.Abstractions.Components;
+using Redstone.Abstractions.Protocol;
 using Redstone.Common;
 
 namespace Redstone.Abstractions.Entities
@@ -22,6 +23,16 @@ namespace Redstone.Abstractions.Entities
         /// Gets the current player's game mode.
         /// </summary>
         ServerGameModeType GameMode { get; }
+
+        /// <summary>
+        /// Gets the current player's inventory.
+        /// </summary>
+        IInventory Inventory { get; }
+
+        /// <summary>
+        /// Gets the current player's hotbar.
+        /// </summary>
+        IHotBar HotBar { get; }
 
         /// <summary>
         /// Sets the current player name.

@@ -1,12 +1,15 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Redstone.Abstractions.Components;
 using Redstone.Abstractions.Entities;
 using Redstone.Abstractions.Protocol;
 using Redstone.Common;
 using Redstone.Common.Chat;
 using Redstone.Common.Configuration;
+using Redstone.Common.DependencyInjection.Extensions;
 using Redstone.Common.Utilities;
 using Redstone.Protocol.Packets.Game.Client;
+using Redstone.Server.Components;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -28,6 +31,10 @@ namespace Redstone.Server.Entities
 
         public ServerGameModeType GameMode { get; internal set; }
 
+        public IInventory Inventory { get; }
+
+        public IHotBar HotBar { get; }
+
         public Player(IMinecraftUser user, Guid id, string name, IServiceProvider serviceProvider)
             : base(serviceProvider)
         {
@@ -36,6 +43,8 @@ namespace Redstone.Server.Entities
             Name = name;
             _keepAliveIdQueue = new Queue<long>();
             _gameOptions = serviceProvider.GetRequiredService<IOptions<GameOptions>>();
+            Inventory = new Inventory(this);
+            HotBar = new HotBar(this);
         }
 
         public override void SendPacket(IMinecraftPacket packet) => _user.Send(packet);

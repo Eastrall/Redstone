@@ -3,6 +3,8 @@ using Redstone.Abstractions.Protocol;
 using Redstone.Common;
 using Redstone.Common.IO;
 using Redstone.Common.Serialization;
+using Redstone.NBT;
+using Redstone.NBT.Tags;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -260,6 +262,13 @@ namespace Redstone.Protocol
             var z = ReadDouble();
 
             return new Position(x, y, z);
+        }
+
+        public NbtCompound ReadNbtCompound()
+        {
+            var reader = new NbtReader(this);
+
+            return reader.IsCompound ? reader.ReadAsTag() as NbtCompound : new NbtCompound();
         }
 
         public void WritePosition(Position position)

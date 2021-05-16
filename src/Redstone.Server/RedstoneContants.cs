@@ -11,6 +11,10 @@ namespace Redstone.Server
         public const int DefaultRenderDistance = 8;
         public const string CommandPrefix = "/";
 
+        public const int PlayerInventorySize = 27;
+        public const int PlayerHotBarSize = 9;
+        public const short PlayerInventoryHotbarOffset = 36;
+
         public const string DefaultFaviconFileName = "Redstone.Server.Resources.DefaultFavicon.png";
 
         private static string _defaultFavicon;

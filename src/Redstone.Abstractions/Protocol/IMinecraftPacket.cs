@@ -1,5 +1,6 @@
 ﻿using LiteNetwork.Protocol.Abstractions;
 using Redstone.Common;
+using Redstone.NBT.Tags;
 using System;
 
 namespace Redstone.Abstractions.Protocol
@@ -51,6 +52,12 @@ namespace Redstone.Abstractions.Protocol
         /// </remarks>
         /// <returns>Position.</returns>
         Position ReadAbsolutePosition();
+
+        /// <summary>
+        /// Reads a <see cref="NbtCompound"/> from the packet stream.
+        /// </summary>
+        /// <returns>Nbt Compound.</returns>
+        NbtCompound ReadNbtCompound();
 
         /// <summary>
         /// Writes an Universal Unique IDentifier into the packet stream.

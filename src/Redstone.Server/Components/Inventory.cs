@@ -1,12 +1,16 @@
 ﻿using Redstone.Abstractions.Components;
+using Redstone.Abstractions.Entities;
 
 namespace Redstone.Server.Components
 {
-    public class Inventory : ItemContainer, IInventory
+    internal class Inventory : ItemContainer, IInventory
     {
-        public Inventory(int capacity) 
-            : base(capacity)
+        private readonly IEntity _owner;
+
+        public Inventory(IEntity owner) 
+            : base(RedstoneContants.PlayerInventorySize)
         {
+            _owner = owner;
         }
     }
 }

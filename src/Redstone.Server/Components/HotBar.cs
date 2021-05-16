@@ -1,12 +1,20 @@
 ﻿using Redstone.Abstractions.Components;
+using Redstone.Abstractions.Entities;
 
 namespace Redstone.Server.Components
 {
-    public class HotBar : ItemContainer, IHotBar
+    internal class HotBar : ItemContainer, IHotBar
     {
-        public HotBar(int capacity)
-            : base(capacity)
+        private readonly IPlayer _owner;
+        private int _selectedSlotIndex;
+
+        public IItemSlot SelectedSlot => GetItem(_selectedSlotIndex);
+
+        public HotBar(IPlayer owner)
+            : base(RedstoneContants.PlayerHotBarSize)
         {
+            _selectedSlotIndex = 0;
+            _owner = owner;
         }
     }
 }

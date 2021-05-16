@@ -2,5 +2,6 @@
 {
     public interface IHotBar : IItemContainer
     {
+        IItemSlot SelectedSlot { get; }
     }
 }

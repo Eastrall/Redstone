@@ -57,7 +57,7 @@ namespace Redstone.Server.Components
 
         IEnumerator IEnumerable.GetEnumerator() => _itemsSlots.GetEnumerator();
 
-        private void ThrowIfOutOfRange(int slotIndex)
+        protected void ThrowIfOutOfRange(int slotIndex)
         {
             if (slotIndex < 0 || slotIndex >= Capacity)
             {

@@ -1,5 +1,6 @@
 ﻿using Redstone.Abstractions.Components;
 using Redstone.Abstractions.Entities;
+using Redstone.Common;
 
 namespace Redstone.Server.Components
 {
@@ -15,6 +16,14 @@ namespace Redstone.Server.Components
         {
             _selectedSlotIndex = 0;
             _owner = owner;
+        }
+
+        public void SetSlotIndex(int slotIndex)
+        {
+            ThrowIfOutOfRange(slotIndex);
+
+            _selectedSlotIndex = slotIndex;
+            _owner.Equip(EquipementSlotType.MainHand, SelectedSlot);
         }
     }
 }

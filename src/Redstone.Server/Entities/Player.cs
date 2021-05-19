@@ -98,6 +98,13 @@ namespace Redstone.Server.Entities
             World.SendToAll(packet);
         }
 
+        public void Equip(EquipementSlotType slot, IItemSlot item)
+        {
+            using var packet = new EntityEquipementPacket(this, slot, item);
+
+            SendPacketToVisibleEntities(packet);
+        }
+
         public override void AddVisibleEntity(IEntity entity)
         {
             base.AddVisibleEntity(entity);

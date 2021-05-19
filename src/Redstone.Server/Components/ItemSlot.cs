@@ -10,6 +10,8 @@ namespace Redstone.Server.Components
 
         public byte ItemCount { get; set; }
 
+        // TODO: Item Metadata such as enchantments
+
         public ItemSlot()
         {
             ItemId = null;

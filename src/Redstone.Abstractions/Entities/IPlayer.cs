@@ -1,5 +1,4 @@
 ﻿using Redstone.Abstractions.Components;
-using Redstone.Abstractions.Protocol;
 using Redstone.Common;
 
 namespace Redstone.Abstractions.Entities
@@ -60,5 +59,12 @@ namespace Redstone.Abstractions.Entities
         /// </summary>
         /// <param name="text">Text that the player should speak/display on the chat.</param>
         void Speak(string text);
+
+        /// <summary>
+        /// Equips an item to the given equipement slot.
+        /// </summary>
+        /// <param name="slot">Equipement slot.</param>
+        /// <param name="item">Item to equip.</param>
+        void Equip(EquipementSlotType slot, IItemSlot item);
     }
 }

@@ -17,12 +17,11 @@ using Redstone.Protocol;
 using Redstone.Protocol.Handlers;
 using Redstone.Protocol.Packets.Game.Client;
 using Redstone.Protocol.Packets.Login;
-using Redstone.Server.World;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Redstone.Server.Handlers.Login
+namespace Redstone.Server.Handlers
 {
     public class LoginHandler
     {
@@ -183,72 +182,12 @@ namespace Redstone.Server.Handlers.Login
         private void SendChunkData(IMinecraftUser user)
         {
             IChunk chunk = _worldManager.Overworld.GetRegion(0, 0).GetChunk(0, 0);
-
             chunk.GenerateHeightMap();
 
+            // Temporary
             _worldManager.Overworld.AddPlayer(user.Player);
 
-            bool fullChunk = true;
-
-            using var packet = new ChunkDataPacket();
-
-            packet.WriteInt32(chunk.X); // Chunk X
-            packet.WriteInt32(chunk.Z); // Chunk Z
-            packet.WriteBoolean(fullChunk); // full chunk
-
-            int mask = 0;
-
-            // if full chunk
-            using var chunkStream = new MinecraftPacket();
-            for (int i = 0; i < chunk.Sections.Count(); i++)
-            {
-                var section = chunk.Sections.ElementAt(i) as ChunkSection;
-
-                if (fullChunk)
-                {
-                    mask |= 1 << i;
-                    section.Serialize(chunkStream);
-                }
-            }
-
-            packet.WriteVarInt32(mask);
-
-            //// Heightmap serialization
-            ////var heightmapCompound = new NbtCompound("")
-            ////{
-            ////    new NbtLongArray("MOTION_BLOCKING", chunk.Heightmap.ToArray()),
-            ////    new NbtLongArray("WORLD_SURFACE", chunk.WorldSurfaceHeightmap.ToArray())
-            ////};
-            ////var nbtFile = new NbtFile(heightmapCompound);
-
-
-            var writer = new NbtWriter(packet, "");
-            writer.WriteLongArray("MOTION_BLOCKING", chunk.Heightmap.ToArray());
-            //writer.WriteLongArray("OCEAN_FLOOR", chunk.Heightmaps[HeightmapType.OceanFloor].data.Storage.Cast<long>().ToArray());
-            writer.WriteLongArray("WORLD_SURFACE", chunk.WorldSurfaceHeightmap.ToArray());
-            writer.EndCompound();
-            writer.Finish();
-
-            //packet.WriteBytes(nbtFile.GetBuffer());
-
-            // Biomes
-            if (fullChunk)
-            {
-                packet.WriteVarInt32(1024);
-                for (int i = 0; i < 1024; i++)
-                {
-                    packet.WriteVarInt32(0);
-                }
-            }
-
-            chunkStream.Position = 0;
-
-            packet.WriteVarInt32((int)chunkStream.Length);
-            packet.WriteBytes(chunkStream.BaseBuffer);
-
-            packet.WriteVarInt32(0); // block count
-            // TODO: foreach block in blocks in chunk as NBT
-
+            using var packet = new ChunkDataPacket(chunk, serializeFullChunk: true);
             user.Send(packet);
         }
 

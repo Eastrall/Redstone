@@ -68,6 +68,11 @@ namespace Redstone.Abstractions.Entities
         IWorldMap Map { get; }
 
         /// <summary>
+        /// Gets the current entity actual chunk.
+        /// </summary>
+        IChunk Chunk { get; }
+
+        /// <summary>
         /// Gets the visible entities from the current entity position.
         /// </summary>
         IEnumerable<IEntity> VisibleEntities { get; }

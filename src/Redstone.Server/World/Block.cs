@@ -16,6 +16,10 @@ namespace Redstone.Server.World
 
         public bool IsFluid => Type is BlockType.Water or BlockType.Lava;
 
+        public bool IsSolid => !IsAir && !IsFluid;
+
+        public int Id => State.Id;
+
         public BlockType Type => _blockData.Type;
 
         public Position Position { get; }

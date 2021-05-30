@@ -3,7 +3,7 @@ using Redstone.Protocol.Handlers;
 using Redstone.Protocol.Packets.Handskake;
 using Redstone.Protocol.Packets.Handskake.Server;
 
-namespace Redstone.Server.Handlers.Handshake
+namespace Redstone.Server.Handlers
 {
     public class HandshakeHandler
     {

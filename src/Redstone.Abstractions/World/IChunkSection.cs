@@ -10,6 +10,11 @@ namespace Redstone.Abstractions.World
     public interface IChunkSection : INetworkSerializable
     {
         /// <summary>
+        /// Gets a value that indicates if the current chunk section is dirty.
+        /// </summary>
+        bool IsDirty { get; }
+
+        /// <summary>
         /// Gets the chunk section index.
         /// </summary>
         int Index { get; }

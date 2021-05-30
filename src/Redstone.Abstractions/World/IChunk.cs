@@ -5,6 +5,8 @@ namespace Redstone.Abstractions.World
 {
     public interface IChunk
     {
+        bool IsDirty { get; }
+
         int X { get; }
 
         int Z { get; }

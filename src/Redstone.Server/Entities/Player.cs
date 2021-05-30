@@ -105,6 +105,19 @@ namespace Redstone.Server.Entities
             SendPacketToVisibleEntities(packet);
         }
 
+        public void SwingHand(HandType hand)
+        {
+            AnimationType animation = hand switch
+            {
+                HandType.Right => AnimationType.SwingMainArm,
+                HandType.Left => AnimationType.SwingOffHand,
+                _ => throw new InvalidOperationException("Invalid hand type.")
+            };
+            using var packet = new EntityAnimationPacket(this, animation);
+
+            SendPacketToVisibleEntities(packet);
+        }
+
         public override void AddVisibleEntity(IEntity entity)
         {
             base.AddVisibleEntity(entity);

@@ -3,10 +3,13 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Redstone.Abstractions.Registry;
 using Redstone.Abstractions.World;
+using Redstone.Common;
+using Redstone.Common.Structures.Blocks;
 using Redstone.Server.Registry;
 using Redstone.Server.Tests.Mocks;
 using Redstone.Server.World;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
@@ -25,7 +28,15 @@ namespace Redstone.Server.Tests.World
 
         public WorldMapTests()
         {
-            _blockFactoryMock = new Mock<IBlockFactory>();
+            _blockFactoryMock = new Mock<IBlockFactory>(); 
+            _blockFactoryMock.Setup(x => x.CreateBlock(It.IsAny<BlockType>()))
+                             .Returns<BlockType>(x =>
+                             {
+                                 return new Block(new BlockData(x.ToString(), null, new[]
+                                 {
+                                   new BlockStateData((int)x, true, new Dictionary<string, string>())
+                                 }));
+                             });
             _registry = new DataRegistry(new Mock<ILogger<DataRegistry>>().Object);
             _serviceProvider = new ServiceCollection()
                 .AddSingleton<ILogger<WorldMap>>(new Mock<ILogger<WorldMap>>().Object)
@@ -282,6 +293,95 @@ namespace Redstone.Server.Tests.World
             Assert.False(map.IsUpdating);
             Assert.Empty(map.Regions);
             Assert.Empty(map.Players);
+        }
+
+        [Theory]
+        [InlineData(0, 183, 0)]
+        [InlineData(17, 47, 20)]
+        public void WorldMapGetBlockTest(int x, int y, int z)
+        {
+            var map = new WorldMap(_mapName, _serviceProvider);
+            IRegion region0 = map.AddRegion(0, 0);
+            region0.AddChunk(0, 0);
+            region0.AddChunk(1, 0);
+            region0.AddChunk(0, 1);
+            region0.AddChunk(1, 1);
+
+            IBlock block = map.GetBlock(x, y, z);
+
+            Assert.NotNull(block);
+            Assert.IsType<Block>(block);
+            Assert.Equal(BlockType.Air, block.Type);
+            Assert.True(block.IsAir);
+        }
+
+        [Fact]
+        public void WorldMapGetBlockAtUnknownRegion()
+        {
+            var map = new WorldMap(_mapName, _serviceProvider);
+
+            Assert.Throws<InvalidOperationException>(() => map.GetBlock(0, 0, 0));
+        }
+
+        [Theory]
+        [InlineData(0, 183, 0, BlockType.GrassBlock)]
+        [InlineData(17, 47, 20, BlockType.Dirt)]
+        public void WorldMapSetBlockTypeTest(int x, int y, int z, BlockType blockType)
+        {
+            var map = new WorldMap(_mapName, _serviceProvider);
+            IRegion region0 = map.AddRegion(0, 0);
+            region0.AddChunk(0, 0);
+            region0.AddChunk(1, 0);
+            region0.AddChunk(0, 1);
+            region0.AddChunk(1, 1);
+
+            map.SetBlock(blockType, x, y, z);
+            IBlock block = map.GetBlock(x, y, z);
+
+            Assert.NotNull(block);
+            Assert.IsType<Block>(block);
+            Assert.Equal(blockType, block.Type);
+            Assert.False(block.IsAir);
+        }
+
+        [Fact]
+        public void WorldMapSetBlockTypeAtUnknownRegionTest()
+        {
+            var map = new WorldMap(_mapName, _serviceProvider);
+
+            Assert.Throws<InvalidOperationException>(() => map.SetBlock(BlockType.GrassBlock, 0, 0, 0));
+        }
+
+        [Theory]
+        [InlineData(0, 183, 0, BlockType.GrassBlock)]
+        [InlineData(17, 47, 20, BlockType.Dirt)]
+        public void WorldMapSetBlockTest(int x, int y, int z, BlockType blockType)
+        {
+            var map = new WorldMap(_mapName, _serviceProvider);
+            IRegion region0 = map.AddRegion(0, 0);
+            region0.AddChunk(0, 0);
+            region0.AddChunk(1, 0);
+            region0.AddChunk(0, 1);
+            region0.AddChunk(1, 1);
+
+            IBlock blockToSet = _blockFactoryMock.Object.CreateBlock(blockType);
+
+            map.SetBlock(blockToSet, x, y, z);
+            IBlock block = map.GetBlock(x, y, z);
+
+            Assert.NotNull(block);
+            Assert.IsType<Block>(block);
+            Assert.Equal(blockType, block.Type);
+            Assert.False(block.IsAir);
+        }
+
+        [Fact]
+        public void WorldMapSetBlockAtUnknownRegionTest()
+        {
+            var map = new WorldMap(_mapName, _serviceProvider);
+            IBlock blockToSet = _blockFactoryMock.Object.CreateBlock(BlockType.GrassBlock);
+
+            Assert.Throws<InvalidOperationException>(() => map.SetBlock(blockToSet, 0, 0, 0));
         }
     }
 }

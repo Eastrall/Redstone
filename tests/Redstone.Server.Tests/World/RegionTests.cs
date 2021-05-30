@@ -111,5 +111,93 @@ namespace Redstone.Server.Tests.World
 
             Assert.Null(region.GetChunk(0, 0));
         }
+
+        [Theory]
+        [InlineData(0, 0, 0)]
+        [InlineData(17, 6, 20)]
+        [InlineData(4, 247, 16)]
+        public void RegionGetBlockTest(int x, int y, int z)
+        {
+            var region = new Region(0, 0, _serviceProvider);
+            region.AddChunk(0, 0);
+            region.AddChunk(1, 0);
+            region.AddChunk(0, 1);
+            region.AddChunk(1, 1);
+
+            IBlock block = region.GetBlock(x, y, z);
+
+            Assert.NotNull(block);
+            Assert.IsType<Block>(block);
+            Assert.Equal(BlockType.Air, block.Type);
+            Assert.True(block.IsAir);
+        }
+
+        [Fact]
+        public void RegionGetBlockAtUnknownChunkTest()
+        {
+            var region = new Region(0, 0, _serviceProvider);
+
+            Assert.Throws<InvalidOperationException>(() => region.GetBlock(0, 0, 0));
+        }
+
+        [Theory]
+        [InlineData(0, 0, 0, BlockType.Stone)]
+        [InlineData(17, 6, 20, BlockType.GrassBlock)]
+        [InlineData(4, 247, 16, BlockType.Basalt)]
+        public void RegionSetBlockTypeAtChunkTest(int x, int y, int z, BlockType blockType)
+        {
+            var region = new Region(0, 0, _serviceProvider);
+            region.AddChunk(0, 0);
+            region.AddChunk(1, 0);
+            region.AddChunk(0, 1);
+            region.AddChunk(1, 1);
+
+            region.SetBlock(blockType, x, y, z);
+            IBlock block = region.GetBlock(x, y, z);
+
+            Assert.NotNull(block);
+            Assert.IsType<Block>(block);
+            Assert.Equal(blockType, block.Type);
+            Assert.False(block.IsAir);
+        }
+
+        [Fact]
+        public void RegionSetBlockTypeAtUnknownChunkTest()
+        {
+            var region = new Region(0, 0, _serviceProvider);
+
+            Assert.Throws<InvalidOperationException>(() => region.SetBlock(BlockType.GrassBlock, 0, 0, 0));
+        }
+
+        [Theory]
+        [InlineData(0, 0, 0, BlockType.Stone)]
+        [InlineData(17, 6, 20, BlockType.GrassBlock)]
+        [InlineData(4, 247, 16, BlockType.Basalt)]
+        public void RegionSetBlockAtChunkTest(int x, int y, int z, BlockType blockType)
+        {
+            var region = new Region(0, 0, _serviceProvider);
+            region.AddChunk(0, 0);
+            region.AddChunk(1, 0);
+            region.AddChunk(0, 1);
+            region.AddChunk(1, 1);
+
+            IBlock blockToSet = _blockFactoryMock.Object.CreateBlock(blockType);
+            region.SetBlock(blockToSet, x, y, z);
+
+            IBlock block = region.GetBlock(x, y, z);
+            Assert.NotNull(block);
+            Assert.IsType<Block>(block);
+            Assert.Equal(blockType, block.Type);
+            Assert.False(block.IsAir);
+        }
+
+        [Fact]
+        public void RegionSetBlockAtUnknownChunkTest()
+        {
+            var region = new Region(0, 0, _serviceProvider);
+            IBlock blockToSet = _blockFactoryMock.Object.CreateBlock(BlockType.GrassBlock);
+
+            Assert.Throws<InvalidOperationException>(() => region.SetBlock(blockToSet, 0, 0, 0));
+        }
     }
 }

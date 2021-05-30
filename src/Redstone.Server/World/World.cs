@@ -54,7 +54,7 @@ namespace Redstone.Server.World
             {
                 for (int z = 0; z < 16; z++)
                 {
-                    chunk.SetBlock(BlockType.Dirt, x, 1, z);
+                    chunk.SetBlock(BlockType.Dirt, x, 0, z);
                 }
             }
 

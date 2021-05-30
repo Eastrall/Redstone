@@ -66,5 +66,11 @@ namespace Redstone.Abstractions.Entities
         /// <param name="slot">Equipement slot.</param>
         /// <param name="item">Item to equip.</param>
         void Equip(EquipementSlotType slot, IItemSlot item);
+
+        /// <summary>
+        /// Swings the player's hand.
+        /// </summary>
+        /// <param name="hand">Player's hand to swing.</param>
+        void SwingHand(HandType hand);
     }
 }

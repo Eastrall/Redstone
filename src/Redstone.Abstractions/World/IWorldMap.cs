@@ -1,5 +1,6 @@
 ﻿using Redstone.Abstractions.Entities;
 using Redstone.Abstractions.Protocol;
+using Redstone.Common;
 using System;
 using System.Collections.Generic;
 
@@ -29,6 +30,33 @@ namespace Redstone.Abstractions.World
         /// Gets the players present in the current world map.
         /// </summary>
         IEnumerable<IPlayer> Players { get; }
+
+        /// <summary>
+        /// Gets a block within the world map.
+        /// </summary>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
+        /// <param name="z">Z coordinate.</param>
+        /// <returns>The block at given coordinates.</returns>
+        IBlock GetBlock(int x, int y, int z);
+
+        /// <summary>
+        /// Sets a block within the world map.
+        /// </summary>
+        /// <param name="blockType">Block type to set.</param>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
+        /// <param name="z">Z coordinate.</param>
+        void SetBlock(BlockType blockType, int x, int y, int z);
+
+        /// <summary>
+        /// Sets a block within the world map.
+        /// </summary>
+        /// <param name="block">Block to set.</param>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
+        /// <param name="z">Z coordinate.</param>
+        void SetBlock(IBlock block, int x, int y, int z);
 
         /// <summary>
         /// Adds a new region at the given x,z position.

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Redstone.Abstractions.Entities;
 using Redstone.Abstractions.Protocol;
 using Redstone.Abstractions.World;
+using Redstone.Common;
 using Redstone.Server.Entities;
 using System;
 using System.Collections.Concurrent;
@@ -48,6 +49,48 @@ namespace Redstone.Server.World
             _logger = _serviceProvider.GetRequiredService<ILogger<WorldMap>>();
             _regions = new List<IRegion>();
             _players = new ConcurrentDictionary<Guid, IPlayer>();
+        }
+
+        public IBlock GetBlock(int x, int y, int z)
+        {
+            int regionX = x / Region.Size;
+            int regionZ = z / Region.Size;
+            IRegion region = GetRegion(regionX, regionZ);
+
+            if (region is null)
+            {
+                throw new InvalidOperationException($"Cannot find region at position: X={regionX};Z={regionZ}");
+            }
+
+            return region.GetBlock(x % Region.Size, y, z % Region.Size);
+        }
+
+        public void SetBlock(BlockType blockType, int x, int y, int z)
+        {
+            int regionX = x / Region.Size;
+            int regionZ = z / Region.Size;
+            IRegion region = GetRegion(regionX, regionZ);
+
+            if (region is null)
+            {
+                throw new InvalidOperationException($"Cannot find region at position: X={regionX};Z={regionZ}");
+            }
+
+            region.SetBlock(blockType, x % Region.Size, y, z % Region.Size);
+        }
+
+        public void SetBlock(IBlock block, int x, int y, int z)
+        {
+            int regionX = x / Region.Size;
+            int regionZ = z / Region.Size;
+            IRegion region = GetRegion(regionX, regionZ);
+
+            if (region is null)
+            {
+                throw new InvalidOperationException($"Cannot find region at position: X={regionX};Z={regionZ}");
+            }
+
+            region.SetBlock(block, x % Region.Size, y, z % Region.Size);
         }
 
         public IRegion AddRegion(int x, int z)

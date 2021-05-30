@@ -20,6 +20,8 @@ namespace Redstone.Server.World
         private readonly CompactedLongArray _blockStorage;
         private readonly IPalette _palette;
 
+        public bool IsDirty { get; private set; }
+
         public int Index { get; }
 
         public ChunkSection(int index, IServiceProvider serviceProvider)
@@ -82,6 +84,8 @@ namespace Redstone.Server.World
             int paletteIndex = _palette.GetIdFromState(block);
 
             _blockStorage[blockIndex] = paletteIndex;
+
+            IsDirty = true;
         }
 
         public void Serialize(IMinecraftPacket packet)

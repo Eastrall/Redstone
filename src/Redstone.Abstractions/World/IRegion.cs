@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Redstone.Common;
+using System;
 using System.Collections.Generic;
 
 namespace Redstone.Abstractions.World
@@ -48,5 +49,32 @@ namespace Redstone.Abstractions.World
         /// <param name="z">Z coordinate.</param>
         /// <returns>True if the chunk exists; false otherwise.</returns>
         bool ContainsChunk(int x, int z);
+
+        /// <summary>
+        /// Gets a block within the region.
+        /// </summary>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
+        /// <param name="z">Z coordinate.</param>
+        /// <returns>The block at given coordinates.</returns>
+        IBlock GetBlock(int x, int y, int z);
+
+        /// <summary>
+        /// Sets a block within the region.
+        /// </summary>
+        /// <param name="blockType">Block type to set.</param>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
+        /// <param name="z">Z coordinate.</param>
+        void SetBlock(BlockType blockType, int x, int y, int z);
+
+        /// <summary>
+        /// Sets a block within the region.
+        /// </summary>
+        /// <param name="block">Block to set.</param>
+        /// <param name="x">X coordinate.</param>
+        /// <param name="y">Y coordinate.</param>
+        /// <param name="z">Z coordinate.</param>
+        void SetBlock(IBlock block, int x, int y, int z);
     }
 }

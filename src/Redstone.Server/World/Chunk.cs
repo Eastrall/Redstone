@@ -20,6 +20,8 @@ namespace Redstone.Server.World
         private readonly CompactedLongArray _oceanFloorHeightmap;
         private readonly CompactedLongArray _worldSurfaceHeightmap;
 
+        public bool IsDirty => _chunkSections.Any(x => x.IsDirty);
+
         public int X { get; }
 
         public int Z { get; }
@@ -90,6 +92,9 @@ namespace Redstone.Server.World
         public void SetBlock(BlockType blockType, int x, int y, int z)
         {
             GetChunkSection(y).SetBlock(blockType, x, y % Size, z);
+
+            // TODO: improve heightmap generation when placing a block.
+            GenerateHeightMap();
         }
 
         public void SetBlock(IBlock block, int x, int y, int z)

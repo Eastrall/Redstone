@@ -14,11 +14,6 @@ namespace Redstone.Server.Handlers.Play
             float pitchAngle = packet.ReadSingle();
             bool isOnGround = packet.ReadBoolean();
 
-            if (user.Player.IsOnGround != isOnGround)
-            {
-                throw new InvalidOperationException("Player is not on ground.");
-            }
-
             user.Player.Rotate(yawAngle, pitchAngle);
         }
     }

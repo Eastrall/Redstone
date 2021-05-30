@@ -4,6 +4,7 @@ using Redstone.Abstractions.Protocol;
 using Redstone.Abstractions.World;
 using Redstone.Common;
 using Redstone.Protocol.Packets.Game.Client;
+using Redstone.Server.World;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -39,6 +40,8 @@ namespace Redstone.Server.Entities
         public float HeadAngle { get; set; }
 
         public IWorldMap Map { get; internal set; }
+
+        public IChunk Chunk => GetActualChunk();
 
         public IEnumerable<IEntity> VisibleEntities => _visibleEntities.Values;
 
@@ -177,5 +180,31 @@ namespace Redstone.Server.Entities
         }
 
         public bool Equals(IEntity other) => other is not null && EntityId == other.EntityId;
+
+        private IChunk GetActualChunk()
+        {
+            int regionX = (int)Position.X / Region.Size;
+            int regionZ = (int)Position.Z / Region.Size;
+            IRegion region = Map.GetRegion(regionX, regionZ);
+
+            if (region is null)
+            {
+                throw new InvalidOperationException($"Failed to get region at coordinates: {regionX}/{regionZ}");
+            }
+
+            int regionPlayerPosX = (int)Position.X % Region.Size;
+            int regionPlayerPosZ = (int)Position.Z % Region.Size;
+            int chunkX = regionPlayerPosX / Redstone.Server.World.Chunk.Size;
+            int chunkZ = regionPlayerPosZ / Redstone.Server.World.Chunk.Size;
+
+            IChunk chunk = region.GetChunk(chunkX, chunkZ);
+
+            if (chunk is null)
+            {
+                throw new InvalidOperationException($"Failed to get chunk {chunkX}/{chunkZ} from region {regionX}/{regionZ}");
+            }
+
+            return chunk;
+        }
     }
 }

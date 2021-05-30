@@ -46,11 +46,18 @@ Note: The configuration files of the project are located in the `bin/config` fol
 - [x] Login
 - [x] Player movements (Move, jump and rotation)
 - [x] Player visibility with other entities
+- [ ] Player data
+  - [ ] Loading
+  - [ ] Saving
 - Chat
   - [x] Normal chat
   - [ ] Commands
 - [ ] Inventory
-- [ ] Block placement
+  - [x] Creative Inventory
+  - [ ] Survival inventory
+- [x] Hotbar
+- [x] Block placement
+- [ ] Block destruction
 - [ ] World generators
 - [ ] Crafting
 

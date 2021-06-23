@@ -3,13 +3,9 @@ using Redstone.Abstractions.Registry;
 using Redstone.Abstractions.World;
 using Redstone.Common;
 using Redstone.Common.DependencyInjection;
-using Redstone.Common.Structures.Biomes;
 using Redstone.Common.Structures.Blocks;
-using Redstone.Common.Structures.Dimensions;
-using Redstone.Server.Registry;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Redstone.Server.World.Factories
@@ -26,7 +22,7 @@ namespace Redstone.Server.World.Factories
             _blocksDatas = new ConcurrentDictionary<BlockType, BlockData>();
         }
 
-        public IBlock CreateBlock(BlockType blockType)
+        public IBlock CreateBlock(BlockType blockType, int x, int y, int z, IChunk chunk)
         {
             if (!_blocksDatas.TryGetValue(blockType, out BlockData blockData))
             {
@@ -40,7 +36,7 @@ namespace Redstone.Server.World.Factories
                 _blocksDatas.TryAdd(blockType, blockData);
             }
 
-            return new Block(blockData);
+            return new Block(x, y, z, chunk, blockData, _registry);
         }
     }
 }

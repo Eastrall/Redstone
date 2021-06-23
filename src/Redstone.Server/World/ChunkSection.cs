@@ -4,19 +4,23 @@ using Redstone.Abstractions.Registry;
 using Redstone.Abstractions.World;
 using Redstone.Common;
 using Redstone.Common.Collections;
+using Redstone.Common.Exceptions;
 using Redstone.Server.World.Palettes;
 using System;
+using System.Linq;
 
 namespace Redstone.Server.World
 {
-    public class ChunkSection : IChunkSection
+    internal class ChunkSection : IChunkSection
     {
         public const byte DefaultBitsPerBlock = 4;
         public const int Size = 16;
         public const int MaximumBlockAmount = 4096;
 
+        private readonly IBlock[] _blocks;
         private readonly IServiceProvider _serviceProvider;
         private readonly IBlockFactory _blockFactory;
+        private readonly IRegistry _registry;
         private readonly CompactedLongArray _blockStorage;
         private readonly IPalette _palette;
 
@@ -24,31 +28,35 @@ namespace Redstone.Server.World
 
         public int Index { get; }
 
-        public ChunkSection(int index, IServiceProvider serviceProvider)
+        public IChunk Chunk { get; }
+
+        public ChunkSection(IChunk chunk, int index, IServiceProvider serviceProvider)
         {
+            Chunk = chunk;
             Index = index;
-            _serviceProvider = serviceProvider; 
+            _serviceProvider = serviceProvider;
+            _blocks = new IBlock[MaximumBlockAmount];
             _blockFactory = _serviceProvider.GetRequiredService<IBlockFactory>();
+            _registry = _serviceProvider.GetRequiredService<IRegistry>();
             _blockStorage = new CompactedLongArray(DefaultBitsPerBlock, MaximumBlockAmount);
 
             if (DefaultBitsPerBlock <= 8)
             {
-                _palette = new IndirectBlockStatePalette(Math.Max((byte)4, DefaultBitsPerBlock));
+                _palette = new BlockStatePalette(_registry, Math.Max((byte)4, DefaultBitsPerBlock));
             }
-            else
-            {
-                _palette = new DirectBlockStatePalette(_serviceProvider.GetRequiredService<IRegistry>());
-            }
+            //else
+            //{
+            //    _palette = new DirectBlockStatePalette(_serviceProvider.GetRequiredService<IRegistry>());
+            //}
 
-            FillWithAir();
+            InitializeEmptySection();
         }
 
         public IBlock GetBlock(int x, int y, int z)
         {
-            y %= Size;
-            int storageId = _blockStorage[GetBlockIndex(x, y, z)];
+            int index = GetBlockIndex(x, y % Size, z);
 
-            return _palette.GetStateFromIndex(storageId);
+            return _blocks[index];
         }
 
         public short GetBlockAmount()
@@ -74,18 +82,18 @@ namespace Redstone.Server.World
             return validBlockCount;
         }
 
-        public void SetBlock(BlockType blockType, int x, int y, int z) => SetBlock(_blockFactory.CreateBlock(blockType), x, y, z);
-
-        public void SetBlock(IBlock block, int x, int y, int z)
+        public IBlock SetBlock(BlockType blockType, int x, int y, int z)
         {
-            y %= Size;
-            var blockIndex = GetBlockIndex(x, y, z);
+            int blockIndex = GetBlockIndex(x, y, z);
+            IBlock block = _blocks.ElementAtOrDefault(blockIndex) ?? throw new BlockNotFoundException(x, y, z);
 
-            int paletteIndex = _palette.GetIdFromState(block);
+            block.SetType(blockType);
 
+            int paletteIndex = _palette.GetState(block.State.Id);
             _blockStorage[blockIndex] = paletteIndex;
-
             IsDirty = true;
+
+            return block;
         }
 
         public void Serialize(IMinecraftPacket packet)
@@ -104,7 +112,7 @@ namespace Redstone.Server.World
             }
         }
 
-        private void FillWithAir()
+        private void InitializeEmptySection()
         {
             for (int x = 0; x < Size; x++)
             {
@@ -112,7 +120,11 @@ namespace Redstone.Server.World
                 {
                     for (int z = 0; z < Size; z++)
                     {
-                        SetBlock(_blockFactory.CreateBlock(BlockType.Air), x, y, z);
+                        int blockIndex = GetBlockIndex(x, y, z);
+                        IBlock block = _blockFactory.CreateBlock(BlockType.Air, x, y, z, Chunk);
+
+                        _blocks[blockIndex] = block;
+                        _blockStorage[blockIndex] = _palette.GetState(block.State.Id);
                     }
                 }
             }

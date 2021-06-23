@@ -4,6 +4,7 @@ using Moq;
 using Redstone.Abstractions.Registry;
 using Redstone.Abstractions.World;
 using Redstone.Common;
+using Redstone.Common.Exceptions;
 using Redstone.Common.Structures.Blocks;
 using Redstone.Server.Registry;
 using Redstone.Server.World;
@@ -27,17 +28,19 @@ namespace Redstone.Server.Tests.World
         public ChunkTests()
         {
             _blockFactoryMock = new Mock<IBlockFactory>();
-            _blockFactoryMock.Setup(x => x.CreateBlock(It.IsAny<BlockType>()))
-                             .Returns<BlockType>(x =>
+            _blockFactoryMock.Setup(x => x.CreateBlock(It.IsAny<BlockType>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<IChunk>()))
+                             .Returns<BlockType, int, int, int, IChunk>((type, x, y, z, chunk) =>
                              {
-                                 return new Block(new BlockData(x.ToString(), null, new[]
+                                 return new Block(x, y, z, chunk, new BlockData(type.ToString(), null, new[]
                                  {
-                                     new BlockStateData((int)x, true, new Dictionary<string, string>())
-                                 }));
+                                     new BlockStateData((int)type, true, new Dictionary<string, string>())
+                                 }), _registry);
                              });
             _registry = new DataRegistry(new Mock<ILogger<DataRegistry>>().Object);
+            _registry.Load();
             _serviceProvider = new ServiceCollection()
                 .AddSingleton(s => _blockFactoryMock.Object)
+                .AddSingleton(s => _registry)
                 .BuildServiceProvider();
         }
 
@@ -50,8 +53,6 @@ namespace Redstone.Server.Tests.World
         [Fact]
         public void ChunkFilledWithAirTest()
         {
-            _registry.Load();
-
             var chunk = new Chunk(0, 0, _serviceProvider);
 
             Assert.NotNull(chunk);
@@ -78,7 +79,7 @@ namespace Redstone.Server.Tests.World
             }
 
             _blockFactoryMock.Verify(
-                x => x.CreateBlock(It.IsAny<BlockType>()), 
+                x => x.CreateBlock(It.IsAny<BlockType>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<IChunk>()), 
                 Times.Exactly(ChunkSection.MaximumBlockAmount * chunk.Sections.Count()));
         }
 
@@ -92,6 +93,12 @@ namespace Redstone.Server.Tests.World
             Assert.IsType<Block>(block);
             Assert.Equal(BlockType.Air, block.Type);
             Assert.True(block.IsAir);
+            Assert.False(block.IsFluid);
+            Assert.False(block.IsSolid);
+            Assert.Equal(0, block.X);
+            Assert.Equal(0, block.Y);
+            Assert.Equal(0, block.Z);
+            Assert.Equal(chunk, block.Chunk);
         }
 
         [Theory]
@@ -131,42 +138,31 @@ namespace Redstone.Server.Tests.World
         public void ChunkSetBlockTest()
         {
             var chunk = new Chunk(0, 0, _serviceProvider);
-            chunk.SetBlock(_blockFactoryMock.Object.CreateBlock(BlockType.Dirt), 0, 0, 0);
+            chunk.SetBlock(BlockType.Dirt, 0, 1, 0);
 
-            IBlock dirtBlock = chunk.GetBlock(0, 0, 0);
-
-            Assert.NotNull(dirtBlock);
-            Assert.IsType<Block>(dirtBlock);
-            Assert.False(dirtBlock.IsAir);
-            Assert.False(dirtBlock.IsFluid);
-            Assert.Equal(BlockType.Dirt, dirtBlock.Type);
-        }
-
-        [Fact]
-        public void ChunkSetBlockWithBlockTypeTest()
-        {
-            var chunk = new Chunk(0, 0, _serviceProvider);
-            chunk.SetBlock(BlockType.Dirt, 0, 0, 0);
-
-            IBlock dirtBlock = chunk.GetBlock(0, 0, 0);
+            IBlock dirtBlock = chunk.GetBlock(0, 1, 0);
 
             Assert.NotNull(dirtBlock);
             Assert.IsType<Block>(dirtBlock);
             Assert.False(dirtBlock.IsAir);
             Assert.False(dirtBlock.IsFluid);
             Assert.Equal(BlockType.Dirt, dirtBlock.Type);
+            Assert.Equal(1, chunk.Heightmap.ElementAt(0));
         }
 
         [Theory]
-        [InlineData(-1)]
-        [InlineData(300)]
-        [InlineData(-300)]
-        public void ChunkSetBlockAtInvalidPositionTest(int blockY)
+        [InlineData(34, 48, 0)]
+        [InlineData(0, 23, 49)]
+        [InlineData(19, 20, 24)]
+        [InlineData(-12, 38, 0)]
+        [InlineData(0, 38, -12)]
+        [InlineData(2, -20, 11)]
+        [InlineData(2, 399, 11)]
+        public void ChunkSetBlockAtInvalidPositionTest(int x, int y, int z)
         {
             var chunk = new Chunk(0, 0, _serviceProvider);
 
-            Assert.Throws<InvalidOperationException>(
-                () => chunk.SetBlock(_blockFactoryMock.Object.CreateBlock(BlockType.Dirt), 0, blockY, 0));
+            Assert.Throws<InvalidOperationException>(() => chunk.SetBlock(BlockType.Dirt, x, y, z));
         }
 
         [Fact]
@@ -180,16 +176,6 @@ namespace Redstone.Server.Tests.World
             {
                 Assert.Equal(0, chunk.Heightmap.ElementAt(i));
             }
-        }
-
-        [Fact]
-        public void ChunkGenerateHeightMapTest()
-        {
-            var chunk = new Chunk(0, 0, _serviceProvider);
-            chunk.SetBlock(_blockFactoryMock.Object.CreateBlock(BlockType.Dirt), 0, 1, 0);
-            chunk.GenerateHeightMap();
-
-            Assert.Equal(1, chunk.Heightmap.ElementAt(0));
         }
     }
 }

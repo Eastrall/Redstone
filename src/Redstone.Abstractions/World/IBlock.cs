@@ -3,6 +3,9 @@ using Redstone.Common.Structures.Blocks;
 
 namespace Redstone.Abstractions.World
 {
+    /// <summary>
+    /// Represents a block in the Minecraft world.
+    /// </summary>
     public interface IBlock
     {
         /// <summary>
@@ -31,13 +34,40 @@ namespace Redstone.Abstractions.World
         BlockType Type { get; }
 
         /// <summary>
-        /// Gets the block position.
+        /// Gets the X position within the chunk.
         /// </summary>
-        Position Position { get; }
+        int X { get; }
+
+        /// <summary>
+        /// Gets the Y position within the chunk.
+        /// </summary>
+        int Y { get; }
+
+        /// <summary>
+        /// Gets the Z position within the chunk.
+        /// </summary>
+        int Z { get; }
+
+        /// <summary>
+        /// Gets the parent chunk.
+        /// </summary>
+        IChunk Chunk { get; }
 
         /// <summary>
         /// Gets the current block state.
         /// </summary>
         BlockStateData State { get; }
+
+        /// <summary>
+        /// Sets the block type.
+        /// </summary>
+        /// <param name="type">Block type.</param>
+        void SetType(BlockType type);
+
+        /// <summary>
+        /// Sets the block state.
+        /// </summary>
+        /// <param name="state">Block state.</param>
+        void SetState(BlockStateData state);
     }
 }

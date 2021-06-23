@@ -65,7 +65,7 @@ namespace Redstone.Server.World
             return region.GetBlock(x % Region.Size, y, z % Region.Size);
         }
 
-        public void SetBlock(BlockType blockType, int x, int y, int z)
+        public IBlock SetBlock(BlockType blockType, int x, int y, int z)
         {
             int regionX = x / Region.Size;
             int regionZ = z / Region.Size;
@@ -76,21 +76,7 @@ namespace Redstone.Server.World
                 throw new InvalidOperationException($"Cannot find region at position: X={regionX};Z={regionZ}");
             }
 
-            region.SetBlock(blockType, x % Region.Size, y, z % Region.Size);
-        }
-
-        public void SetBlock(IBlock block, int x, int y, int z)
-        {
-            int regionX = x / Region.Size;
-            int regionZ = z / Region.Size;
-            IRegion region = GetRegion(regionX, regionZ);
-
-            if (region is null)
-            {
-                throw new InvalidOperationException($"Cannot find region at position: X={regionX};Z={regionZ}");
-            }
-
-            region.SetBlock(block, x % Region.Size, y, z % Region.Size);
+            return region.SetBlock(blockType, x % Region.Size, y, z % Region.Size);
         }
 
         public IRegion AddRegion(int x, int z)

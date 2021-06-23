@@ -4,7 +4,7 @@ using System;
 
 namespace Redstone.Server.World.Palettes
 {
-    public class IndirectBlockStatePalette : IPalette
+    public class IndirectBlockStatePalette //: IPalette
     {
         public IBlock[] BlockStateArray { get; set; }
         public int BlockStateCount { get; set; }

@@ -23,17 +23,19 @@ namespace Redstone.Server.Tests.World
         public RegionTests()
         {
             _blockFactoryMock = new Mock<IBlockFactory>();
-            _blockFactoryMock.Setup(x => x.CreateBlock(It.IsAny<BlockType>()))
-                             .Returns<BlockType>(x =>
+            _blockFactoryMock.Setup(x => x.CreateBlock(It.IsAny<BlockType>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<IChunk>()))
+                             .Returns<BlockType, int, int, int, IChunk>((type, x, y, z, chunk) =>
                              {
-                                 return new Block(new BlockData(x.ToString(), null, new[]
+                                 return new Block(x, y, z, chunk, new BlockData(type.ToString(), null, new[]
                                  {
-                                    new BlockStateData((int)x, true, new Dictionary<string, string>())
-                                 }));
+                                     new BlockStateData((int)type, true, new Dictionary<string, string>())
+                                 }), _registry);
                              });
             _registry = new DataRegistry(new Mock<ILogger<DataRegistry>>().Object);
+            _registry.Load();
             _serviceProvider = new ServiceCollection()
                 .AddSingleton(s => _blockFactoryMock.Object)
+                .AddSingleton(s => _registry)
                 .BuildServiceProvider();
         }
 
@@ -140,27 +142,6 @@ namespace Redstone.Server.Tests.World
             Assert.Throws<InvalidOperationException>(() => region.GetBlock(0, 0, 0));
         }
 
-        [Theory]
-        [InlineData(0, 0, 0, BlockType.Stone)]
-        [InlineData(17, 6, 20, BlockType.GrassBlock)]
-        [InlineData(4, 247, 16, BlockType.Basalt)]
-        public void RegionSetBlockTypeAtChunkTest(int x, int y, int z, BlockType blockType)
-        {
-            var region = new Region(0, 0, _serviceProvider);
-            region.AddChunk(0, 0);
-            region.AddChunk(1, 0);
-            region.AddChunk(0, 1);
-            region.AddChunk(1, 1);
-
-            region.SetBlock(blockType, x, y, z);
-            IBlock block = region.GetBlock(x, y, z);
-
-            Assert.NotNull(block);
-            Assert.IsType<Block>(block);
-            Assert.Equal(blockType, block.Type);
-            Assert.False(block.IsAir);
-        }
-
         [Fact]
         public void RegionSetBlockTypeAtUnknownChunkTest()
         {
@@ -181,11 +162,13 @@ namespace Redstone.Server.Tests.World
             region.AddChunk(0, 1);
             region.AddChunk(1, 1);
 
-            IBlock blockToSet = _blockFactoryMock.Object.CreateBlock(blockType);
-            region.SetBlock(blockToSet, x, y, z);
-
+            IBlock placedBlock = region.SetBlock(blockType, x, y, z);
             IBlock block = region.GetBlock(x, y, z);
+
+            Assert.NotNull(placedBlock);
             Assert.NotNull(block);
+            Assert.Equal(placedBlock, block);
+            Assert.IsType<Block>(placedBlock);
             Assert.IsType<Block>(block);
             Assert.Equal(blockType, block.Type);
             Assert.False(block.IsAir);
@@ -195,9 +178,8 @@ namespace Redstone.Server.Tests.World
         public void RegionSetBlockAtUnknownChunkTest()
         {
             var region = new Region(0, 0, _serviceProvider);
-            IBlock blockToSet = _blockFactoryMock.Object.CreateBlock(BlockType.GrassBlock);
 
-            Assert.Throws<InvalidOperationException>(() => region.SetBlock(blockToSet, 0, 0, 0));
+            Assert.Throws<InvalidOperationException>(() => region.SetBlock(BlockType.GrassBlock, 0, 0, 0));
         }
     }
 }

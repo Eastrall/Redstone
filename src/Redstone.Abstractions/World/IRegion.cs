@@ -66,15 +66,7 @@ namespace Redstone.Abstractions.World
         /// <param name="x">X coordinate.</param>
         /// <param name="y">Y coordinate.</param>
         /// <param name="z">Z coordinate.</param>
-        void SetBlock(BlockType blockType, int x, int y, int z);
-
-        /// <summary>
-        /// Sets a block within the region.
-        /// </summary>
-        /// <param name="block">Block to set.</param>
-        /// <param name="x">X coordinate.</param>
-        /// <param name="y">Y coordinate.</param>
-        /// <param name="z">Z coordinate.</param>
-        void SetBlock(IBlock block, int x, int y, int z);
+        /// <returns>The block placed at the given position.</returns>
+        IBlock SetBlock(BlockType blockType, int x, int y, int z);
     }
 }

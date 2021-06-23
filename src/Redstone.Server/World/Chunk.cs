@@ -1,6 +1,10 @@
-﻿using Redstone.Abstractions.World;
+﻿using Redstone.Abstractions.Protocol;
+using Redstone.Abstractions.World;
 using Redstone.Common;
 using Redstone.Common.Collections;
+using Redstone.NBT;
+using Redstone.NBT.Tags;
+using Redstone.Protocol;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +18,7 @@ namespace Redstone.Server.World
         public const int ChunkSectionAmount = 16;
 
         private readonly IServiceProvider _serviceProvider;
-        private readonly IEnumerable<IChunkSection> _chunkSections;
+        private readonly IEnumerable<ChunkSection> _chunkSections;
 
         private readonly CompactedLongArray _heightmap;
         private readonly CompactedLongArray _oceanFloorHeightmap;
@@ -25,6 +29,8 @@ namespace Redstone.Server.World
         public int X { get; }
 
         public int Z { get; }
+
+        public int BlockAmount => _chunkSections.Sum(x => x.GetBlockAmount());
 
         public IEnumerable<long> Heightmap => _heightmap.Storage;
 
@@ -37,7 +43,7 @@ namespace Redstone.Server.World
             X = x;
             Z = z;
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-            _chunkSections = Enumerable.Range(0, ChunkSectionAmount).Select(index => new ChunkSection(index, _serviceProvider)).ToList();
+            _chunkSections = Enumerable.Range(0, ChunkSectionAmount).Select(index => new ChunkSection(this, index, _serviceProvider)).ToList();
 
             _heightmap = new CompactedLongArray(9, 256);
             _oceanFloorHeightmap = new CompactedLongArray(9, 256);
@@ -71,6 +77,11 @@ namespace Redstone.Server.World
                 throw new InvalidOperationException($"Cannot get a block with a negative Y value.");
             }
 
+            if (y > Height)
+            {
+                throw new InvalidOperationException($"Cannot get a block with a Y value higher than {Height}.");
+            }
+
             int sectionIndex = GetSectionIndex(y);
             IChunkSection section = GetSection(sectionIndex);
 
@@ -89,17 +100,86 @@ namespace Redstone.Server.World
             return section;
         }
 
-        public void SetBlock(BlockType blockType, int x, int y, int z)
+        public IBlock SetBlock(BlockType blockType, int x, int y, int z)
         {
-            GetChunkSection(y).SetBlock(blockType, x, y % Size, z);
+            if (x < 0 || x >= Size)
+            {
+                throw new InvalidOperationException("X position is out of chunk bounds.");
+            }
+
+            if (z < 0 || z >= Size)
+            {
+                throw new InvalidOperationException("Z position is out of chunk bounds.");
+            }
+
+            IChunkSection section = GetChunkSection(y);
+            IBlock block = section.SetBlock(blockType, x, y % Size, z);
 
             // TODO: improve heightmap generation when placing a block.
             GenerateHeightMap();
+
+            return block;
         }
 
-        public void SetBlock(IBlock block, int x, int y, int z)
+        public void Serialize(IMinecraftPacket packet, bool fullChunk = false)
         {
-            GetChunkSection(y).SetBlock(block, x, y % Size, z);
+            packet.WriteInt32(X); // Chunk X
+            packet.WriteInt32(Z); // Chunk Z
+            packet.WriteBoolean(fullChunk); // full chunk
+
+            int mask = 0;
+
+            // if full chunk
+            using var chunkStream = new MinecraftPacket();
+            for (int i = 0; i < Sections.Count(); i++)
+            {
+                IChunkSection section = Sections.ElementAt(i);
+
+                if (fullChunk || section.IsDirty)
+                {
+                    mask |= 1 << i;
+                    section.Serialize(chunkStream);
+                }
+            }
+
+            packet.WriteVarInt32(mask);
+
+            // Heightmap serialization
+            var heightmapCompound = new NbtCompound("")
+            {
+                new NbtLongArray("MOTION_BLOCKING", Heightmap.ToArray()),
+                new NbtLongArray("WORLD_SURFACE", WorldSurfaceHeightmap.ToArray())
+            };
+            var nbtFile = new NbtFile(heightmapCompound);
+
+
+            //var writer = new NbtWriter(this, "");
+            //writer.WriteLongArray("MOTION_BLOCKING", Heightmap.ToArray());
+            ////writer.WriteLongArray("OCEAN_FLOOR", chunk.Heightmaps[HeightmapType.OceanFloor].data.Storage.Cast<long>().ToArray());
+            //writer.WriteLongArray("WORLD_SURFACE", WorldSurfaceHeightmap.ToArray());
+            //writer.EndCompound();
+            //writer.Finish();
+
+            packet.WriteBytes(nbtFile.GetBuffer());
+
+            // Biomes
+            if (fullChunk)
+            {
+                packet.WriteVarInt32(1024);
+
+                for (int i = 0; i < 1024; i++)
+                {
+                    packet.WriteVarInt32(0);
+                }
+            }
+
+            chunkStream.Position = 0;
+
+            packet.WriteVarInt32((int)chunkStream.Length);
+            packet.WriteBytes(chunkStream.BaseBuffer);
+
+            packet.WriteVarInt32(0); // block count
+            // TODO: foreach block in blocks in chunk as NBT
         }
 
         private IChunkSection GetChunkSection(int yCoordinate)
@@ -107,6 +187,11 @@ namespace Redstone.Server.World
             if (yCoordinate < 0)
             {
                 throw new InvalidOperationException($"Cannot get a block with a negative Y value.");
+            }
+
+            if (yCoordinate > Height)
+            {
+                throw new InvalidOperationException($"Cannot get a block with a height value higher than '{Height}'.");
             }
 
             int sectionIndex = GetSectionIndex(yCoordinate);

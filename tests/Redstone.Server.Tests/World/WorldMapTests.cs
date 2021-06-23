@@ -28,19 +28,21 @@ namespace Redstone.Server.Tests.World
 
         public WorldMapTests()
         {
-            _blockFactoryMock = new Mock<IBlockFactory>(); 
-            _blockFactoryMock.Setup(x => x.CreateBlock(It.IsAny<BlockType>()))
-                             .Returns<BlockType>(x =>
+            _blockFactoryMock = new Mock<IBlockFactory>();
+            _blockFactoryMock.Setup(x => x.CreateBlock(It.IsAny<BlockType>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<IChunk>()))
+                             .Returns<BlockType, int, int, int, IChunk>((type, x, y, z, chunk) =>
                              {
-                                 return new Block(new BlockData(x.ToString(), null, new[]
+                                 return new Block(x, y, z, chunk, new BlockData(type.ToString(), null, new[]
                                  {
-                                   new BlockStateData((int)x, true, new Dictionary<string, string>())
-                                 }));
+                                     new BlockStateData((int)type, true, new Dictionary<string, string>())
+                                 }), _registry);
                              });
             _registry = new DataRegistry(new Mock<ILogger<DataRegistry>>().Object);
+            _registry.Load();
             _serviceProvider = new ServiceCollection()
                 .AddSingleton<ILogger<WorldMap>>(new Mock<ILogger<WorldMap>>().Object)
                 .AddSingleton(s => _blockFactoryMock.Object)
+                .AddSingleton(s => _registry)
                 .BuildServiceProvider();
         }
 
@@ -323,27 +325,6 @@ namespace Redstone.Server.Tests.World
             Assert.Throws<InvalidOperationException>(() => map.GetBlock(0, 0, 0));
         }
 
-        [Theory]
-        [InlineData(0, 183, 0, BlockType.GrassBlock)]
-        [InlineData(17, 47, 20, BlockType.Dirt)]
-        public void WorldMapSetBlockTypeTest(int x, int y, int z, BlockType blockType)
-        {
-            var map = new WorldMap(_mapName, _serviceProvider);
-            IRegion region0 = map.AddRegion(0, 0);
-            region0.AddChunk(0, 0);
-            region0.AddChunk(1, 0);
-            region0.AddChunk(0, 1);
-            region0.AddChunk(1, 1);
-
-            map.SetBlock(blockType, x, y, z);
-            IBlock block = map.GetBlock(x, y, z);
-
-            Assert.NotNull(block);
-            Assert.IsType<Block>(block);
-            Assert.Equal(blockType, block.Type);
-            Assert.False(block.IsAir);
-        }
-
         [Fact]
         public void WorldMapSetBlockTypeAtUnknownRegionTest()
         {
@@ -364,9 +345,7 @@ namespace Redstone.Server.Tests.World
             region0.AddChunk(0, 1);
             region0.AddChunk(1, 1);
 
-            IBlock blockToSet = _blockFactoryMock.Object.CreateBlock(blockType);
-
-            map.SetBlock(blockToSet, x, y, z);
+            map.SetBlock(blockType, x, y, z);
             IBlock block = map.GetBlock(x, y, z);
 
             Assert.NotNull(block);
@@ -379,9 +358,8 @@ namespace Redstone.Server.Tests.World
         public void WorldMapSetBlockAtUnknownRegionTest()
         {
             var map = new WorldMap(_mapName, _serviceProvider);
-            IBlock blockToSet = _blockFactoryMock.Object.CreateBlock(BlockType.GrassBlock);
 
-            Assert.Throws<InvalidOperationException>(() => map.SetBlock(blockToSet, 0, 0, 0));
+            Assert.Throws<InvalidOperationException>(() => map.SetBlock(BlockType.GrassBlock, 0, 0, 0));
         }
     }
 }

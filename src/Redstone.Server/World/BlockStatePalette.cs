@@ -6,7 +6,7 @@ namespace Redstone.Server.World.Palettes
 {
     internal class BlockStatePalette : IPalette
     {
-        private readonly int[] _blockStates;
+        private readonly int?[] _blockStates;
         private readonly IRegistry _registry;
 
         private int _count;
@@ -18,7 +18,7 @@ namespace Redstone.Server.World.Palettes
         public BlockStatePalette(IRegistry registry, byte bitCount)
         {
             _registry = registry;
-            _blockStates = new int[1 << bitCount];
+            _blockStates = new int?[1 << bitCount];
         }
 
         public int GetState(int blockStateId)
@@ -47,7 +47,7 @@ namespace Redstone.Server.World.Palettes
 
             for (var i = 0; i < _count; i++)
             {
-                stream.WriteVarInt32(_blockStates[i]);
+                stream.WriteVarInt32(_blockStates[i].Value);
             }
         }
 

@@ -7,6 +7,7 @@ using Redstone.Common.Collections;
 using Redstone.Common.Exceptions;
 using Redstone.Server.World.Palettes;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Redstone.Server.World
@@ -49,7 +50,7 @@ namespace Redstone.Server.World
             //    _palette = new DirectBlockStatePalette(_serviceProvider.GetRequiredService<IRegistry>());
             //}
 
-            InitializeEmptySection();
+            Initialize();
         }
 
         public IBlock GetBlock(int x, int y, int z)
@@ -61,25 +62,27 @@ namespace Redstone.Server.World
 
         public short GetBlockAmount()
         {
-            short validBlockCount = 0;
+            return (short)_blocks.Count(x => !x.IsAir);
+
+            //short validBlockCount = 0;
             
-            for (int x = 0; x < Size; x++)
-            {
-                for (int y = 0; y < Size; y++)
-                {
-                    for (int z = 0; z < Size; z++)
-                    {
-                        IBlock block = GetBlock(x, y, z);
+            //for (int x = 0; x < Size; x++)
+            //{
+            //    for (int y = 0; y < Size; y++)
+            //    {
+            //        for (int z = 0; z < Size; z++)
+            //        {
+            //            IBlock block = GetBlock(x, y, z);
 
-                        if (!block.IsAir)
-                        {
-                            validBlockCount++;
-                        }
-                    }
-                }
-            }
+            //            if (!block.IsAir)
+            //            {
+            //                validBlockCount++;
+            //            }
+            //        }
+            //    }
+            //}
 
-            return validBlockCount;
+            //return validBlockCount;
         }
 
         public IBlock SetBlock(BlockType blockType, int x, int y, int z)
@@ -96,6 +99,7 @@ namespace Redstone.Server.World
             return block;
         }
 
+        [ExcludeFromCodeCoverage]
         public void Serialize(IMinecraftPacket packet)
         {
             packet.WriteInt16(GetBlockAmount());
@@ -110,9 +114,11 @@ namespace Redstone.Server.World
             {
                 packet.WriteInt64(storage[i]);
             }
+
+            IsDirty = false;
         }
 
-        private void InitializeEmptySection()
+        private void Initialize()
         {
             for (int x = 0; x < Size; x++)
             {

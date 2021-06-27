@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
 using Redstone.Abstractions.Protocol;
+using Redstone.Abstractions.World;
 using Redstone.Common;
 using Redstone.Protocol.Handlers;
 using Redstone.Protocol.Packets.Game;
+using Redstone.Protocol.Packets.Game.Client;
 
 namespace Redstone.Server.Handlers.Play
 {
@@ -26,8 +28,12 @@ namespace Redstone.Server.Handlers.Play
 
             if (user.Player.GameMode is ServerGameModeType.Creative)
             {
-                user.Player.Map.SetBlock(BlockType.Air, (int)position.X, (int)position.Y, (int)position.Z);
+                IBlock block = user.Player.Map.SetBlock(BlockType.Air, (int)position.X, (int)position.Y, (int)position.Z);
 
+                using var chunkPacket = new ChunkDataPacket(block.Chunk);
+
+                user.Player.SendPacket(chunkPacket);
+                user.Player.SendPacketToVisibleEntities(chunkPacket);
             }
             else
             {

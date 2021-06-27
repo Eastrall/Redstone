@@ -7,6 +7,7 @@ using Redstone.NBT.Tags;
 using Redstone.Protocol;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Redstone.Server.World
@@ -121,6 +122,7 @@ namespace Redstone.Server.World
             return block;
         }
 
+        [ExcludeFromCodeCoverage]
         public void Serialize(IMinecraftPacket packet, bool fullChunk = false)
         {
             packet.WriteInt32(X); // Chunk X

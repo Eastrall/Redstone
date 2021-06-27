@@ -45,10 +45,6 @@ namespace Redstone.Server.World
             {
                 _palette = new BlockStatePalette(_registry, Math.Max((byte)4, DefaultBitsPerBlock));
             }
-            //else
-            //{
-            //    _palette = new DirectBlockStatePalette(_serviceProvider.GetRequiredService<IRegistry>());
-            //}
 
             Initialize();
         }
@@ -60,30 +56,7 @@ namespace Redstone.Server.World
             return _blocks[index];
         }
 
-        public short GetBlockAmount()
-        {
-            return (short)_blocks.Count(x => !x.IsAir);
-
-            //short validBlockCount = 0;
-            
-            //for (int x = 0; x < Size; x++)
-            //{
-            //    for (int y = 0; y < Size; y++)
-            //    {
-            //        for (int z = 0; z < Size; z++)
-            //        {
-            //            IBlock block = GetBlock(x, y, z);
-
-            //            if (!block.IsAir)
-            //            {
-            //                validBlockCount++;
-            //            }
-            //        }
-            //    }
-            //}
-
-            //return validBlockCount;
-        }
+        public short GetBlockAmount() => (short)_blocks.Count(x => !x.IsAir);
 
         public IBlock SetBlock(BlockType blockType, int x, int y, int z)
         {

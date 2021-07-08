@@ -1,64 +1,88 @@
 ﻿using Redstone.Abstractions.Protocol;
-using Redstone.Abstractions.Registry;
 using Redstone.Abstractions.World;
+using Redstone.Common.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Redstone.Server.World.Palettes
 {
     internal class BlockStatePalette : IPalette
     {
-        private readonly int?[] _blockStates;
-        private readonly IRegistry _registry;
+        public event EventHandler<int> Resized;
 
-        private int _count;
+        private readonly int _maximumBitsPerBlock;
+        private readonly IDictionary<int, int> _blockStatesCount;
 
-        public bool IsFull => _blockStates.Length == _count;
+        private int _bitsPerBlock;
+        private int?[] _blockStates;
 
-        public int Count => _count;
+        public bool IsFull => _blockStates.All(x => x.HasValue);
 
-        public BlockStatePalette(IRegistry registry, byte bitCount)
+        public bool IsUsingGlobalPalette => _bitsPerBlock == _maximumBitsPerBlock;
+
+        public int BitsPerBlock => _bitsPerBlock;
+
+        public int Count => _blockStates.Count(x => x.HasValue);
+
+        public BlockStatePalette(byte bitCount, int maximumBitsPerBlock)
         {
-            _registry = registry;
-            _blockStates = new int?[1 << bitCount];
+            _bitsPerBlock = bitCount;
+            _maximumBitsPerBlock = maximumBitsPerBlock;
+            _blockStates = new int?[1 << _bitsPerBlock];
+            _blockStatesCount = new Dictionary<int, int>();
         }
 
-        public int GetState(int blockStateId)
+        public int SetState(int blockStateId)
         {
-            for (var index = 0; index < Count; index++)
+            int paletteIndex;
+
+            if (IsUsingGlobalPalette)
             {
-                if (_blockStates[index] == blockStateId)
+                paletteIndex = blockStateId;
+            }
+            else
+            {
+                paletteIndex = Array.IndexOf(_blockStates, blockStateId);
+
+                if (paletteIndex == -1) // Block state not in palette.
                 {
-                    return index;
+                    // Search for the first empty state slot in array.
+                    paletteIndex = Array.IndexOf(_blockStates, null);
+
+                    if (paletteIndex == -1)
+                    {
+                        // Palette is empty, we need to increase internal block state array.
+                        Array.Resize(ref _blockStates, _blockStates.Length + 1);
+                        paletteIndex = Array.IndexOf(_blockStates, null);
+                    }
+
+                    int neededBits = paletteIndex.NeededBits();
+
+                    if (neededBits > BitsPerBlock)
+                    {
+                        _bitsPerBlock = neededBits;
+                        Resized?.Invoke(this, neededBits);
+                    }
+
+                    _blockStates[paletteIndex] = blockStateId;
                 }
             }
 
-            if (IsFull)
-            {
-                return -1;
-            }
-
-            int newStateId = AddStateToPalette(blockStateId);
-
-            return newStateId;
+            return paletteIndex;
         }
 
         public void Serialize(IMinecraftPacket stream)
         {
-            stream.WriteVarInt32(_count);
+            stream.WriteVarInt32(Count);
 
-            for (var i = 0; i < _count; i++)
+            for (var i = 0; i < Count; i++)
             {
-                stream.WriteVarInt32(_blockStates[i].Value);
+                if (_blockStates[i].HasValue)
+                {
+                    stream.WriteVarInt32(_blockStates[i].Value);
+                }
             }
-        }
-
-        private int AddStateToPalette(int blockStateId)
-        {
-            int newStateId = _count;
-
-            _blockStates[newStateId] = blockStateId;
-            _count++;
-
-            return newStateId;
         }
     }
 }

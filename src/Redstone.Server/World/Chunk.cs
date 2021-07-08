@@ -125,9 +125,9 @@ namespace Redstone.Server.World
         [ExcludeFromCodeCoverage]
         public void Serialize(IMinecraftPacket packet, bool fullChunk = false)
         {
-            packet.WriteInt32(X); // Chunk X
-            packet.WriteInt32(Z); // Chunk Z
-            packet.WriteBoolean(fullChunk); // full chunk
+            packet.WriteInt32(X);
+            packet.WriteInt32(Z);
+            packet.WriteBoolean(fullChunk);
 
             int mask = 0;
 
@@ -153,14 +153,6 @@ namespace Redstone.Server.World
                 new NbtLongArray("WORLD_SURFACE", WorldSurfaceHeightmap.ToArray())
             };
             var nbtFile = new NbtFile(heightmapCompound);
-
-
-            //var writer = new NbtWriter(this, "");
-            //writer.WriteLongArray("MOTION_BLOCKING", Heightmap.ToArray());
-            ////writer.WriteLongArray("OCEAN_FLOOR", chunk.Heightmaps[HeightmapType.OceanFloor].data.Storage.Cast<long>().ToArray());
-            //writer.WriteLongArray("WORLD_SURFACE", WorldSurfaceHeightmap.ToArray());
-            //writer.EndCompound();
-            //writer.Finish();
 
             packet.WriteBytes(nbtFile.GetBuffer());
 

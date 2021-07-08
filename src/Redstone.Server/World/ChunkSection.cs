@@ -14,6 +14,10 @@ namespace Redstone.Server.World
 {
     internal class ChunkSection : IChunkSection
     {
+        /// <summary>
+        /// Gets the maximum number of bits per block in the global palette.
+        /// </summary>
+        public const int MaximumBitsPerBlock = 14;
         public const byte DefaultBitsPerBlock = 4;
         public const int Size = 16;
         public const int MaximumBlockAmount = 4096;
@@ -40,11 +44,8 @@ namespace Redstone.Server.World
             _blockFactory = _serviceProvider.GetRequiredService<IBlockFactory>();
             _registry = _serviceProvider.GetRequiredService<IRegistry>();
             _blockStorage = new CompactedLongArray(DefaultBitsPerBlock, MaximumBlockAmount);
-
-            if (DefaultBitsPerBlock <= 8)
-            {
-                _palette = new BlockStatePalette(_registry, Math.Max((byte)4, DefaultBitsPerBlock));
-            }
+            _palette = new BlockStatePalette(DefaultBitsPerBlock, MaximumBitsPerBlock);
+            _palette.Resized += OnPaletteResized;
 
             Initialize();
         }
@@ -65,7 +66,7 @@ namespace Redstone.Server.World
 
             block.SetType(blockType);
 
-            int paletteIndex = _palette.GetState(block.State.Id);
+            int paletteIndex = _palette.SetState(block.State.Id);
             _blockStorage[blockIndex] = paletteIndex;
             IsDirty = true;
 
@@ -76,7 +77,7 @@ namespace Redstone.Server.World
         public void Serialize(IMinecraftPacket packet)
         {
             packet.WriteInt16(GetBlockAmount());
-            packet.WriteByte(DefaultBitsPerBlock);
+            packet.WriteByte((byte)_palette.BitsPerBlock);
 
             _palette.Serialize(packet);
 
@@ -103,10 +104,15 @@ namespace Redstone.Server.World
                         IBlock block = _blockFactory.CreateBlock(BlockType.Air, x, y, z, Chunk);
 
                         _blocks[blockIndex] = block;
-                        _blockStorage[blockIndex] = _palette.GetState(block.State.Id);
+                        _blockStorage[blockIndex] = _palette.SetState(block.State.Id);
                     }
                 }
             }
+        }
+
+        private void OnPaletteResized(object sender, int bitsPerBlock)
+        {
+            _blockStorage.Resize(bitsPerBlock);
         }
 
         public static int GetBlockIndex(int x, int y, int z) => ((y * Size) + z) * Size + x;

@@ -4,14 +4,12 @@ using Moq;
 using Redstone.Abstractions.Registry;
 using Redstone.Abstractions.World;
 using Redstone.Common;
-using Redstone.Common.Exceptions;
 using Redstone.Common.Structures.Blocks;
 using Redstone.Server.Registry;
 using Redstone.Server.World;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Xunit;
 
 namespace Redstone.Server.Tests.World

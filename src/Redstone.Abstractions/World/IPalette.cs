@@ -37,11 +37,19 @@ namespace Redstone.Abstractions.World
         int Count { get; }
 
         /// <summary>
-        /// Gets the palette index of the given block state id.
+        /// Sets the given block state into the palette.
         /// </summary>
         /// <param name="blockStateId">Block state id.</param>
         /// <returns>Block state index in the palette.</returns>
         int SetState(int blockStateId);
+
+        /// <summary>
+        /// Gets the block state based on the given palette index.
+        /// </summary>
+        /// <param name="paletteIndex">Palette index.</param>
+        /// <exception cref="IndexOutOfRangeException">Fired when palette index is out of palette range.</exception>
+        /// <returns>Block state at the palette index.</returns>
+        int GetState(int paletteIndex);
 
         /// <summary>
         /// Serializes the current block state palette.

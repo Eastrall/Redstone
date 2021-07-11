@@ -3,6 +3,7 @@ using Redstone.Abstractions.World;
 using Redstone.Common.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Redstone.Server.World.Palettes
@@ -32,6 +33,8 @@ namespace Redstone.Server.World.Palettes
             _blockStates = new int?[1 << _bitsPerBlock];
             _blockStatesCount = new Dictionary<int, int>();
         }
+
+        public int GetState(int paletteIndex) => _blockStates[paletteIndex].GetValueOrDefault(-1);
 
         public int SetState(int blockStateId)
         {
@@ -72,6 +75,7 @@ namespace Redstone.Server.World.Palettes
             return paletteIndex;
         }
 
+        [ExcludeFromCodeCoverage]
         public void Serialize(IMinecraftPacket stream)
         {
             stream.WriteVarInt32(Count);

@@ -1,21 +1,26 @@
 ﻿using Microsoft.Extensions.Logging;
 using Redstone.Abstractions.Components;
 using Redstone.Abstractions.Protocol;
+using Redstone.Abstractions.Registry;
 using Redstone.Common;
+using Redstone.Common.Structures.Blocks;
 using Redstone.Protocol.Handlers;
 using Redstone.Protocol.Packets.Game;
 using Redstone.Protocol.Packets.Game.Client;
 using System;
+using System.Linq;
 
 namespace Redstone.Server.Handlers.Play
 {
     public class PlayerBlockPlacement
     {
         private readonly ILogger<PlayerBlockPlacement> _logger;
+        private readonly IRegistry _registry;
 
-        public PlayerBlockPlacement(ILogger<PlayerBlockPlacement> logger)
+        public PlayerBlockPlacement(ILogger<PlayerBlockPlacement> logger, IRegistry registry)
         {
             _logger = logger;
+            _registry = registry;
         }
 
         [PlayPacketHandler(ServerPlayPacketType.PlayerBlockPlacement)]
@@ -29,8 +34,6 @@ namespace Redstone.Server.Handlers.Play
             float cursorZ = packet.ReadSingle();
             bool isInsideBlock = packet.ReadBoolean();
 
-            _logger.LogDebug($"Block position: {blockPosition}");
-
             // TODO: check if the current player is interacting with an interactable object.
             // Like: Chest, anvil, crafting table.
 
@@ -38,7 +41,8 @@ namespace Redstone.Server.Handlers.Play
 
             if (currentHeldItem.HasItem)
             {
-                BlockType blockToPlace = (BlockType)currentHeldItem.ItemId;
+                BlockData block = _registry.Blocks.FirstOrDefault(x => x.ItemId == currentHeldItem.ItemId);
+                BlockType blockToPlace = block.Type;
 
                 if (blockToPlace is not BlockType.Air)
                 {
@@ -52,6 +56,8 @@ namespace Redstone.Server.Handlers.Play
                         BlockFaceType.East => new Position(blockPosition.X + 1, blockPosition.Y, blockPosition.Z),
                         _ => throw new InvalidOperationException("Invalid block face type.")
                     };
+
+                    _logger.LogDebug($"Placing block '{blockToPlace}' at position {realBlockPosition}");
 
                     user.Player.Map.SetBlock(blockToPlace, (int)realBlockPosition.X, (int)realBlockPosition.Y, (int)realBlockPosition.Z);
 

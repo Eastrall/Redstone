@@ -13,7 +13,7 @@ namespace Redstone.Common
         /// <summary>
         /// Gets the zero position.
         /// </summary>
-        public static Position Zero => new Position();
+        public static Position Zero => new();
 
         /// <summary>
         /// Gets or sets the X coordinate position.
@@ -104,7 +104,7 @@ namespace Redstone.Common
         /// Clones this Position3 instance.
         /// </summary>
         /// <returns></returns>
-        public Position Clone() => new Position(X, Y, Z);
+        public Position Clone() => new(X, Y, Z);
 
         /// <summary>
         /// Reset to 0 this Position3.
@@ -137,7 +137,7 @@ namespace Redstone.Common
         /// Returns a Position3 under string format.
         /// </summary>
         /// <returns></returns>
-        public override string ToString() => $"Position: {X}:{Y}:{Z}";
+        public override string ToString() => $"{X},{Y},{Z}";
 
         /// <summary>
         /// Returns the HashCode for this Position
@@ -160,7 +160,7 @@ namespace Redstone.Common
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static Position operator +(Position a, Position b) => new Position(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
+        public static Position operator +(Position a, Position b) => new(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
 
         /// <summary>
         /// Subtract two Position.
@@ -168,7 +168,7 @@ namespace Redstone.Common
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static Position operator -(Position a, Position b) => new Position(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
+        public static Position operator -(Position a, Position b) => new(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
 
         /// <summary>
         /// Multiplies two Position.
@@ -176,7 +176,7 @@ namespace Redstone.Common
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static Position operator *(Position a, Position b) => new Position(a.X * b.X, a.Y * b.Y, a.Z * b.Z);
+        public static Position operator *(Position a, Position b) => new(a.X * b.X, a.Y * b.Y, a.Z * b.Z);
 
         /// <summary>
         /// Multiplies a Position and a float value.
@@ -184,7 +184,7 @@ namespace Redstone.Common
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static Position operator *(Position a, float b) => new Position(a.X * b, a.Y * b, a.Z * b);
+        public static Position operator *(Position a, float b) => new(a.X * b, a.Y * b, a.Z * b);
 
         /// <summary>
         /// Divides two Position.
@@ -195,7 +195,7 @@ namespace Redstone.Common
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static Position operator /(Position a, Position b) => new Position(a.X / b.X, a.Y / b.Y, a.Z / b.Z);
+        public static Position operator /(Position a, Position b) => new(a.X / b.X, a.Y / b.Y, a.Z / b.Z);
 
         /// <summary>
         /// Divides a Position by a scalar number.
@@ -203,7 +203,7 @@ namespace Redstone.Common
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static Position operator /(Position a, float b) => new Position(a.X / b, a.Y / b, a.Z / b);
+        public static Position operator /(Position a, float b) => new(a.X / b, a.Y / b, a.Z / b);
 
         /// <summary>
         /// Compares two Position.

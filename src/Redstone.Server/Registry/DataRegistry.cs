@@ -7,6 +7,7 @@ using Redstone.Common.Structures.Biomes;
 using Redstone.Common.Structures.Blocks;
 using Redstone.Common.Structures.Dimensions;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -20,8 +21,10 @@ namespace Redstone.Server.Registry
         public const string DimensionRegistryPath = "data/dimensions.json";
         public const string BiomesRegistryPath = "data/biomes.json";
         public const string BlocksDataPath = "data/blocks.json";
+        public const string RegistriesDataPath = "data/registries.json";
 
         private readonly ILogger<DataRegistry> _logger;
+        private readonly ConcurrentDictionary<string, int> _items = new();
         private bool _isLoaded;
 
         public IEnumerable<Dimension> Dimensions { get; private set; }
@@ -48,6 +51,7 @@ namespace Redstone.Server.Registry
             {
                 LoadDimensions();
                 LoadBiomes();
+                LoadItems();
                 LoadBlocksData();
 
                 _isLoaded = true;
@@ -74,6 +78,32 @@ namespace Redstone.Server.Registry
 
             Biomes = Common.Serialization.JsonSerializer.Deserialize<IEnumerable<Biome>>(content);
             _logger.LogInformation($"{Biomes.Count()} biomes loaded!");
+        }
+
+        private void LoadItems()
+        {
+            string registriesPath = Path.Combine(EnvironmentExtensions.GetCurrentEnvironementDirectory(), RegistriesDataPath);
+
+            if (!File.Exists(registriesPath))
+            {
+                throw new FileNotFoundException("Failed to load items from registries file.", registriesPath);
+            }
+
+            using var registriesFile = File.OpenRead(registriesPath);
+            JsonDocument registriesDocument = JsonDocument.Parse(registriesFile);
+
+            JsonElement itemEntries = registriesDocument.RootElement.GetProperty("minecraft:item").GetProperty("entries");
+
+            foreach (JsonProperty itemEntry in itemEntries.EnumerateObject())
+            {
+                string name = itemEntry.Name;
+                int itemId = itemEntry.Value.GetProperty("protocol_id").GetInt32();
+
+                if (!_items.TryAdd(name, itemId))
+                {
+                    _logger.LogWarning($"Duplicate item: {name}");
+                }
+            }
         }
 
         private void LoadBlocksData()
@@ -128,7 +158,13 @@ namespace Redstone.Server.Registry
                         }
                     }
 
-                    var block = new BlockData(blockName, blockProperties, blockStates);
+                    if (!_items.TryGetValue(blockName, out int blockItemId))
+                    {
+                        _logger.LogWarning($"Failed to get block item id for block '{blockName}'.");
+                        continue;
+                    }
+
+                    var block = new BlockData(blockName, blockItemId, blockProperties, blockStates);
 
                     blocks.Add(block);
                 }

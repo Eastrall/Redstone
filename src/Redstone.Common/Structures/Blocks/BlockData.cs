@@ -15,6 +15,11 @@ namespace Redstone.Common.Structures.Blocks
         public string Name { get; }
 
         /// <summary>
+        /// Gets the block item id.
+        /// </summary>
+        public int ItemId { get; }
+
+        /// <summary>
         /// Gets the block type.
         /// </summary>
         public BlockType Type { get; }
@@ -33,9 +38,10 @@ namespace Redstone.Common.Structures.Blocks
         /// Creates a new <see cref="BlockData"/> instance.
         /// </summary>
         /// <param name="name">Block name.</param>
+        /// <param name="itemId">Block item id.</param>
         /// <param name="properties">Block properties.</param>
         /// <param name="blockStates">Block available states.</param>
-        public BlockData(string name, IEnumerable<BlockPropertyData> properties, IEnumerable<BlockStateData> blockStates)
+        public BlockData(string name, int itemId, IEnumerable<BlockPropertyData> properties, IEnumerable<BlockStateData> blockStates)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -43,6 +49,7 @@ namespace Redstone.Common.Structures.Blocks
             }
 
             Name = name;
+            ItemId = itemId;
             Properties = properties ?? Enumerable.Empty<BlockPropertyData>();
             States = blockStates ?? Enumerable.Empty<BlockStateData>();
 

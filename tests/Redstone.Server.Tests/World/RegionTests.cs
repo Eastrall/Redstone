@@ -26,7 +26,7 @@ namespace Redstone.Server.Tests.World
             _blockFactoryMock.Setup(x => x.CreateBlock(It.IsAny<BlockType>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<IChunk>()))
                              .Returns<BlockType, int, int, int, IChunk>((type, x, y, z, chunk) =>
                              {
-                                 return new Block(x, y, z, chunk, new BlockData(type.ToString(), null, new[]
+                                 return new Block(x, y, z, chunk, new BlockData(type.ToString(), (int)type, null, new[]
                                  {
                                      new BlockStateData((int)type, true, new Dictionary<string, string>())
                                  }), _registry);

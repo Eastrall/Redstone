@@ -128,6 +128,7 @@ namespace Redstone.Abstractions.Entities
         /// Sends a packet to all visible entities of the current entity.
         /// </summary>
         /// <param name="packet">Packet to send.</param>
-        void SendPacketToVisibleEntities(IMinecraftPacket packet);
+        /// <param name="includeEntity">Boolean value that indicates if the packet should also be sent to the current entity.</param>
+        void SendPacketToVisibleEntities(IMinecraftPacket packet, bool includeEntity = false);
     }
 }

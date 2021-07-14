@@ -65,6 +65,8 @@ namespace Redstone.Server.World
             return region.GetBlock(x % Region.Size, y, z % Region.Size);
         }
 
+        public IBlock GetBlock(Position position) => GetBlock((int)position.X, (int)position.Y, (int)position.Z);
+
         public IBlock SetBlock(BlockType blockType, int x, int y, int z)
         {
             int regionX = x / Region.Size;
@@ -78,6 +80,9 @@ namespace Redstone.Server.World
 
             return region.SetBlock(blockType, x % Region.Size, y, z % Region.Size);
         }
+
+        public IBlock SetBlock(BlockType blockType, Position position) 
+            => SetBlock(blockType, (int)position.X, (int)position.Y, (int)position.Z);
 
         public IRegion AddRegion(int x, int z)
         {

@@ -32,7 +32,7 @@ namespace Redstone.Server.Tests.World
             _blockFactoryMock.Setup(x => x.CreateBlock(It.IsAny<BlockType>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<IChunk>()))
                              .Returns<BlockType, int, int, int, IChunk>((type, x, y, z, chunk) =>
                              {
-                                 return new Block(x, y, z, chunk, new BlockData(type.ToString(), null, new[]
+                                 return new Block(x, y, z, chunk, new BlockData(type.ToString(), (int)type, null, new[]
                                  {
                                      new BlockStateData((int)type, true, new Dictionary<string, string>())
                                  }), _registry);
@@ -317,6 +317,31 @@ namespace Redstone.Server.Tests.World
             Assert.True(block.IsAir);
         }
 
+        public static IEnumerable<object[]> GetPositions => new[]
+        {
+            new[] { new Position(0, 183, 0) },
+            new[] { new Position(17, 47, 20) }
+        };
+
+        [Theory]
+        [MemberData(nameof(GetPositions))]
+        public void WorldMapGetBlockAtPositionTest(Position position)
+        {
+            var map = new WorldMap(_mapName, _serviceProvider);
+            IRegion region0 = map.AddRegion(0, 0);
+            region0.AddChunk(0, 0);
+            region0.AddChunk(1, 0);
+            region0.AddChunk(0, 1);
+            region0.AddChunk(1, 1);
+
+            IBlock block = map.GetBlock(position);
+
+            Assert.NotNull(block);
+            Assert.IsType<Block>(block);
+            Assert.Equal(BlockType.Air, block.Type);
+            Assert.True(block.IsAir);
+        }
+
         [Fact]
         public void WorldMapGetBlockAtUnknownRegion()
         {
@@ -347,6 +372,28 @@ namespace Redstone.Server.Tests.World
 
             map.SetBlock(blockType, x, y, z);
             IBlock block = map.GetBlock(x, y, z);
+
+            Assert.NotNull(block);
+            Assert.IsType<Block>(block);
+            Assert.Equal(blockType, block.Type);
+            Assert.False(block.IsAir);
+        }
+
+        [Theory]
+        [InlineData(0, 183, 0, BlockType.GrassBlock)]
+        [InlineData(17, 47, 20, BlockType.Dirt)]
+        public void WorldMapSetBlockAtPositionTest(int x, int y, int z, BlockType blockType)
+        {
+            var position = new Position(x, y, z);
+            var map = new WorldMap(_mapName, _serviceProvider);
+            IRegion region0 = map.AddRegion(0, 0);
+            region0.AddChunk(0, 0);
+            region0.AddChunk(1, 0);
+            region0.AddChunk(0, 1);
+            region0.AddChunk(1, 1);
+
+            map.SetBlock(blockType, position);
+            IBlock block = map.GetBlock(position);
 
             Assert.NotNull(block);
             Assert.IsType<Block>(block);

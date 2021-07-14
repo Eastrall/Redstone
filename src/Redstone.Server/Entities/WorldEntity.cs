@@ -66,11 +66,16 @@ namespace Redstone.Server.Entities
             // Nothing to do.
         }
 
-        public virtual void SendPacketToVisibleEntities(IMinecraftPacket packet)
+        public virtual void SendPacketToVisibleEntities(IMinecraftPacket packet, bool includeEntity = false)
         {
             if (packet is null)
             {
                 throw new ArgumentNullException(nameof(packet), "The packet is null.");
+            }
+
+            if (includeEntity)
+            {
+                SendPacket(packet);
             }
 
             foreach (IEntity entity in VisibleEntities)

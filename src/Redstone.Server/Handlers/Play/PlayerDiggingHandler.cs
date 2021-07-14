@@ -5,6 +5,7 @@ using Redstone.Common;
 using Redstone.Protocol.Handlers;
 using Redstone.Protocol.Packets.Game;
 using Redstone.Protocol.Packets.Game.Client;
+using System;
 
 namespace Redstone.Server.Handlers.Play
 {
@@ -28,12 +29,23 @@ namespace Redstone.Server.Handlers.Play
 
             if (user.Player.GameMode is ServerGameModeType.Creative)
             {
-                IBlock block = user.Player.Map.SetBlock(BlockType.Air, (int)position.X, (int)position.Y, (int)position.Z);
+                IBlock previousBlock = user.Player.Map.GetBlock(position);
+
+                if (previousBlock.IsAir)
+                {
+                    throw new InvalidOperationException($"Cannot dig air blocks ({position})");
+                }
+
+                using var playerDiggingAck = new AcknowledgePlayerDiggingPacket(position, previousBlock, DiggingType.Started);
+                user.Player.SendPacketToVisibleEntities(playerDiggingAck);
+                
+                using var blockChange = new BlockChangePacket(BlockType.Air, position);
+                user.Player.SendPacketToVisibleEntities(blockChange);
+
+                IBlock block = user.Player.Map.SetBlock(BlockType.Air, position);
 
                 using var chunkPacket = new ChunkDataPacket(block.Chunk);
-
-                user.Player.SendPacket(chunkPacket);
-                user.Player.SendPacketToVisibleEntities(chunkPacket);
+                user.Player.SendPacketToVisibleEntities(chunkPacket, includeEntity: true);
             }
             else
             {

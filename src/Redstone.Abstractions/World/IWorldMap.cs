@@ -41,6 +41,13 @@ namespace Redstone.Abstractions.World
         IBlock GetBlock(int x, int y, int z);
 
         /// <summary>
+        /// Gets a block whithin the world map.
+        /// </summary>
+        /// <param name="position">Block position.</param>
+        /// <returns>The block at the given position.</returns>
+        IBlock GetBlock(Position position);
+
+        /// <summary>
         /// Sets a block within the world map.
         /// </summary>
         /// <param name="blockType">Block type to set.</param>
@@ -49,6 +56,14 @@ namespace Redstone.Abstractions.World
         /// <param name="z">Z coordinate.</param>
         /// <returns>The block placed at the given position.</returns>
         IBlock SetBlock(BlockType blockType, int x, int y, int z);
+
+        /// <summary>
+        /// Sets a block within the world map.
+        /// </summary>
+        /// <param name="blockType">Block type to set.</param>
+        /// <param name="position">Block position.</param>
+        /// <returns>The block placed at the given position.</returns>
+        IBlock SetBlock(BlockType blockType, Position position);
 
         /// <summary>
         /// Adds a new region at the given x,z position.

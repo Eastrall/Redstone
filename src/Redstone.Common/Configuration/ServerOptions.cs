@@ -34,6 +34,11 @@
         public ushort ProtocolVersion { get; set; }
 
         /// <summary>
+        /// Gets or sets the server's version name.
+        /// </summary>
+        public string VersionName { get; set; } 
+
+        /// <summary>
         /// Gets or sets the server's status description.
         /// </summary>
         public string Description { get; set; }

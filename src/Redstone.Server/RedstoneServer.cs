@@ -56,7 +56,7 @@ namespace Redstone.Server
 
         protected override void OnAfterStart()
         {
-            _logger.LogInformation($"Server started and listening on port '{Options.Port}'.");
+            _logger.LogInformation($"Redstone server started and listening on port '{Options.Port}'. (Minecraft version: {_serverConfiguration.Value.VersionName})");
         }
 
         public void SendTo(IEnumerable<IMinecraftUser> users, IMinecraftPacket packet) 

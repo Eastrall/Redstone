@@ -5,6 +5,7 @@ server:
   name: 'Redstone-Dev'
   description: 'An awesome Minecraft server powered by Redstone!'
   protocol-version: 754
+  version-name: '1.16.5'
   use-encryption: false
   mode: 'offline'
   debug: false

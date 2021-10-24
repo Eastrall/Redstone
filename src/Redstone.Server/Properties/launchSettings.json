@@ -1,7 +1,8 @@
 {
   "profiles": {
     "Redstone.Server": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "workingDirectory": "D:\\Projects\\Minecraft\\Redstone\\bin"
     },
     "Docker": {
       "commandName": "Docker"

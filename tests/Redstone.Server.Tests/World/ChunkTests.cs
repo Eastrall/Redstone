@@ -22,9 +22,11 @@ namespace Redstone.Server.Tests.World
         private readonly IRegistry _registry;
         private readonly IServiceProvider _serviceProvider;
         private readonly Mock<IBlockFactory> _blockFactoryMock;
+        private readonly Mock<IRegion> _regionMock;
 
         public ChunkTests()
         {
+            _regionMock = new();
             _blockFactoryMock = new Mock<IBlockFactory>();
             _blockFactoryMock.Setup(x => x.CreateBlock(It.IsAny<BlockType>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<IChunk>()))
                              .Returns<BlockType, int, int, int, IChunk>((type, x, y, z, chunk) =>
@@ -45,13 +47,13 @@ namespace Redstone.Server.Tests.World
         [Fact]
         public void CreateChunkWithNoServiceProviderTest()
         {
-            Assert.Throws<ArgumentNullException>(() => new Chunk(0, 0, null));
+            Assert.Throws<ArgumentNullException>(() => new Chunk(null, 0, 0, null));
         }
 
         [Fact]
         public void ChunkFilledWithAirTest()
         {
-            var chunk = new Chunk(0, 0, _serviceProvider);
+            var chunk = new Chunk(_regionMock.Object, 0, 0, _serviceProvider);
 
             Assert.NotNull(chunk);
             Assert.Equal(0, chunk.X);
@@ -84,7 +86,7 @@ namespace Redstone.Server.Tests.World
         [Fact]
         public void ChunkGetBlockTest()
         {
-            var chunk = new Chunk(0, 0, _serviceProvider);
+            var chunk = new Chunk(_regionMock.Object, 0, 0, _serviceProvider);
             IBlock block = chunk.GetBlock(0, 0, 0);
 
             Assert.NotNull(block);
@@ -105,7 +107,7 @@ namespace Redstone.Server.Tests.World
         [InlineData(-300)]
         public void ChunkGetBlockAtInvalidSectionTest(int height)
         {
-            var chunk = new Chunk(0, 0, _serviceProvider);
+            var chunk = new Chunk(_regionMock.Object, 0, 0, _serviceProvider);
             
             Assert.Throws<InvalidOperationException>(() => chunk.GetBlock(0, height, 0));
         }
@@ -113,7 +115,7 @@ namespace Redstone.Server.Tests.World
         [Fact]
         public void ChunkGetSectionTest()
         {
-            var chunk = new Chunk(0, 0, _serviceProvider);
+            var chunk = new Chunk(_regionMock.Object, 0, 0, _serviceProvider);
             IChunkSection section = chunk.GetSection(0);
 
             Assert.NotNull(section);
@@ -127,7 +129,7 @@ namespace Redstone.Server.Tests.World
         [InlineData(-300)]
         public void ChunkGetInvalidChunkSectionTest(int sectionIndex)
         {
-            var chunk = new Chunk(0, 0, _serviceProvider);
+            var chunk = new Chunk(_regionMock.Object, 0, 0, _serviceProvider);
 
             Assert.Throws<InvalidOperationException>(() => chunk.GetSection(sectionIndex));
         }
@@ -135,7 +137,7 @@ namespace Redstone.Server.Tests.World
         [Fact]
         public void ChunkSetBlockTest()
         {
-            var chunk = new Chunk(0, 0, _serviceProvider);
+            var chunk = new Chunk(_regionMock.Object, 0, 0, _serviceProvider);
             chunk.SetBlock(BlockType.Dirt, 0, 1, 0);
 
             IBlock dirtBlock = chunk.GetBlock(0, 1, 0);
@@ -158,7 +160,7 @@ namespace Redstone.Server.Tests.World
         [InlineData(2, 399, 11)]
         public void ChunkSetBlockAtInvalidPositionTest(int x, int y, int z)
         {
-            var chunk = new Chunk(0, 0, _serviceProvider);
+            var chunk = new Chunk(_regionMock.Object, 0, 0, _serviceProvider);
 
             Assert.Throws<InvalidOperationException>(() => chunk.SetBlock(BlockType.Dirt, x, y, z));
         }
@@ -166,7 +168,7 @@ namespace Redstone.Server.Tests.World
         [Fact]
         public void ChunkGenerateEmptyHeightMapTest()
         {
-            var chunk = new Chunk(0, 0, _serviceProvider);
+            var chunk = new Chunk(_regionMock.Object, 0, 0, _serviceProvider);
 
             chunk.GenerateHeightMap();
 

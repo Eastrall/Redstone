@@ -10,6 +10,11 @@ namespace Redstone.Abstractions.World
     public interface IRegion
     {
         /// <summary>
+        /// Gets the region parent world map.
+        /// </summary>
+        IWorldMap WorldMap { get; }
+
+        /// <summary>
         /// Gets the region X position in the world.
         /// </summary>
         int X { get; }

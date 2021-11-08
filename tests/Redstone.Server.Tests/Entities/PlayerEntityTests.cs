@@ -1,12 +1,15 @@
 ﻿using Bogus;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Redstone.Abstractions.Entities;
+using Redstone.Abstractions.Registry;
+using Redstone.Abstractions.World;
 using Redstone.Common;
 using Redstone.Protocol.Packets.Game.Client;
+using Redstone.Server.Registry;
 using Redstone.Server.Tests.Mocks;
-using Redstone.Server.World;
 using System;
-using System.Linq;
 using Xunit;
 
 namespace Redstone.Server.Tests.Entities
@@ -14,6 +17,17 @@ namespace Redstone.Server.Tests.Entities
     public class PlayerEntityTests
     {
         private readonly Faker _faker = new();
+        private readonly IRegistry _registry;
+        private readonly IServiceProvider _serviceProvider;
+
+        public PlayerEntityTests()
+        {
+            _registry = new DataRegistry(new Mock<ILogger<DataRegistry>>().Object);
+            _registry.Load();
+            _serviceProvider = new ServiceCollection()
+                .AddSingleton(s => _registry)
+                .BuildServiceProvider();
+        }
 
         [Fact]
         public void PlayerSetName()
@@ -139,7 +153,11 @@ namespace Redstone.Server.Tests.Entities
             var destinationPosition = new Position(3, 3, 8);
             var otherPlayer = CreatePlayer("OtherPlayer", otherMinecraftUserMock);
             var map = WorldMapMock.Create("minecraft:test");
+            IRegion region = map.AddRegion(0, 0);
+            IChunk chunk = region.AddChunk(0, 0);
 
+            Assert.NotNull(region);
+            Assert.NotNull(chunk);
             map.AddPlayer(player);
             map.AddPlayer(otherPlayer);
 

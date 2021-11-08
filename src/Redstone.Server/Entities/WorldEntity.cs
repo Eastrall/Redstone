@@ -124,7 +124,8 @@ namespace Redstone.Server.Entities
             Position.Copy(destinationPosition);
 
             //_lastPosition.Copy(Position);
-            IsOnGround = true; // TODO: check block at current position. If not air then true, false otherwise.
+            IsOnGround = GetBlock().GetRelative(BlockFaceType.Bottom).IsSolid;
+            Console.WriteLine(IsOnGround);
 
             using var movePacket = new EntityPositionPacket(this, delta);
             SendPacketToVisibleEntities(movePacket);
@@ -162,7 +163,7 @@ namespace Redstone.Server.Entities
             Position.Copy(destinationPosition);
             Angle = yawAngle;
             HeadAngle = pitchAngle;
-            IsOnGround = true; // TODO: check block at current position. If not air then true, false otherwise.
+            IsOnGround = !GetBlock().GetRelative(BlockFaceType.Bottom).IsAir;
 
             using var entityMovePacket = new EntityPositionAndRotationPacket(this, delta);
             SendPacketToVisibleEntities(entityMovePacket);
@@ -211,5 +212,11 @@ namespace Redstone.Server.Entities
 
             return chunk;
         }
+
+        /// <summary>
+        /// Gets the block where the current world object is located.
+        /// </summary>
+        /// <returns></returns>
+        private IBlock GetBlock() => Chunk.GetBlock((int)Position.X, (int)Position.Y, (int)Position.Z);
     }
 }

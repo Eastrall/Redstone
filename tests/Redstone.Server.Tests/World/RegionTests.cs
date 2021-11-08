@@ -19,9 +19,11 @@ namespace Redstone.Server.Tests.World
         private readonly IRegistry _registry;
         private readonly IServiceProvider _serviceProvider;
         private readonly Mock<IBlockFactory> _blockFactoryMock;
+        private readonly Mock<IWorldMap> _worldMapMock;
 
         public RegionTests()
         {
+            _worldMapMock = new();
             _blockFactoryMock = new Mock<IBlockFactory>();
             _blockFactoryMock.Setup(x => x.CreateBlock(It.IsAny<BlockType>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<IChunk>()))
                              .Returns<BlockType, int, int, int, IChunk>((type, x, y, z, chunk) =>
@@ -42,7 +44,7 @@ namespace Redstone.Server.Tests.World
         [Fact]
         public void CreateRegionTest()
         {
-            var region = new Region(0, 0, _serviceProvider);
+            var region = new Region(_worldMapMock.Object, 0, 0, _serviceProvider);
 
             Assert.NotNull(region);
             Assert.NotEmpty(region.Chunks);
@@ -54,13 +56,13 @@ namespace Redstone.Server.Tests.World
         [Fact]
         public void CreateRegionWithoutServiceProviderTest()
         {
-            Assert.Throws<ArgumentNullException>(() => new Region(0, 0, null));
+            Assert.Throws<ArgumentNullException>(() => new Region(_worldMapMock.Object, 0, 0, null));
         }
 
         [Fact]
         public void RegionCreateChunkTest()
         {
-            IRegion region = new Region(0, 0, _serviceProvider);
+            IRegion region = new Region(_worldMapMock.Object, 0, 0, _serviceProvider);
             IChunk chunk = region.AddChunk(0, 0);
 
             Assert.NotNull(chunk);
@@ -73,7 +75,7 @@ namespace Redstone.Server.Tests.World
         [Fact]
         public void RegionCreateExistingChunkTest()
         {
-            IRegion region = new Region(0, 0, _serviceProvider);
+            IRegion region = new Region(_worldMapMock.Object, 0, 0, _serviceProvider);
             IChunk chunk = region.AddChunk(0, 0);
 
             Assert.Throws<InvalidOperationException>(() => region.AddChunk(0, 0));
@@ -82,7 +84,7 @@ namespace Redstone.Server.Tests.World
         [Fact]
         public void RegionCheckIfContainsChunkTest()
         {
-            var region = new Region(0, 0, _serviceProvider);
+            var region = new Region(_worldMapMock.Object, 0, 0, _serviceProvider);
             region.AddChunk(0, 0);
 
             Assert.True(region.ContainsChunk(0, 0));
@@ -91,7 +93,7 @@ namespace Redstone.Server.Tests.World
         [Fact]
         public void RegionCheckIfDoesntContainsChunkTest()
         {
-            var region = new Region(0, 0, _serviceProvider);
+            var region = new Region(_worldMapMock.Object, 0, 0, _serviceProvider);
 
             Assert.False(region.ContainsChunk(0, 0));
         }
@@ -99,7 +101,7 @@ namespace Redstone.Server.Tests.World
         [Fact]
         public void RegionGetExistingChunkTest()
         {
-            var region = new Region(0, 0, _serviceProvider);
+            var region = new Region(_worldMapMock.Object, 0, 0, _serviceProvider);
             IChunk chunk = region.AddChunk(0, 0);
 
             Assert.NotNull(chunk);
@@ -109,7 +111,7 @@ namespace Redstone.Server.Tests.World
         [Fact]
         public void RegionGetUnknownChunkTest()
         {
-            var region = new Region(0, 0, _serviceProvider);
+            var region = new Region(_worldMapMock.Object, 0, 0, _serviceProvider);
 
             Assert.Null(region.GetChunk(0, 0));
         }
@@ -120,7 +122,7 @@ namespace Redstone.Server.Tests.World
         [InlineData(4, 247, 16)]
         public void RegionGetBlockTest(int x, int y, int z)
         {
-            var region = new Region(0, 0, _serviceProvider);
+            var region = new Region(_worldMapMock.Object, 0, 0, _serviceProvider);
             region.AddChunk(0, 0);
             region.AddChunk(1, 0);
             region.AddChunk(0, 1);
@@ -137,7 +139,7 @@ namespace Redstone.Server.Tests.World
         [Fact]
         public void RegionGetBlockAtUnknownChunkTest()
         {
-            var region = new Region(0, 0, _serviceProvider);
+            var region = new Region(_worldMapMock.Object, 0, 0, _serviceProvider);
 
             Assert.Throws<InvalidOperationException>(() => region.GetBlock(0, 0, 0));
         }
@@ -145,7 +147,7 @@ namespace Redstone.Server.Tests.World
         [Fact]
         public void RegionSetBlockTypeAtUnknownChunkTest()
         {
-            var region = new Region(0, 0, _serviceProvider);
+            var region = new Region(_worldMapMock.Object, 0, 0, _serviceProvider);
 
             Assert.Throws<InvalidOperationException>(() => region.SetBlock(BlockType.GrassBlock, 0, 0, 0));
         }
@@ -156,7 +158,7 @@ namespace Redstone.Server.Tests.World
         [InlineData(4, 247, 16, BlockType.Basalt)]
         public void RegionSetBlockAtChunkTest(int x, int y, int z, BlockType blockType)
         {
-            var region = new Region(0, 0, _serviceProvider);
+            var region = new Region(_worldMapMock.Object, 0, 0, _serviceProvider);
             region.AddChunk(0, 0);
             region.AddChunk(1, 0);
             region.AddChunk(0, 1);
@@ -177,7 +179,7 @@ namespace Redstone.Server.Tests.World
         [Fact]
         public void RegionSetBlockAtUnknownChunkTest()
         {
-            var region = new Region(0, 0, _serviceProvider);
+            var region = new Region(_worldMapMock.Object, 0, 0, _serviceProvider);
 
             Assert.Throws<InvalidOperationException>(() => region.SetBlock(BlockType.GrassBlock, 0, 0, 0));
         }

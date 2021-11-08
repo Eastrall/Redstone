@@ -11,6 +11,11 @@ namespace Redstone.Abstractions.World
     public interface IChunk
     {
         /// <summary>
+        /// Gets the chunk parent region.
+        /// </summary>
+        IRegion Region { get; }
+
+        /// <summary>
         /// Gets a boolean value that indicates if the current chunk is dirty.
         /// </summary>
         bool IsDirty { get; }
@@ -40,8 +45,10 @@ namespace Redstone.Abstractions.World
         /// </summary>
         IEnumerable<long> WorldSurfaceHeightmap { get; }
 
+        /// <summary>
+        /// Gets the chunk sections.
+        /// </summary>
         IEnumerable<IChunkSection> Sections { get; }
-
 
         /// <summary>
         /// Generates the chunk heightmap.

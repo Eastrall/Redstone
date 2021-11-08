@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="LiteNetwork.Server" Version="1.0.0-rc.7" />
+    <PackageReference Include="LiteNetwork" Version="1.0.0" />
   </ItemGroup>
   
   <ItemGroup>

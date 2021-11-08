@@ -91,7 +91,7 @@ namespace Redstone.Server.World
                 throw new InvalidOperationException($"Region {x}/{z} already exists.");
             }
 
-            var region = new Region(x, z, _serviceProvider);
+            var region = new Region(this, x, z, _serviceProvider);
 
             _regions.Add(region);
 

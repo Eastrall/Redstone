@@ -14,14 +14,17 @@ namespace Redstone.Server.World
         private readonly IChunk[] _chunks;
         private readonly IServiceProvider _serviceProvider;
 
+        public IWorldMap WorldMap { get; }
+
         public int X { get; }
 
         public int Z { get; }
 
         public IEnumerable<IChunk> Chunks => _chunks;
 
-        public Region(int x, int z, IServiceProvider serviceProvider)
+        public Region(IWorldMap worldMap, int x, int z, IServiceProvider serviceProvider)
         {
+            WorldMap = worldMap;
             X = x;
             Z = z;
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
@@ -35,7 +38,7 @@ namespace Redstone.Server.World
                 throw new InvalidOperationException($"Failed to add chunk at {x}/{z}. Chunk already exists.");
             }
 
-            var chunk = new Chunk(x, z, _serviceProvider);
+            var chunk = new Chunk(this, x, z, _serviceProvider);
 
             _chunks[GetChunkIndex(x, z)] = chunk;
 

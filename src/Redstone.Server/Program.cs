@@ -1,4 +1,5 @@
-﻿using LiteNetwork.Common;
+﻿using LiteNetwork;
+using LiteNetwork.Hosting;
 using LiteNetwork.Server.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +14,6 @@ using Redstone.Protocol;
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
-using LiteNetwork.Common.Hosting;
 
 namespace Redstone.Server
 {

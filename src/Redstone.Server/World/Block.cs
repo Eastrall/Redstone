@@ -54,7 +54,7 @@ namespace Redstone.Server.World
         {
             if (type != Type)
             {
-                _blockData = _registry.Blocks.FirstOrDefault(x => x.Type == type) ?? 
+                _blockData = _registry.Blocks.FirstOrDefault(x => x.Type == type) ??
                     throw new ArgumentException($"Failed to find block type: {type} in registry.");
                 SetState(_blockData.States.Single(x => x.IsDefault));
             }
@@ -71,6 +71,30 @@ namespace Redstone.Server.World
             {
                 State = state;
             }
+        }
+
+        public IBlock GetRelative(BlockFaceType blockFace)
+        {
+            int x = blockFace switch
+            {
+                BlockFaceType.North => X + 1,
+                BlockFaceType.South => X - 1,
+                _ => X
+            };
+            int y = blockFace switch
+            {
+                BlockFaceType.Top => Y + 1,
+                BlockFaceType.Bottom => Y - 1,
+                _ => Y
+            };
+            int z = blockFace switch
+            {
+                BlockFaceType.East => Z + 1,
+                BlockFaceType.West => Z - 1,
+                _ => Z
+            };
+
+            return Chunk.Region.WorldMap.GetBlock(x, y, z);
         }
     }
 }

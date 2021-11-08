@@ -27,6 +27,8 @@ namespace Redstone.Server.World
 
         public bool IsDirty => _chunkSections.Any(x => x.IsDirty);
 
+        public IRegion Region { get; }
+
         public int X { get; }
 
         public int Z { get; }
@@ -39,8 +41,9 @@ namespace Redstone.Server.World
 
         public IEnumerable<IChunkSection> Sections => _chunkSections;
 
-        public Chunk(int x, int z, IServiceProvider serviceProvider)
+        public Chunk(IRegion region, int x, int z, IServiceProvider serviceProvider)
         {
+            Region = region;
             X = x;
             Z = z;
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));

@@ -69,5 +69,12 @@ namespace Redstone.Abstractions.World
         /// </summary>
         /// <param name="state">Block state.</param>
         void SetState(BlockStateData state);
+
+        /// <summary>
+        /// Gets the relative block of the current block.
+        /// </summary>
+        /// <param name="blockFace">Block face.</param>
+        /// <returns>The relative block.</returns>
+        IBlock GetRelative(BlockFaceType blockFace);
     }
 }

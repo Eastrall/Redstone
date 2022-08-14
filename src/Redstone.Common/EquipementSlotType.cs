@@ -1,15 +1,14 @@
-﻿namespace Redstone.Common
+﻿namespace Redstone.Common;
+
+/// <summary>
+/// Represents the entities equipement slots.
+/// </summary>
+public enum EquipementSlotType
 {
-    /// <summary>
-    /// Represents the entities equipement slots.
-    /// </summary>
-    public enum EquipementSlotType
-    {
-        MainHand,
-        OffHand,
-        Boots,
-        Leggings,
-        Chestplate,
-        Helmet
-    }
+    MainHand,
+    OffHand,
+    Boots,
+    Leggings,
+    Chestplate,
+    Helmet
 }

@@ -1,8 +1,7 @@
-﻿namespace Redstone.Common
+﻿namespace Redstone.Common;
+
+public enum ServerModeType
 {
-    public enum ServerModeType
-    {
-        Offline,
-        Online
-    }
+    Offline,
+    Online
 }

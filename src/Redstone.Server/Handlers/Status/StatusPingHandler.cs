@@ -4,16 +4,15 @@ using Redstone.Protocol.Packets.Status;
 using Redstone.Protocol.Packets.Status.Client;
 using Redstone.Protocol.Packets.Status.Server;
 
-namespace Redstone.Server.Handlers.Status
+namespace Redstone.Server.Handlers.Status;
+
+public class StatusPingHandler
 {
-    public class StatusPingHandler
+    [StatusPacketHandler(ServerStatusPacketType.Ping)]
+    public void OnPing(IMinecraftUser user, IMinecraftPacket packet)
     {
-        [StatusPacketHandler(ServerStatusPacketType.Ping)]
-        public void OnPing(IMinecraftUser user, IMinecraftPacket packet)
-        {
-            var pingPacket = new StatusPingPacket(packet);
-            using var pongPacket = new StatusPongPacket(pingPacket.Payload);
-            user.Send(pongPacket);
-        }
+        var pingPacket = new StatusPingPacket(packet);
+        using var pongPacket = new StatusPongPacket(pingPacket.Payload);
+        user.Send(pongPacket);
     }
 }

@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Redstone.Server.World.Providers
+namespace Redstone.Server.World.Providers;
+
+internal class AnvilMapProvider
 {
-    internal class AnvilMapProvider
-    {
-    }
 }

@@ -5,339 +5,338 @@ using System.Linq;
 using System.Text;
 using Xunit;
 
-namespace Redstone.Common.Tests.IO
+namespace Redstone.Common.Tests.IO;
+
+public class BinaryStreamTests
 {
-    public class BinaryStreamTests
+    private readonly Faker _faker;
+
+    public BinaryStreamTests()
     {
-        private readonly Faker _faker;
+        _faker = new Faker();
+    }
 
-        public BinaryStreamTests()
-        {
-            _faker = new Faker();
-        }
+    [Fact]
+    public void ReadByteTest()
+    {
+        var value = _faker.Random.Byte();
 
-        [Fact]
-        public void ReadByteTest()
-        {
-            var value = _faker.Random.Byte();
+        using var stream = new BinaryStream(new[] { value });
 
-            using var stream = new BinaryStream(new[] { value });
+        var streamValue = stream.ReadByte();
 
-            var streamValue = stream.ReadByte();
+        Assert.Equal(value, (byte)streamValue);
+    }
 
-            Assert.Equal(value, (byte)streamValue);
-        }
+    [Fact]
+    public void ReadCharTest()
+    {
+        var value = _faker.Random.Char();
+        var buffer = BitConverter.GetBytes(value);
 
-        [Fact]
-        public void ReadCharTest()
-        {
-            var value = _faker.Random.Char();
-            var buffer = BitConverter.GetBytes(value);
+        using var stream = new BinaryStream(buffer);
 
-            using var stream = new BinaryStream(buffer);
+        var streamValue = stream.ReadChar();
 
-            var streamValue = stream.ReadChar();
+        Assert.Equal(value, streamValue);
+    }
 
-            Assert.Equal(value, streamValue);
-        }
+    [Fact]
+    public void ReadBooleanTest()
+    {
+        var value = _faker.Random.Bool();
+        var buffer = BitConverter.GetBytes(value);
 
-        [Fact]
-        public void ReadBooleanTest()
-        {
-            var value = _faker.Random.Bool();
-            var buffer = BitConverter.GetBytes(value);
+        using var stream = new BinaryStream(buffer);
 
-            using var stream = new BinaryStream(buffer);
+        var streamValue = stream.ReadBoolean();
 
-            var streamValue = stream.ReadBoolean();
+        Assert.Equal(value, streamValue);
+    }
 
-            Assert.Equal(value, streamValue);
-        }
+    [Fact]
+    public void ReadInt16Test()
+    {
+        var value = _faker.Random.Short();
+        var buffer = BitConverter.GetBytes(value);
 
-        [Fact]
-        public void ReadInt16Test()
-        {
-            var value = _faker.Random.Short();
-            var buffer = BitConverter.GetBytes(value);
+        using var stream = new BinaryStream(buffer);
 
-            using var stream = new BinaryStream(buffer);
+        var streamValue = stream.ReadInt16();
 
-            var streamValue = stream.ReadInt16();
+        Assert.Equal(value, streamValue);
+    }
 
-            Assert.Equal(value, streamValue);
-        }
+    [Fact]
+    public void ReadUInt16Test()
+    {
+        var value = _faker.Random.UShort();
+        var buffer = BitConverter.GetBytes(value);
 
-        [Fact]
-        public void ReadUInt16Test()
-        {
-            var value = _faker.Random.UShort();
-            var buffer = BitConverter.GetBytes(value);
+        using var stream = new BinaryStream(buffer);
 
-            using var stream = new BinaryStream(buffer);
+        var streamValue = stream.ReadUInt16();
 
-            var streamValue = stream.ReadUInt16();
+        Assert.Equal(value, streamValue);
+    }
 
-            Assert.Equal(value, streamValue);
-        }
+    [Fact]
+    public void ReadInt32Test()
+    {
+        var value = _faker.Random.Int();
+        var buffer = BitConverter.GetBytes(value);
 
-        [Fact]
-        public void ReadInt32Test()
-        {
-            var value = _faker.Random.Int();
-            var buffer = BitConverter.GetBytes(value);
+        using var stream = new BinaryStream(buffer);
 
-            using var stream = new BinaryStream(buffer);
+        var streamValue = stream.ReadInt32();
 
-            var streamValue = stream.ReadInt32();
+        Assert.Equal(value, streamValue);
+    }
 
-            Assert.Equal(value, streamValue);
-        }
+    [Fact]
+    public void ReadUInt32Test()
+    {
+        var value = _faker.Random.UInt();
+        var buffer = BitConverter.GetBytes(value);
 
-        [Fact]
-        public void ReadUInt32Test()
-        {
-            var value = _faker.Random.UInt();
-            var buffer = BitConverter.GetBytes(value);
+        using var stream = new BinaryStream(buffer);
 
-            using var stream = new BinaryStream(buffer);
+        var streamValue = stream.ReadUInt32();
 
-            var streamValue = stream.ReadUInt32();
+        Assert.Equal(value, streamValue);
+    }
 
-            Assert.Equal(value, streamValue);
-        }
+    [Fact]
+    public void ReadInt64Test()
+    {
+        var value = _faker.Random.Long();
+        var buffer = BitConverter.GetBytes(value);
 
-        [Fact]
-        public void ReadInt64Test()
-        {
-            var value = _faker.Random.Long();
-            var buffer = BitConverter.GetBytes(value);
+        using var stream = new BinaryStream(buffer);
 
-            using var stream = new BinaryStream(buffer);
+        var streamValue = stream.ReadInt64();
 
-            var streamValue = stream.ReadInt64();
+        Assert.Equal(value, streamValue);
+    }
 
-            Assert.Equal(value, streamValue);
-        }
+    [Fact]
+    public void ReadUInt64Test()
+    {
+        var value = _faker.Random.ULong();
+        var buffer = BitConverter.GetBytes(value);
 
-        [Fact]
-        public void ReadUInt64Test()
-        {
-            var value = _faker.Random.ULong();
-            var buffer = BitConverter.GetBytes(value);
+        using var stream = new BinaryStream(buffer);
 
-            using var stream = new BinaryStream(buffer);
+        var streamValue = stream.ReadUInt64();
 
-            var streamValue = stream.ReadUInt64();
+        Assert.Equal(value, streamValue);
+    }
 
-            Assert.Equal(value, streamValue);
-        }
+    [Fact]
+    public void ReadSingleTest()
+    {
+        var value = _faker.Random.Float();
+        var buffer = BitConverter.GetBytes(value);
 
-        [Fact]
-        public void ReadSingleTest()
-        {
-            var value = _faker.Random.Float();
-            var buffer = BitConverter.GetBytes(value);
+        using var stream = new BinaryStream(buffer);
 
-            using var stream = new BinaryStream(buffer);
+        var streamValue = stream.ReadSingle();
 
-            var streamValue = stream.ReadSingle();
+        Assert.Equal(value, streamValue);
+    }
 
-            Assert.Equal(value, streamValue);
-        }
+    [Fact]
+    public void ReadDoubleTest()
+    {
+        var value = _faker.Random.Double();
+        var buffer = BitConverter.GetBytes(value);
 
-        [Fact]
-        public void ReadDoubleTest()
-        {
-            var value = _faker.Random.Double();
-            var buffer = BitConverter.GetBytes(value);
+        using var stream = new BinaryStream(buffer);
 
-            using var stream = new BinaryStream(buffer);
+        var streamValue = stream.ReadDouble();
 
-            var streamValue = stream.ReadDouble();
+        Assert.Equal(value, streamValue);
+    }
 
-            Assert.Equal(value, streamValue);
-        }
+    [Fact]
+    public void ReadStringTest()
+    {
+        var value = _faker.Lorem.Sentence();
+        var buffer = BitConverter.GetBytes(value.Length).Concat(Encoding.UTF8.GetBytes(value)).ToArray();
 
-        [Fact]
-        public void ReadStringTest()
-        {
-            var value = _faker.Lorem.Sentence();
-            var buffer = BitConverter.GetBytes(value.Length).Concat(Encoding.UTF8.GetBytes(value)).ToArray();
+        using var stream = new BinaryStream(buffer);
 
-            using var stream = new BinaryStream(buffer);
+        var streamValue = stream.ReadString();
 
-            var streamValue = stream.ReadString();
+        Assert.Equal(value, streamValue);
+    }
 
-            Assert.Equal(value, streamValue);
-        }
+    [Fact]
+    public void WriteByteTest()
+    {
+        var value = _faker.Random.Byte();
+        var expectedBuffer = BitConverter.GetBytes((byte)value);
 
-        [Fact]
-        public void WriteByteTest()
-        {
-            var value = _faker.Random.Byte();
-            var expectedBuffer = BitConverter.GetBytes((byte)value);
+        using var stream = new BinaryStream();
 
-            using var stream = new BinaryStream();
+        stream.WriteByte(value);
 
-            stream.WriteByte(value);
+        Assert.Equal(expectedBuffer.Take(1).ToArray(), stream.Buffer);
+    }
 
-            Assert.Equal(expectedBuffer.Take(1).ToArray(), stream.Buffer);
-        }
+    [Fact]
+    public void WriteSByteTest()
+    {
+        var value = _faker.Random.SByte();
+        var expectedBuffer = BitConverter.GetBytes(value);
 
-        [Fact]
-        public void WriteSByteTest()
-        {
-            var value = _faker.Random.SByte();
-            var expectedBuffer = BitConverter.GetBytes(value);
+        using var stream = new BinaryStream();
 
-            using var stream = new BinaryStream();
+        stream.WriteSByte(value);
 
-            stream.WriteSByte(value);
+        Assert.Equal(expectedBuffer.Take(1).ToArray(), stream.Buffer);
+    }
 
-            Assert.Equal(expectedBuffer.Take(1).ToArray(), stream.Buffer);
-        }
+    [Fact]
+    public void WriteBooleanTest()
+    {
+        var value = _faker.Random.Bool();
+        var expectedBuffer = BitConverter.GetBytes(value);
 
-        [Fact]
-        public void WriteBooleanTest()
-        {
-            var value = _faker.Random.Bool();
-            var expectedBuffer = BitConverter.GetBytes(value);
+        using var stream = new BinaryStream();
 
-            using var stream = new BinaryStream();
+        stream.WriteBoolean(value);
 
-            stream.WriteBoolean(value);
+        Assert.Equal(expectedBuffer, stream.Buffer);
+    }
 
-            Assert.Equal(expectedBuffer, stream.Buffer);
-        }
+    [Fact]
+    public void WriteCharTest()
+    {
+        var value = _faker.Random.Char();
+        var expectedBuffer = BitConverter.GetBytes(value);
 
-        [Fact]
-        public void WriteCharTest()
-        {
-            var value = _faker.Random.Char();
-            var expectedBuffer = BitConverter.GetBytes(value);
+        using var stream = new BinaryStream();
 
-            using var stream = new BinaryStream();
+        stream.WriteChar(value);
 
-            stream.WriteChar(value);
+        Assert.Equal(expectedBuffer, stream.Buffer);
+    }
 
-            Assert.Equal(expectedBuffer, stream.Buffer);
-        }
+    [Fact]
+    public void WriteInt16Test()
+    {
+        var value = _faker.Random.Short();
+        var expectedBuffer = BitConverter.GetBytes(value);
 
-        [Fact]
-        public void WriteInt16Test()
-        {
-            var value = _faker.Random.Short();
-            var expectedBuffer = BitConverter.GetBytes(value);
+        using var stream = new BinaryStream();
 
-            using var stream = new BinaryStream();
+        stream.WriteInt16(value);
 
-            stream.WriteInt16(value);
+        Assert.Equal(expectedBuffer, stream.Buffer);
+    }
 
-            Assert.Equal(expectedBuffer, stream.Buffer);
-        }
+    [Fact]
+    public void WriteUInt16Test()
+    {
+        var value = _faker.Random.UShort();
+        var expectedBuffer = BitConverter.GetBytes(value);
 
-        [Fact]
-        public void WriteUInt16Test()
-        {
-            var value = _faker.Random.UShort();
-            var expectedBuffer = BitConverter.GetBytes(value);
+        using var stream = new BinaryStream();
 
-            using var stream = new BinaryStream();
+        stream.WriteUInt16(value);
 
-            stream.WriteUInt16(value);
+        Assert.Equal(expectedBuffer, stream.Buffer);
+    }
 
-            Assert.Equal(expectedBuffer, stream.Buffer);
-        }
+    [Fact]
+    public void WriteInt32Test()
+    {
+        var value = _faker.Random.Int();
+        var expectedBuffer = BitConverter.GetBytes(value);
 
-        [Fact]
-        public void WriteInt32Test()
-        {
-            var value = _faker.Random.Int();
-            var expectedBuffer = BitConverter.GetBytes(value);
+        using var stream = new BinaryStream();
 
-            using var stream = new BinaryStream();
+        stream.WriteInt32(value);
 
-            stream.WriteInt32(value);
+        Assert.Equal(expectedBuffer, stream.Buffer);
+    }
 
-            Assert.Equal(expectedBuffer, stream.Buffer);
-        }
+    [Fact]
+    public void WriteUInt32Test()
+    {
+        var value = _faker.Random.UInt();
+        var expectedBuffer = BitConverter.GetBytes(value);
 
-        [Fact]
-        public void WriteUInt32Test()
-        {
-            var value = _faker.Random.UInt();
-            var expectedBuffer = BitConverter.GetBytes(value);
+        using var stream = new BinaryStream();
 
-            using var stream = new BinaryStream();
+        stream.WriteUInt32(value);
 
-            stream.WriteUInt32(value);
+        Assert.Equal(expectedBuffer, stream.Buffer);
+    }
 
-            Assert.Equal(expectedBuffer, stream.Buffer);
-        }
+    [Fact]
+    public void WriteInt64Test()
+    {
+        var value = _faker.Random.Long();
+        var expectedBuffer = BitConverter.GetBytes(value);
 
-        [Fact]
-        public void WriteInt64Test()
-        {
-            var value = _faker.Random.Long();
-            var expectedBuffer = BitConverter.GetBytes(value);
+        using var stream = new BinaryStream();
 
-            using var stream = new BinaryStream();
+        stream.WriteInt64(value);
 
-            stream.WriteInt64(value);
+        Assert.Equal(expectedBuffer, stream.Buffer);
+    }
 
-            Assert.Equal(expectedBuffer, stream.Buffer);
-        }
+    [Fact]
+    public void WriteUInt64Test()
+    {
+        var value = _faker.Random.ULong();
+        var expectedBuffer = BitConverter.GetBytes(value);
 
-        [Fact]
-        public void WriteUInt64Test()
-        {
-            var value = _faker.Random.ULong();
-            var expectedBuffer = BitConverter.GetBytes(value);
+        using var stream = new BinaryStream();
 
-            using var stream = new BinaryStream();
+        stream.WriteUInt64(value);
 
-            stream.WriteUInt64(value);
+        Assert.Equal(expectedBuffer, stream.Buffer);
+    }
 
-            Assert.Equal(expectedBuffer, stream.Buffer);
-        }
+    [Fact]
+    public void WriteSingleTest()
+    {
+        var value = _faker.Random.Float();
+        var expectedBuffer = BitConverter.GetBytes(value);
 
-        [Fact]
-        public void WriteSingleTest()
-        {
-            var value = _faker.Random.Float();
-            var expectedBuffer = BitConverter.GetBytes(value);
+        using var stream = new BinaryStream();
 
-            using var stream = new BinaryStream();
+        stream.WriteSingle(value);
 
-            stream.WriteSingle(value);
+        Assert.Equal(expectedBuffer, stream.Buffer);
+    }
 
-            Assert.Equal(expectedBuffer, stream.Buffer);
-        }
+    [Fact]
+    public void WriteDoubleTest()
+    {
+        var value = _faker.Random.Double();
+        var expectedBuffer = BitConverter.GetBytes(value);
 
-        [Fact]
-        public void WriteDoubleTest()
-        {
-            var value = _faker.Random.Double();
-            var expectedBuffer = BitConverter.GetBytes(value);
+        using var stream = new BinaryStream();
 
-            using var stream = new BinaryStream();
+        stream.WriteDouble(value);
 
-            stream.WriteDouble(value);
+        Assert.Equal(expectedBuffer, stream.Buffer);
+    }
 
-            Assert.Equal(expectedBuffer, stream.Buffer);
-        }
+    [Fact]
+    public void WriteStringTest()
+    {
+        var value = _faker.Lorem.Sentence();
+        var expectedBuffer = BitConverter.GetBytes(value.Length).Concat(Encoding.UTF8.GetBytes(value)).ToArray();
 
-        [Fact]
-        public void WriteStringTest()
-        {
-            var value = _faker.Lorem.Sentence();
-            var expectedBuffer = BitConverter.GetBytes(value.Length).Concat(Encoding.UTF8.GetBytes(value)).ToArray();
+        using var stream = new BinaryStream();
 
-            using var stream = new BinaryStream();
+        stream.WriteString(value);
 
-            stream.WriteString(value);
-
-            Assert.Equal(expectedBuffer, stream.Buffer);
-        }
+        Assert.Equal(expectedBuffer, stream.Buffer);
     }
 }

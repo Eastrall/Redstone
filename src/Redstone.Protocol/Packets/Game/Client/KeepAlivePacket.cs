@@ -1,11 +1,10 @@
-﻿namespace Redstone.Protocol.Packets.Game.Client
+﻿namespace Redstone.Protocol.Packets.Game.Client;
+
+public class KeepAlivePacket : MinecraftPacket
 {
-    public class KeepAlivePacket : MinecraftPacket
+    public KeepAlivePacket(long keepAliveId)
+        : base(ClientPlayPacketType.KeepAlive)
     {
-        public KeepAlivePacket(long keepAliveId)
-            : base(ClientPlayPacketType.KeepAlive)
-        {
-            WriteInt64(keepAliveId);
-        }
+        WriteInt64(keepAliveId);
     }
 }

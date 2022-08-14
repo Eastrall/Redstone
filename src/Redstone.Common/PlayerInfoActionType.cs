@@ -1,11 +1,10 @@
-﻿namespace Redstone.Common
+﻿namespace Redstone.Common;
+
+public enum PlayerInfoActionType
 {
-    public enum PlayerInfoActionType
-    {
-        Add,
-        UpdateGameMode,
-        UpdateLatency,
-        UpdateDisplayName,
-        Remove
-    }
+    Add,
+    UpdateGameMode,
+    UpdateLatency,
+    UpdateDisplayName,
+    Remove
 }

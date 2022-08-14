@@ -4,61 +4,60 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace Redstone.Common.Structures.Blocks
+namespace Redstone.Common.Structures.Blocks;
+
+[DebuggerDisplay("{Name}")]
+public class BlockData
 {
-    [DebuggerDisplay("{Name}")]
-    public class BlockData
+    /// <summary>
+    /// Gets the block name.
+    /// </summary>
+    public string Name { get; }
+
+    /// <summary>
+    /// Gets the block item id.
+    /// </summary>
+    public int ItemId { get; }
+
+    /// <summary>
+    /// Gets the block type.
+    /// </summary>
+    public BlockType Type { get; }
+
+    /// <summary>
+    /// Gets the block properties list.
+    /// </summary>
+    public IEnumerable<BlockPropertyData> Properties { get; }
+
+    /// <summary>
+    /// Gets the block available states.
+    /// </summary>
+    public IEnumerable<BlockStateData> States { get; }
+
+    /// <summary>
+    /// Creates a new <see cref="BlockData"/> instance.
+    /// </summary>
+    /// <param name="name">Block name.</param>
+    /// <param name="itemId">Block item id.</param>
+    /// <param name="properties">Block properties.</param>
+    /// <param name="blockStates">Block available states.</param>
+    public BlockData(string name, int itemId, IEnumerable<BlockPropertyData> properties, IEnumerable<BlockStateData> blockStates)
     {
-        /// <summary>
-        /// Gets the block name.
-        /// </summary>
-        public string Name { get; }
-
-        /// <summary>
-        /// Gets the block item id.
-        /// </summary>
-        public int ItemId { get; }
-
-        /// <summary>
-        /// Gets the block type.
-        /// </summary>
-        public BlockType Type { get; }
-
-        /// <summary>
-        /// Gets the block properties list.
-        /// </summary>
-        public IEnumerable<BlockPropertyData> Properties { get; }
-
-        /// <summary>
-        /// Gets the block available states.
-        /// </summary>
-        public IEnumerable<BlockStateData> States { get; }
-
-        /// <summary>
-        /// Creates a new <see cref="BlockData"/> instance.
-        /// </summary>
-        /// <param name="name">Block name.</param>
-        /// <param name="itemId">Block item id.</param>
-        /// <param name="properties">Block properties.</param>
-        /// <param name="blockStates">Block available states.</param>
-        public BlockData(string name, int itemId, IEnumerable<BlockPropertyData> properties, IEnumerable<BlockStateData> blockStates)
+        if (string.IsNullOrWhiteSpace(name))
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                throw new ArgumentNullException(nameof(name), "Block data name cannot be null or empty.");
-            }
-
-            Name = name;
-            ItemId = itemId;
-            Properties = properties ?? Enumerable.Empty<BlockPropertyData>();
-            States = blockStates ?? Enumerable.Empty<BlockStateData>();
-
-            if (!Enum.TryParse(name.Replace("minecraft:", "").Trim().ToPascalCase(), out BlockType type))
-            {
-                throw new InvalidOperationException($"Failed to convert '{name}' into 'BlockType' enum.");
-            }
-
-            Type = type;
+            throw new ArgumentNullException(nameof(name), "Block data name cannot be null or empty.");
         }
+
+        Name = name;
+        ItemId = itemId;
+        Properties = properties ?? Enumerable.Empty<BlockPropertyData>();
+        States = blockStates ?? Enumerable.Empty<BlockStateData>();
+
+        if (!Enum.TryParse(name.Replace("minecraft:", "").Trim().ToPascalCase(), out BlockType type))
+        {
+            throw new InvalidOperationException($"Failed to convert '{name}' into 'BlockType' enum.");
+        }
+
+        Type = type;
     }
 }

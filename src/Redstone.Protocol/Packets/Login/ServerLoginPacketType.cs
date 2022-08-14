@@ -1,9 +1,8 @@
-﻿namespace Redstone.Protocol.Packets.Login
+﻿namespace Redstone.Protocol.Packets.Login;
+
+public enum ServerLoginPacketType
 {
-    public enum ServerLoginPacketType
-    {
-        LoginStart = 0x00,
-        EncryptionResponse = 0x01,
-        LoginPluginResponse = 0x02
-    }
+    LoginStart = 0x00,
+    EncryptionResponse = 0x01,
+    LoginPluginResponse = 0x02
 }

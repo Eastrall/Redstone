@@ -10,37 +10,36 @@ using Redstone.Server.Entities;
 using Redstone.Server.World;
 using System;
 
-namespace Redstone.Server.Tests.Mocks
+namespace Redstone.Server.Tests.Mocks;
+
+public static class PlayerEntityGenerator
 {
-    public static class PlayerEntityGenerator
+    private static readonly Faker _faker = new();
+
+    public static IPlayer GeneratePlayer(Mock<IMinecraftUser> user, Mock<IWorld> world = null)
     {
-        private static readonly Faker _faker = new();
+        var serviceProviderMock = new Mock<IServiceProvider>();
+        serviceProviderMock.Setup(x => x.GetService(typeof(IWorld))).Returns(world?.Object ?? default);
+        serviceProviderMock.Setup(x => x.GetService(typeof(IOptions<GameOptions>))).Returns(Options.Create<GameOptions>(new()));
 
-        public static IPlayer GeneratePlayer(Mock<IMinecraftUser> user, Mock<IWorld> world = null)
+        var player = new Player(user.Object, Guid.NewGuid(), _faker.Name.FirstName(), serviceProviderMock.Object)
         {
-            var serviceProviderMock = new Mock<IServiceProvider>();
-            serviceProviderMock.Setup(x => x.GetService(typeof(IWorld))).Returns(world?.Object ?? default);
-            serviceProviderMock.Setup(x => x.GetService(typeof(IOptions<GameOptions>))).Returns(Options.Create<GameOptions>(new()));
+            Angle = _faker.Random.Float(0, 360),
+            HeadAngle = _faker.Random.Float(0, 360)
+        };
 
-            var player = new Player(user.Object, Guid.NewGuid(), _faker.Name.FirstName(), serviceProviderMock.Object)
-            {
-                Angle = _faker.Random.Float(0, 360),
-                HeadAngle = _faker.Random.Float(0, 360)
-            };
+        player.Position.Copy(new Position(_faker.Random.Float(), _faker.Random.Float(), _faker.Random.Float()));
+        player.SetName(_faker.Name.FirstName());
 
-            player.Position.Copy(new Position(_faker.Random.Float(), _faker.Random.Float(), _faker.Random.Float()));
-            player.SetName(_faker.Name.FirstName());
+        return player;
+    }
 
-            return player;
-        }
+    public static Mock<IPlayer> GeneratePlayerMock(Mock<IWorld> world = null)
+    {
+        var playerMock = new Mock<IPlayer>();
 
-        public static Mock<IPlayer> GeneratePlayerMock(Mock<IWorld> world = null)
-        {
-            var playerMock = new Mock<IPlayer>();
+        playerMock.SetupGet(x => x.World).Returns(world?.Object ?? default);
 
-            playerMock.SetupGet(x => x.World).Returns(world?.Object ?? default);
-
-            return playerMock;
-        }
+        return playerMock;
     }
 }

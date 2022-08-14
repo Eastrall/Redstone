@@ -1,9 +1,8 @@
-﻿namespace Redstone.Common
+﻿namespace Redstone.Common;
+
+public enum PrecipitationType
 {
-    public enum PrecipitationType
-    {
-        Rain,
-        None,
-        Snow
-    }
+    Rain,
+    None,
+    Snow
 }

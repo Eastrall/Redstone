@@ -13,212 +13,211 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Redstone.Server.World
+namespace Redstone.Server.World;
+
+public class WorldMap : IWorldMap
 {
-    public class WorldMap : IWorldMap
+    public const int UpdateTickRate = 50;
+
+    private readonly ConcurrentDictionary<Guid, IPlayer> _players;
+    private readonly List<IRegion> _regions;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly ILogger<WorldMap> _logger;
+    private readonly float _entityVisibilityRange = 45f;
+
+    private bool _isUpdating;
+    private Task _updateTask;
+    private CancellationToken _cancellationToken;
+    private CancellationTokenSource _cancellationTokenSource;
+
+    public IEnumerable<IRegion> Regions => _regions;
+
+    public IEnumerable<IPlayer> Players => _players.Values.AsEnumerable();
+
+    public bool IsUpdating => _isUpdating;
+
+    public string Name { get; }
+
+    public WorldMap(string worldName, IServiceProvider serviceProvider)
     {
-        public const int UpdateTickRate = 50;
-
-        private readonly ConcurrentDictionary<Guid, IPlayer> _players;
-        private readonly List<IRegion> _regions;
-        private readonly IServiceProvider _serviceProvider;
-        private readonly ILogger<WorldMap> _logger;
-        private readonly float _entityVisibilityRange = 45f;
-
-        private bool _isUpdating;
-        private Task _updateTask;
-        private CancellationToken _cancellationToken;
-        private CancellationTokenSource _cancellationTokenSource;
-
-        public IEnumerable<IRegion> Regions => _regions;
-
-        public IEnumerable<IPlayer> Players => _players.Values.AsEnumerable();
-
-        public bool IsUpdating => _isUpdating;
-
-        public string Name { get; }
-
-        public WorldMap(string worldName, IServiceProvider serviceProvider)
+        if (string.IsNullOrWhiteSpace(worldName))
         {
-            if (string.IsNullOrWhiteSpace(worldName))
-            {
-                throw new ArgumentException($"'{nameof(worldName)}' cannot be null or empty", nameof(worldName));
-            }
-
-            Name = worldName;
-            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-            _logger = _serviceProvider.GetRequiredService<ILogger<WorldMap>>();
-            _regions = new List<IRegion>();
-            _players = new ConcurrentDictionary<Guid, IPlayer>();
+            throw new ArgumentException($"'{nameof(worldName)}' cannot be null or empty", nameof(worldName));
         }
 
-        public IBlock GetBlock(int x, int y, int z)
+        Name = worldName;
+        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+        _logger = _serviceProvider.GetRequiredService<ILogger<WorldMap>>();
+        _regions = new List<IRegion>();
+        _players = new ConcurrentDictionary<Guid, IPlayer>();
+    }
+
+    public IBlock GetBlock(int x, int y, int z)
+    {
+        int regionX = x / Region.Size;
+        int regionZ = z / Region.Size;
+        IRegion region = GetRegion(regionX, regionZ);
+
+        if (region is null)
         {
-            int regionX = x / Region.Size;
-            int regionZ = z / Region.Size;
-            IRegion region = GetRegion(regionX, regionZ);
-
-            if (region is null)
-            {
-                throw new InvalidOperationException($"Cannot find region at position: X={regionX};Z={regionZ}");
-            }
-
-            return region.GetBlock(x % Region.Size, y, z % Region.Size);
+            throw new InvalidOperationException($"Cannot find region at position: X={regionX};Z={regionZ}");
         }
 
-        public IBlock GetBlock(Position position) => GetBlock((int)position.X, (int)position.Y, (int)position.Z);
+        return region.GetBlock(x % Region.Size, y, z % Region.Size);
+    }
 
-        public IBlock SetBlock(BlockType blockType, int x, int y, int z)
+    public IBlock GetBlock(Position position) => GetBlock((int)position.X, (int)position.Y, (int)position.Z);
+
+    public IBlock SetBlock(BlockType blockType, int x, int y, int z)
+    {
+        int regionX = x / Region.Size;
+        int regionZ = z / Region.Size;
+        IRegion region = GetRegion(regionX, regionZ);
+
+        if (region is null)
         {
-            int regionX = x / Region.Size;
-            int regionZ = z / Region.Size;
-            IRegion region = GetRegion(regionX, regionZ);
-
-            if (region is null)
-            {
-                throw new InvalidOperationException($"Cannot find region at position: X={regionX};Z={regionZ}");
-            }
-
-            return region.SetBlock(blockType, x % Region.Size, y, z % Region.Size);
+            throw new InvalidOperationException($"Cannot find region at position: X={regionX};Z={regionZ}");
         }
 
-        public IBlock SetBlock(BlockType blockType, Position position) 
-            => SetBlock(blockType, (int)position.X, (int)position.Y, (int)position.Z);
+        return region.SetBlock(blockType, x % Region.Size, y, z % Region.Size);
+    }
 
-        public IRegion AddRegion(int x, int z)
+    public IBlock SetBlock(BlockType blockType, Position position) 
+        => SetBlock(blockType, (int)position.X, (int)position.Y, (int)position.Z);
+
+    public IRegion AddRegion(int x, int z)
+    {
+        if (ContainsRegion(x, z))
         {
-            if (ContainsRegion(x, z))
-            {
-                throw new InvalidOperationException($"Region {x}/{z} already exists.");
-            }
-
-            var region = new Region(this, x, z, _serviceProvider);
-
-            _regions.Add(region);
-
-            return region;
+            throw new InvalidOperationException($"Region {x}/{z} already exists.");
         }
 
-        public IRegion GetRegion(int x, int z) => _regions.FirstOrDefault(region => region.X == x && region.Z == z);
+        var region = new Region(this, x, z, _serviceProvider);
 
-        public bool ContainsRegion(int x, int z) => _regions.Any(region => region.X == x && region.Z == z);
+        _regions.Add(region);
 
-        public void AddPlayer(IPlayer player)
+        return region;
+    }
+
+    public IRegion GetRegion(int x, int z) => _regions.FirstOrDefault(region => region.X == x && region.Z == z);
+
+    public bool ContainsRegion(int x, int z) => _regions.Any(region => region.X == x && region.Z == z);
+
+    public void AddPlayer(IPlayer player)
+    {
+        if (player is Player playerEntity)
         {
-            if (player is Player playerEntity)
-            {
-                playerEntity.Map = this;
-            }
-
-            if (!_players.TryAdd(player.Id, player))
-            {
-                throw new InvalidOperationException($"Cannot add player with id: {player.Id} to the current map. Player already exists.");
-            }
+            playerEntity.Map = this;
         }
 
-        public IPlayer RemovePlayer(IPlayer player)
-            => _players.TryRemove(player.Id, out IPlayer removedPlayer) ?
-                removedPlayer :
-                throw new InvalidOperationException($"Failed to remove player with id: {player.Id} from map {Name}. Player doesn't exist.");
-
-        public IPlayer GetPlayer(Guid playerId)
-            => _players.TryGetValue(playerId, out IPlayer player) ? player : default;
-
-        public IEnumerable<IEntity> GetVisibleEntities(IEntity entity)
+        if (!_players.TryAdd(player.Id, player))
         {
-            var entities = new List<IEntity>();
+            throw new InvalidOperationException($"Cannot add player with id: {player.Id} to the current map. Player already exists.");
+        }
+    }
 
-            lock (_players)
-            {
-                entities.AddRange(GetVisibleEntities(entity, _players.Values, _entityVisibilityRange));
-            }
+    public IPlayer RemovePlayer(IPlayer player)
+        => _players.TryRemove(player.Id, out IPlayer removedPlayer) ?
+            removedPlayer :
+            throw new InvalidOperationException($"Failed to remove player with id: {player.Id} from map {Name}. Player doesn't exist.");
 
-            return entities;
+    public IPlayer GetPlayer(Guid playerId)
+        => _players.TryGetValue(playerId, out IPlayer player) ? player : default;
+
+    public IEnumerable<IEntity> GetVisibleEntities(IEntity entity)
+    {
+        var entities = new List<IEntity>();
+
+        lock (_players)
+        {
+            entities.AddRange(GetVisibleEntities(entity, _players.Values, _entityVisibilityRange));
         }
 
-        public void StartUpdate()
-        {
-            if (_isUpdating)
-            {
-                throw new InvalidOperationException("Cannot start update because the current map is already updating.");
-            }
+        return entities;
+    }
 
-            _cancellationTokenSource = new CancellationTokenSource();
-            _cancellationToken = _cancellationTokenSource.Token;
-            _updateTask = Task.Factory.StartNew(
-                () => Update(),
-                _cancellationToken,
-                TaskCreationOptions.LongRunning,
-                TaskScheduler.Default);
-            _isUpdating = true;
+    public void StartUpdate()
+    {
+        if (_isUpdating)
+        {
+            throw new InvalidOperationException("Cannot start update because the current map is already updating.");
         }
 
-        public void StopUpdate()
-        {
-            if (!_isUpdating)
-            {
-                throw new InvalidOperationException("Cannot stop update because the current map is not being updated.");
-            }
+        _cancellationTokenSource = new CancellationTokenSource();
+        _cancellationToken = _cancellationTokenSource.Token;
+        _updateTask = Task.Factory.StartNew(
+            () => Update(),
+            _cancellationToken,
+            TaskCreationOptions.LongRunning,
+            TaskScheduler.Default);
+        _isUpdating = true;
+    }
 
-            _cancellationTokenSource.Cancel();
-            _isUpdating = false;
+    public void StopUpdate()
+    {
+        if (!_isUpdating)
+        {
+            throw new InvalidOperationException("Cannot stop update because the current map is not being updated.");
         }
 
-        public void Dispose()
-        {
-            if (_isUpdating)
-            {
-                StopUpdate();
-            }
+        _cancellationTokenSource.Cancel();
+        _isUpdating = false;
+    }
 
-            _players.Clear();
-            _regions.Clear();
+    public void Dispose()
+    {
+        if (_isUpdating)
+        {
+            StopUpdate();
         }
 
-        public void Broadcast(IMinecraftPacket packet)
-        {
-            foreach (IPlayer player in _players.Values)
-            {
-                player.SendPacket(packet);
-            }
-        }
+        _players.Clear();
+        _regions.Clear();
+    }
 
-        private async Task Update()
+    public void Broadcast(IMinecraftPacket packet)
+    {
+        foreach (IPlayer player in _players.Values)
         {
-            while (!_cancellationToken.IsCancellationRequested)
+            player.SendPacket(packet);
+        }
+    }
+
+    private async Task Update()
+    {
+        while (!_cancellationToken.IsCancellationRequested)
+        {
+            try
             {
-                try
+                await Task.Delay(UpdateTickRate, _cancellationToken);
+
+                foreach (var playerEntity in _players)
                 {
-                    await Task.Delay(UpdateTickRate, _cancellationToken);
+                    IPlayer currentPlayer = playerEntity.Value;
 
-                    foreach (var playerEntity in _players)
-                    {
-                        IPlayer currentPlayer = playerEntity.Value;
-
-                        currentPlayer.KeepAlive();
-                        currentPlayer.LookAround();
-                    }
-
-                    // TODO: update monsters and animals
+                    currentPlayer.KeepAlive();
+                    currentPlayer.LookAround();
                 }
-                catch (Exception e)
-                {
-                    _logger.LogError(e, $"An error occured while updating map '{Name}'");
-                }
+
+                // TODO: update monsters and animals
             }
-
-            _updateTask.Dispose();
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"An error occured while updating map '{Name}'");
+            }
         }
 
-        private static IEnumerable<TEntity> GetVisibleEntities<TEntity>(IEntity currentEntity, IEnumerable<TEntity> entities, float visibilityRange)
-            where TEntity : IEntity
-        {
-            return from x in entities
-                   where x.EntityId != currentEntity.EntityId &&
-                         x.IsSpawned &&
-                         x.IsVisible &&
-                         x.Position.IsInRange(currentEntity.Position, visibilityRange)
-                   select x;
-        }
+        _updateTask.Dispose();
+    }
+
+    private static IEnumerable<TEntity> GetVisibleEntities<TEntity>(IEntity currentEntity, IEnumerable<TEntity> entities, float visibilityRange)
+        where TEntity : IEntity
+    {
+        return from x in entities
+               where x.EntityId != currentEntity.EntityId &&
+                     x.IsSpawned &&
+                     x.IsVisible &&
+                     x.Position.IsInRange(currentEntity.Position, visibilityRange)
+               select x;
     }
 }

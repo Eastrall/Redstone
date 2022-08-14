@@ -1,23 +1,22 @@
-﻿namespace Redstone.Common.Chat
+﻿namespace Redstone.Common.Chat;
+
+/// <summary>
+/// Represents the available chat message types.
+/// </summary>
+public enum ChatMessageType
 {
     /// <summary>
-    /// Represents the available chat message types.
+    /// A player-initiated chat message.
     /// </summary>
-    public enum ChatMessageType
-    {
-        /// <summary>
-        /// A player-initiated chat message.
-        /// </summary>
-        Chat,
+    Chat,
 
-        /// <summary>
-        /// System chat message in response of a chat command.
-        /// </summary>
-        System,
+    /// <summary>
+    /// System chat message in response of a chat command.
+    /// </summary>
+    System,
 
-        /// <summary>
-        /// Game state information that is displayed above the hot bar, such as "You may not rest now, the bed is too far away".
-        /// </summary>
-        GameInfo
-    }
+    /// <summary>
+    /// Game state information that is displayed above the hot bar, such as "You may not rest now, the bed is too far away".
+    /// </summary>
+    GameInfo
 }

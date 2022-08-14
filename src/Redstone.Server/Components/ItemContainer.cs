@@ -4,65 +4,64 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Redstone.Server.Components
+namespace Redstone.Server.Components;
+
+public class ItemContainer : IItemContainer
 {
-    public class ItemContainer : IItemContainer
+    private readonly IReadOnlyCollection<IItemSlot> _itemsSlots;
+
+    public int Capacity { get; }
+
+    public int Count => _itemsSlots.Count(x => x.HasItem);
+
+    public ItemContainer(int capacity)
     {
-        private readonly IReadOnlyCollection<IItemSlot> _itemsSlots;
-
-        public int Capacity { get; }
-
-        public int Count => _itemsSlots.Count(x => x.HasItem);
-
-        public ItemContainer(int capacity)
+        if (capacity <= 0)
         {
-            if (capacity <= 0)
-            {
-                throw new ArgumentException($"Capacity cannot be less or equal to zero.");
-            }
-
-            Capacity = capacity;
-            _itemsSlots = new List<IItemSlot>(Enumerable.Range(0, capacity).Select(_ => new ItemSlot()));
+            throw new ArgumentException($"Capacity cannot be less or equal to zero.");
         }
 
-        public virtual IItemSlot GetItem(int slotIndex)
-        {
-            ThrowIfOutOfRange(slotIndex);
+        Capacity = capacity;
+        _itemsSlots = new List<IItemSlot>(Enumerable.Range(0, capacity).Select(_ => new ItemSlot()));
+    }
 
-            return _itemsSlots.ElementAt(slotIndex);
+    public virtual IItemSlot GetItem(int slotIndex)
+    {
+        ThrowIfOutOfRange(slotIndex);
+
+        return _itemsSlots.ElementAt(slotIndex);
+    }
+
+    public virtual void SetItem(int slotIndex, int itemId, byte quantity = 1)
+    {
+        IItemSlot slot = GetItem(slotIndex);
+
+        if (slot is not null)
+        {
+            slot.ItemId = itemId;
+            slot.ItemCount = quantity;
         }
+    }
 
-        public virtual void SetItem(int slotIndex, int itemId, byte quantity = 1)
+    public virtual void ClearItem(int slotIndex)
+    {
+        IItemSlot slot = GetItem(slotIndex);
+
+        if (slot is not null)
         {
-            IItemSlot slot = GetItem(slotIndex);
-
-            if (slot is not null)
-            {
-                slot.ItemId = itemId;
-                slot.ItemCount = quantity;
-            }
+            slot.Reset();
         }
+    }
 
-        public virtual void ClearItem(int slotIndex)
+    public IEnumerator<IItemSlot> GetEnumerator() => _itemsSlots.GetEnumerator();
+
+    IEnumerator IEnumerable.GetEnumerator() => _itemsSlots.GetEnumerator();
+
+    protected void ThrowIfOutOfRange(int slotIndex)
+    {
+        if (slotIndex < 0 || slotIndex >= Capacity)
         {
-            IItemSlot slot = GetItem(slotIndex);
-
-            if (slot is not null)
-            {
-                slot.Reset();
-            }
-        }
-
-        public IEnumerator<IItemSlot> GetEnumerator() => _itemsSlots.GetEnumerator();
-
-        IEnumerator IEnumerable.GetEnumerator() => _itemsSlots.GetEnumerator();
-
-        protected void ThrowIfOutOfRange(int slotIndex)
-        {
-            if (slotIndex < 0 || slotIndex >= Capacity)
-            {
-                throw new IndexOutOfRangeException($"The given index '{slotIndex}' was out of range. Max capacity: '{Capacity}'.");
-            }
+            throw new IndexOutOfRangeException($"The given index '{slotIndex}' was out of range. Max capacity: '{Capacity}'.");
         }
     }
 }

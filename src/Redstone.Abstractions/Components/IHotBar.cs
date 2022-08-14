@@ -1,9 +1,8 @@
-﻿namespace Redstone.Abstractions.Components
-{
-    public interface IHotBar : IItemContainer
-    {
-        IItemSlot SelectedSlot { get; }
+﻿namespace Redstone.Abstractions.Components;
 
-        void SetSlotIndex(int slotIndex);
-    }
+public interface IHotBar : IItemContainer
+{
+    IItemSlot SelectedSlot { get; }
+
+    void SetSlotIndex(int slotIndex);
 }

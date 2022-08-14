@@ -1,11 +1,10 @@
-﻿namespace Redstone.Protocol.Packets.Game.Client
+﻿namespace Redstone.Protocol.Packets.Game.Client;
+
+public class PluginMessagePacket : MinecraftPacket
 {
-    public class PluginMessagePacket : MinecraftPacket
+    public PluginMessagePacket(string channel)
+        : base(ClientPlayPacketType.PluginMessage)
     {
-        public PluginMessagePacket(string channel)
-            : base(ClientPlayPacketType.PluginMessage)
-        {
-            WriteString(channel);
-        }
+        WriteString(channel);
     }
 }

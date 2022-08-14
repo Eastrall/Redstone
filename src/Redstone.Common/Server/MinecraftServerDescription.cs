@@ -1,10 +1,9 @@
-﻿namespace Redstone.Common.Server
+﻿namespace Redstone.Common.Server;
+
+public class MinecraftServerDescription
 {
-    public class MinecraftServerDescription
-    {
-        /// <summary>
-        /// Gets or sets the Minecraft server description text.
-        /// </summary>
-        public string Text { get; set; }
-    }
+    /// <summary>
+    /// Gets or sets the Minecraft server description text.
+    /// </summary>
+    public string Text { get; set; }
 }

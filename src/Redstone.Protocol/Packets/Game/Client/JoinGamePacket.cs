@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Redstone.Protocol.Packets.Game.Client
+namespace Redstone.Protocol.Packets.Game.Client;
+
+public class JoinGamePacket : MinecraftPacket
 {
-    public class JoinGamePacket : MinecraftPacket
+    public JoinGamePacket()
+        : base(ClientPlayPacketType.JoinGame)
     {
-        public JoinGamePacket()
-            : base(ClientPlayPacketType.JoinGame)
-        {
-        }
     }
 }

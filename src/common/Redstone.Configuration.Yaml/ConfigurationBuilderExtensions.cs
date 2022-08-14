@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.FileProviders;
+﻿using Microsoft.Extensions.FileProviders;
 using Redstone.Configuration.Yaml.Internal;
 using System;
 using System.IO;
@@ -7,49 +6,48 @@ using System.IO;
 // All the code of this project comes from https://github.com/andrewlock/NetEscapades.Configuration 
 // Credits to https://github.com/andrewlock
 
-namespace Microsoft.Extensions.Configuration
+namespace Microsoft.Extensions.Configuration;
+
+public static class ConfigurationBuilderExtensions
 {
-    public static class ConfigurationBuilderExtensions
+    public static IConfigurationBuilder AddYamlFile(this IConfigurationBuilder builder, string path)
     {
-        public static IConfigurationBuilder AddYamlFile(this IConfigurationBuilder builder, string path)
+        return AddYamlFile(builder, provider: null, path: path, optional: false, reloadOnChange: false);
+    }
+
+    public static IConfigurationBuilder AddYamlFile(this IConfigurationBuilder builder, string path, bool optional)
+    {
+        return AddYamlFile(builder, provider: null, path: path, optional: optional, reloadOnChange: false);
+    }
+
+    public static IConfigurationBuilder AddYamlFile(this IConfigurationBuilder builder, string path, bool optional, bool reloadOnChange)
+    {
+        return AddYamlFile(builder, provider: null, path: path, optional: optional, reloadOnChange: reloadOnChange);
+    }
+
+    public static IConfigurationBuilder AddYamlFile(this IConfigurationBuilder builder, IFileProvider provider, string path, bool optional, bool reloadOnChange)
+    {
+        if (builder is null)
         {
-            return AddYamlFile(builder, provider: null, path: path, optional: false, reloadOnChange: false);
+            throw new ArgumentNullException(nameof(builder));
         }
 
-        public static IConfigurationBuilder AddYamlFile(this IConfigurationBuilder builder, string path, bool optional)
+        if (provider is null && Path.IsPathRooted(path))
         {
-            return AddYamlFile(builder, provider: null, path: path, optional: optional, reloadOnChange: false);
+            provider = new PhysicalFileProvider(Path.GetDirectoryName(path));
+            path = Path.GetFileName(path);
         }
 
-        public static IConfigurationBuilder AddYamlFile(this IConfigurationBuilder builder, string path, bool optional, bool reloadOnChange)
+        var source = new YamlConfigurationSource
         {
-            return AddYamlFile(builder, provider: null, path: path, optional: optional, reloadOnChange: reloadOnChange);
-        }
+            FileProvider = provider,
+            Path = path,
+            Optional = optional,
+            ReloadOnChange = reloadOnChange
+        };
 
-        public static IConfigurationBuilder AddYamlFile(this IConfigurationBuilder builder, IFileProvider provider, string path, bool optional, bool reloadOnChange)
-        {
-            if (builder is null)
-            {
-                throw new ArgumentNullException(nameof(builder));
-            }
-
-            if (provider is null && Path.IsPathRooted(path))
-            {
-                provider = new PhysicalFileProvider(Path.GetDirectoryName(path));
-                path = Path.GetFileName(path);
-            }
-
-            var source = new YamlConfigurationSource
-            {
-                FileProvider = provider,
-                Path = path,
-                Optional = optional,
-                ReloadOnChange = reloadOnChange
-            };
-
-            builder.Add(source);
-            
-            return builder;
-        }
+        builder.Add(source);
+        
+        return builder;
     }
 }

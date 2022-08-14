@@ -1,12 +1,11 @@
-﻿namespace Redstone.Protocol.Packets.Game.Client
+﻿namespace Redstone.Protocol.Packets.Game.Client;
+
+public class EntityHeadLookPacket : MinecraftPacket
 {
-    public class EntityHeadLookPacket : MinecraftPacket
+    public EntityHeadLookPacket(int entityId, float yawAngle)
+        : base(ClientPlayPacketType.EntityHeadLook)
     {
-        public EntityHeadLookPacket(int entityId, float yawAngle)
-            : base(ClientPlayPacketType.EntityHeadLook)
-        {
-            WriteVarInt32(entityId);
-            WriteAngle(yawAngle);
-        }
+        WriteVarInt32(entityId);
+        WriteAngle(yawAngle);
     }
 }

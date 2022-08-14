@@ -1,6 +1,5 @@
-﻿namespace Redstone.Server.World.Providers
+﻿namespace Redstone.Server.World.Providers;
+
+internal class RedstoneMapProvider
 {
-    internal class RedstoneMapProvider
-    {
-    }
 }

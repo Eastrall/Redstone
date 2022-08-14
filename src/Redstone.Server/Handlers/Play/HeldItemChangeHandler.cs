@@ -4,32 +4,31 @@ using Redstone.Protocol.Handlers;
 using Redstone.Protocol.Packets.Game;
 using System;
 
-namespace Redstone.Server.Handlers.Play
+namespace Redstone.Server.Handlers.Play;
+
+public class HeldItemChangeHandler
 {
-    public class HeldItemChangeHandler
+    private readonly ILogger<HeldItemChangeHandler> _logger;
+
+    public HeldItemChangeHandler(ILogger<HeldItemChangeHandler> logger)
     {
-        private readonly ILogger<HeldItemChangeHandler> _logger;
+        _logger = logger;
+    }
 
-        public HeldItemChangeHandler(ILogger<HeldItemChangeHandler> logger)
+    [PlayPacketHandler(ServerPlayPacketType.HeldItemChange)]
+    public void OnHeldItemChange(IMinecraftUser user, IMinecraftPacket packet)
+    {
+        short slot = packet.ReadInt16();
+
+        if (slot < 0 || slot > 8)
         {
-            _logger = logger;
+            throw new IndexOutOfRangeException($"Slot was out of bounds: {slot}");
         }
 
-        [PlayPacketHandler(ServerPlayPacketType.HeldItemChange)]
-        public void OnHeldItemChange(IMinecraftUser user, IMinecraftPacket packet)
-        {
-            short slot = packet.ReadInt16();
+        _logger.LogDebug($"Current slot: {slot}");
 
-            if (slot < 0 || slot > 8)
-            {
-                throw new IndexOutOfRangeException($"Slot was out of bounds: {slot}");
-            }
+        user.Player.HotBar.SetSlotIndex(slot);
 
-            _logger.LogDebug($"Current slot: {slot}");
-
-            user.Player.HotBar.SetSlotIndex(slot);
-
-            _logger.LogDebug($"Selected Item: ItemId = {user.Player.HotBar.SelectedSlot.ItemId}");
-        }
+        _logger.LogDebug($"Selected Item: ItemId = {user.Player.HotBar.SelectedSlot.ItemId}");
     }
 }

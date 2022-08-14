@@ -3,16 +3,15 @@ using Redstone.Protocol.Handlers;
 using Redstone.Protocol.Packets.Handskake;
 using Redstone.Protocol.Packets.Handskake.Server;
 
-namespace Redstone.Server.Handlers
-{
-    public class HandshakeHandler
-    {
-        [HandshakePacketHandler(ServerHandshakePacketType.Handshaking)]
-        public void OnHandshake(IMinecraftUser user, IMinecraftPacket packet)
-        {
-            var handshake = new HandshakePacket(packet);
+namespace Redstone.Server.Handlers;
 
-            user.UpdateStatus(handshake.NextState);
-        }
+public class HandshakeHandler
+{
+    [HandshakePacketHandler(ServerHandshakePacketType.Handshaking)]
+    public void OnHandshake(IMinecraftUser user, IMinecraftPacket packet)
+    {
+        var handshake = new HandshakePacket(packet);
+
+        user.UpdateStatus(handshake.NextState);
     }
 }

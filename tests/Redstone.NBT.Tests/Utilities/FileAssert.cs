@@ -3,40 +3,39 @@ using System.Security.Cryptography;
 using System.Text;
 using Xunit;
 
-namespace Redstone.NBT.Tests.Utilities
+namespace Redstone.NBT.Tests.Utilities;
+
+public static class FileAssert
 {
-    public static class FileAssert
+    static string GetFileHash(string filename)
     {
-        static string GetFileHash(string filename)
-        {
-            Assert.True(File.Exists(filename));
+        Assert.True(File.Exists(filename));
 
-            using var hash = new SHA1Managed();
-            
-            var clearBytes = File.ReadAllBytes(filename);
-            var hashedBytes = hash.ComputeHash(clearBytes);
-            
-            return ConvertBytesToHex(hashedBytes);
+        using var hash = new SHA1Managed();
+        
+        var clearBytes = File.ReadAllBytes(filename);
+        var hashedBytes = hash.ComputeHash(clearBytes);
+        
+        return ConvertBytesToHex(hashedBytes);
+    }
+
+    static string ConvertBytesToHex(byte[] bytes)
+    {
+        var sb = new StringBuilder();
+
+        for (var i = 0; i < bytes.Length; i++)
+        {
+            sb.Append(bytes[i].ToString("x"));
         }
 
-        static string ConvertBytesToHex(byte[] bytes)
-        {
-            var sb = new StringBuilder();
+        return sb.ToString();
+    }
 
-            for (var i = 0; i < bytes.Length; i++)
-            {
-                sb.Append(bytes[i].ToString("x"));
-            }
+    public static void Equal(string filename1, string filename2)
+    {
+        string hash1 = GetFileHash(filename1);
+        string hash2 = GetFileHash(filename2);
 
-            return sb.ToString();
-        }
-
-        public static void Equal(string filename1, string filename2)
-        {
-            string hash1 = GetFileHash(filename1);
-            string hash2 = GetFileHash(filename2);
-
-            Assert.Equal(hash1, hash2);
-        }
+        Assert.Equal(hash1, hash2);
     }
 }

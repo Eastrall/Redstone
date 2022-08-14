@@ -1,11 +1,10 @@
-﻿namespace Redstone.Common
+﻿namespace Redstone.Common;
+
+public enum ServerGameModeType
 {
-    public enum ServerGameModeType
-    {
-        Unknown = -1,
-        Survival,
-        Creative,
-        Adventure,
-        Spectator
-    }
+    Unknown = -1,
+    Survival,
+    Creative,
+    Adventure,
+    Spectator
 }

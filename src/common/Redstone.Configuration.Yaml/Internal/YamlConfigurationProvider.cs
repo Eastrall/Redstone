@@ -1,17 +1,16 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System.IO;
 
-namespace Redstone.Configuration.Yaml.Internal
+namespace Redstone.Configuration.Yaml.Internal;
+
+internal class YamlConfigurationProvider : FileConfigurationProvider
 {
-    internal class YamlConfigurationProvider : FileConfigurationProvider
+    public YamlConfigurationProvider(YamlConfigurationSource source) : base(source) { }
+
+    public override void Load(Stream stream)
     {
-        public YamlConfigurationProvider(YamlConfigurationSource source) : base(source) { }
+        var parser = new YamlConfigurationFileParser();
 
-        public override void Load(Stream stream)
-        {
-            var parser = new YamlConfigurationFileParser();
-
-            Data = parser.Parse(stream);
-        }
+        Data = parser.Parse(stream);
     }
 }

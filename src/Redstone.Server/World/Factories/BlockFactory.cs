@@ -8,35 +8,34 @@ using System;
 using System.Collections.Concurrent;
 using System.Linq;
 
-namespace Redstone.Server.World.Factories
+namespace Redstone.Server.World.Factories;
+
+[Injectable(ServiceLifetime.Singleton)]
+public class BlockFactory : IBlockFactory
 {
-    [Injectable(ServiceLifetime.Singleton)]
-    public class BlockFactory : IBlockFactory
+    private readonly IRegistry _registry;
+    private readonly ConcurrentDictionary<BlockType, BlockData> _blocksDatas;
+
+    public BlockFactory(IRegistry registry)
     {
-        private readonly IRegistry _registry;
-        private readonly ConcurrentDictionary<BlockType, BlockData> _blocksDatas;
+        _registry = registry;
+        _blocksDatas = new ConcurrentDictionary<BlockType, BlockData>();
+    }
 
-        public BlockFactory(IRegistry registry)
+    public IBlock CreateBlock(BlockType blockType, int x, int y, int z, IChunk chunk)
+    {
+        if (!_blocksDatas.TryGetValue(blockType, out BlockData blockData))
         {
-            _registry = registry;
-            _blocksDatas = new ConcurrentDictionary<BlockType, BlockData>();
-        }
+            blockData = _registry.Blocks.SingleOrDefault(x => x.Type == blockType);
 
-        public IBlock CreateBlock(BlockType blockType, int x, int y, int z, IChunk chunk)
-        {
-            if (!_blocksDatas.TryGetValue(blockType, out BlockData blockData))
+            if (blockData is null)
             {
-                blockData = _registry.Blocks.SingleOrDefault(x => x.Type == blockType);
-
-                if (blockData is null)
-                {
-                    throw new InvalidOperationException($"Failed to find block data for type: '{blockType}'");
-                }
-
-                _blocksDatas.TryAdd(blockType, blockData);
+                throw new InvalidOperationException($"Failed to find block data for type: '{blockType}'");
             }
 
-            return new Block(x, y, z, chunk, blockData, _registry);
+            _blocksDatas.TryAdd(blockType, blockData);
         }
+
+        return new Block(x, y, z, chunk, blockData, _registry);
     }
 }

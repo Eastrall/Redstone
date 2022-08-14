@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace Redstone.Common.IO
 {
@@ -7,6 +8,8 @@ namespace Redstone.Common.IO
     /// </summary>
     public class MinecraftStream : BinaryStream
     {
+        protected override bool ReverseIfLittleEndian => false;
+
         public MinecraftStream()
         {
         }
@@ -41,6 +44,14 @@ namespace Redstone.Common.IO
         {
         }
 
+        public override string ReadString()
+        {
+            int stringLength = ReadVarInt32();
+            byte[] stringBytes = ReadBytes(stringLength);
+
+            return Encoding.UTF8.GetString(stringBytes);
+        }
+
         /// <summary>
         /// Reads an Univeral Unique IDentifier value from the packet stream.
         /// </summary>
@@ -72,7 +83,7 @@ namespace Redstone.Common.IO
 
             do
             {
-                read = (byte)ReadByte();
+                read = ReadByte();
                 int value = (read & 0b01111111);
                 result |= (value << (7 * numRead));
 
@@ -98,7 +109,7 @@ namespace Redstone.Common.IO
 
             do
             {
-                read = (byte)ReadByte();
+                read = ReadByte();
                 long value = (read & 0b01111111);
                 result |= (value << (7 * numRead));
 
@@ -110,6 +121,19 @@ namespace Redstone.Common.IO
             } while ((read & 0b10000000) != 0);
 
             return result;
+        }
+
+        public override void WriteString(string value)
+        {
+            if (value is null)
+            {
+                throw new ArgumentNullException(nameof(value), "Failed to write a null string into the packet stream.");
+            }
+
+            byte[] stringData = Encoding.UTF8.GetBytes(value);
+
+            WriteVarInt32(stringData.Length);
+            WriteBytes(stringData);
         }
 
         /// <summary>

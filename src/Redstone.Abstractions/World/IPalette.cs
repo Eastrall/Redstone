@@ -1,4 +1,5 @@
 ﻿using Redstone.Abstractions.Protocol;
+using Redstone.Common.IO;
 using System;
 
 namespace Redstone.Abstractions.World
@@ -55,6 +56,6 @@ namespace Redstone.Abstractions.World
         /// Serializes the current block state palette.
         /// </summary>
         /// <param name="stream">Minecraft packet stream.</param>
-        void Serialize(IMinecraftPacket stream);
+        void Serialize(MinecraftStream stream);
     }
 }

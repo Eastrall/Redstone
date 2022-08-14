@@ -7,7 +7,9 @@ namespace Redstone.Common.IO
 {
     public class BinaryStream : MemoryStream
     {
-        public virtual byte[] Buffer => GetBuffer().Take((int)Length).ToArray();
+        protected virtual bool ReverseIfLittleEndian => false;
+
+        public virtual byte[] Buffer => TryGetBuffer(out ArraySegment<byte> buffer) ? buffer.ToArray() : Array.Empty<byte>();
 
         public BinaryStream()
         {
@@ -43,76 +45,99 @@ namespace Redstone.Common.IO
         {
         }
 
-        public void WriteSByte(sbyte value) => Write(BitConverter.GetBytes(value), 0, sizeof(sbyte));
+        public virtual void WriteSByte(sbyte value) => WriteByte((byte)value);
 
-        public void WriteChar(char value) => Write(BitConverter.GetBytes(value), 0, sizeof(char));
+        public virtual void WriteBoolean(bool value) => InternalWriteBytes(BitConverter.GetBytes(value));
 
-        public void WriteBoolean(bool value) => Write(BitConverter.GetBytes(value), 0, sizeof(bool));
+        public virtual void WriteChar(char value) => InternalWriteBytes(BitConverter.GetBytes(value));
 
-        public void WriteInt16(short value) => Write(BitConverter.GetBytes(value), 0, sizeof(short));
+        public virtual void WriteInt16(short value) => InternalWriteBytes(BitConverter.GetBytes(value));
 
-        public void WriteUInt16(ushort value) => Write(BitConverter.GetBytes(value), 0, sizeof(ushort));
+        public virtual void WriteUInt16(ushort value) => InternalWriteBytes(BitConverter.GetBytes(value));
 
-        public void WriteInt32(int value) => Write(BitConverter.GetBytes(value), 0, sizeof(int));
+        public virtual void WriteInt32(int value) => InternalWriteBytes(BitConverter.GetBytes(value));
 
-        public void WriteUInt32(uint value) => Write(BitConverter.GetBytes(value), 0, sizeof(uint));
+        public virtual void WriteUInt32(uint value) => InternalWriteBytes(BitConverter.GetBytes(value));
 
-        public void WriteInt64(long value) => Write(BitConverter.GetBytes(value), 0, sizeof(long));
+        public virtual void WriteInt64(long value) => InternalWriteBytes(BitConverter.GetBytes(value));
 
-        public void WriteUInt64(ulong value) => Write(BitConverter.GetBytes(value), 0, sizeof(ulong));
+        public virtual void WriteUInt64(ulong value) => InternalWriteBytes(BitConverter.GetBytes(value));
 
-        public void WriteSingle(float value) => Write(BitConverter.GetBytes(value), 0, sizeof(float));
+        public virtual void WriteSingle(float value) => InternalWriteBytes(BitConverter.GetBytes(value));
 
-        public void WriteDouble(double value) => Write(BitConverter.GetBytes(value), 0, sizeof(double));
+        public virtual void WriteDouble(double value) => InternalWriteBytes(BitConverter.GetBytes(value));
 
-        public void WriteBytes(byte[] values) => Write(values, 0, values.Length);
+        public virtual void WriteBytes(byte[] values) => Write(values, 0, values.Length);
 
-        public void WriteString(string value)
+        public virtual void WriteString(string value)
         {
             WriteInt32(value.Length);
             WriteBytes(Encoding.UTF8.GetBytes(value));
         }
 
-        public sbyte ReadSByte() => Read<sbyte>();
+        public virtual new byte ReadByte() => (byte)base.ReadByte();
 
-        public char ReadChar() => Read<char>();
+        public virtual sbyte ReadSByte() => InternalReadValue<sbyte>();
 
-        public bool ReadBoolean() => Read<bool>();
+        public virtual char ReadChar() => InternalReadValue<char>();
 
-        public short ReadInt16() => Read<short>();
+        public virtual bool ReadBoolean() => InternalReadValue<bool>();
 
-        public ushort ReadUInt16() => Read<ushort>();
+        public virtual short ReadInt16() => InternalReadValue<short>();
 
-        public int ReadInt32() => Read<int>();
+        public virtual ushort ReadUInt16() => InternalReadValue<ushort>();
 
-        public uint ReadUInt32() => Read<uint>();
+        public virtual int ReadInt32() => InternalReadValue<int>();
 
-        public long ReadInt64() => Read<long>();
+        public virtual uint ReadUInt32() => InternalReadValue<uint>();
 
-        public ulong ReadUInt64() => Read<ulong>();
+        public virtual long ReadInt64() => InternalReadValue<long>();
 
-        public float ReadSingle() => Read<float>();
+        public virtual ulong ReadUInt64() => InternalReadValue<ulong>();
 
-        public double ReadDouble() => Read<double>();
+        public virtual float ReadSingle() => InternalReadValue<float>();
 
-        public string ReadString()
+        public virtual double ReadDouble() => InternalReadValue<double>();
+
+        public virtual string ReadString()
         {
-            var sizeBuffer = new byte[sizeof(int)];
-            Read(sizeBuffer, 0, sizeBuffer.Length);
+            int stringLength = ReadInt32();
+            byte[] stringData = ReadBytes(stringLength);
 
-            var contentBuffer = new byte[BitConverter.ToInt32(sizeBuffer)];
-            Read(contentBuffer, 0, contentBuffer.Length);
-
-            return Encoding.UTF8.GetString(contentBuffer, 0, contentBuffer.Length);
+            return Encoding.UTF8.GetString(stringData);
         }
 
-        private TValue Read<TValue>() where TValue : struct, IConvertible
+        public virtual byte[] ReadBytes(int count)
+        {
+            var bytes = new byte[count];
+
+            Read(bytes, 0, count);
+
+            return bytes;
+        }
+
+        private void InternalWriteBytes(byte[] values)
+        {
+            if (BitConverter.IsLittleEndian && ReverseIfLittleEndian)
+            {
+                Array.Reverse(values);
+            }
+
+            WriteBytes(values);
+        }
+
+        private TValue InternalReadValue<TValue>() where TValue : struct, IConvertible
         {
             if (typeof(TValue).IsPrimitive)
             {
                 var buffer = new byte[GetTypeSize<TValue>()];
 
                 Read(buffer, 0, buffer.Length);
+
+                if (BitConverter.IsLittleEndian && ReverseIfLittleEndian)
+                {
+                    Array.Reverse(buffer);
+                }
 
                 return ConvertToPrimitiveValue<TValue>(buffer);
             }
@@ -158,7 +183,6 @@ namespace Redstone.Common.IO
                 TypeCode.Double => BitConverter.ToDouble(buffer),
                 _ => throw new NotImplementedException(),
             };
-
 
             return (TValue)@object;
         }

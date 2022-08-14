@@ -1,4 +1,6 @@
-﻿namespace Redstone.Abstractions.Protocol
+﻿using Redstone.Common.IO;
+
+namespace Redstone.Abstractions.Protocol
 {
     /// <summary>
     /// Provides a mechanism that allows packet serialization.
@@ -9,6 +11,6 @@
         /// Serializes the current object into the given minecraft packet stream.
         /// </summary>
         /// <param name="packet">Minecraft packet stream.</param>
-        void Serialize(IMinecraftPacket packet);
+        void Serialize(MinecraftStream packet);
     }
 }

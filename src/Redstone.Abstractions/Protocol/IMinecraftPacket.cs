@@ -1,5 +1,4 @@
-﻿using LiteNetwork.Protocol.Abstractions;
-using Redstone.Common;
+﻿using Redstone.Common;
 using Redstone.NBT.Tags;
 using System;
 
@@ -8,12 +7,45 @@ namespace Redstone.Abstractions.Protocol
     /// <summary>
     /// Provides a mechanism to read and write minecraft packets.
     /// </summary>
-    public interface IMinecraftPacket : ILitePacketStream
+    public interface IMinecraftPacket
     {
         /// <summary>
         /// Gets the packet id.
         /// </summary>
         int PacketId { get; }
+
+        /// <summary>
+        /// Gets the packet length.
+        /// </summary>
+        int PacketLength { get; }
+
+        byte ReadByte();
+
+        sbyte ReadSByte();
+
+        char ReadChar();
+
+        bool ReadBoolean();
+
+        short ReadInt16();
+
+        ushort ReadUInt16();
+
+        int ReadInt32();
+
+        uint ReadUInt32();
+
+        long ReadInt64();
+
+        ulong ReadUInt64();
+
+        float ReadSingle();
+
+        double ReadDouble();
+
+        string ReadString();
+
+        byte[] ReadBytes(int count);
 
         /// <summary>
         /// Reads an Univeral Unique IDentifier value from the packet stream.
@@ -58,6 +90,34 @@ namespace Redstone.Abstractions.Protocol
         /// </summary>
         /// <returns>Nbt Compound.</returns>
         NbtCompound ReadNbtCompound();
+
+        void WriteByte(byte value);
+
+        void WriteSByte(sbyte value);
+
+        void WriteChar(char value);
+
+        void WriteBoolean(bool value);
+
+        void WriteInt16(short value);
+
+        void WriteUInt16(ushort value);
+
+        void WriteInt32(int value);
+
+        void WriteUInt32(uint value);
+
+        void WriteSingle(float value);
+
+        void WriteDouble(double value);
+
+        void WriteInt64(long value);
+
+        void WriteUInt64(ulong value);
+
+        void WriteString(string value);
+
+        void WriteBytes(byte[] values);
 
         /// <summary>
         /// Writes an Universal Unique IDentifier into the packet stream.

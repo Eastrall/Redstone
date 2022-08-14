@@ -6,8 +6,8 @@ using Redstone.Abstractions.Protocol;
 using Redstone.Common;
 using Redstone.Common.Chat;
 using Redstone.Common.Configuration;
-using Redstone.Common.DependencyInjection.Extensions;
 using Redstone.Common.Utilities;
+using Redstone.Protocol;
 using Redstone.Protocol.Packets.Game.Client;
 using Redstone.Server.Components;
 using System;
@@ -122,7 +122,7 @@ namespace Redstone.Server.Entities
         {
             base.AddVisibleEntity(entity);
 
-            using IMinecraftPacket packet = entity switch
+            using MinecraftPacket packet = entity switch
             {
                 IPlayer playerEntity => new SpawnPlayerPacket(playerEntity),
                 // TODO: add other entity types

@@ -1,5 +1,4 @@
-﻿using LiteNetwork.Protocol.Abstractions;
-using LiteNetwork.Server;
+﻿using LiteNetwork.Server;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -9,6 +8,7 @@ using Redstone.Abstractions.Registry;
 using Redstone.Abstractions.World;
 using Redstone.Common.Configuration;
 using Redstone.Common.Server;
+using Redstone.Protocol;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +28,8 @@ namespace Redstone.Server
         public IRedstoneServerEvents Events { get; }
 
         public RSAParameters ServerEncryptionKey { get; private set; }
+
+        public IEnumerable<IMinecraftUser> ConnectedUsers => Users.Cast<MinecraftUser>();
 
         public IEnumerable<IMinecraftUser> ConnectedPlayers => ConnectedUsers.Where(x => x.Status == MinecraftUserStatus.Play);
 
@@ -59,8 +61,8 @@ namespace Redstone.Server
             _logger.LogInformation($"Redstone server started and listening on port '{Options.Port}'. (Minecraft version: {_serverConfiguration.Value.VersionName})");
         }
 
-        public void SendTo(IEnumerable<IMinecraftUser> users, IMinecraftPacket packet) 
-            => base.SendTo(users.Cast<MinecraftUser>(), packet);
+        public void SendTo(IEnumerable<IMinecraftUser> users, IMinecraftPacket packet)
+            => SendTo(users.Cast<MinecraftUser>(), (packet as MinecraftPacket).Buffer);
 
         public MinecraftServerStatus GetServerStatus()
         {

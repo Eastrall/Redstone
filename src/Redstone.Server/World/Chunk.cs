@@ -2,6 +2,7 @@
 using Redstone.Abstractions.World;
 using Redstone.Common;
 using Redstone.Common.Collections;
+using Redstone.Common.IO;
 using Redstone.NBT;
 using Redstone.NBT.Tags;
 using Redstone.Protocol;

@@ -3,6 +3,8 @@ using Redstone.Abstractions.Entities;
 using Redstone.Abstractions.Protocol;
 using Redstone.Abstractions.World;
 using Redstone.Common;
+using Redstone.Common.IO;
+using Redstone.Protocol;
 using Redstone.Protocol.Packets.Game.Client;
 using Redstone.Server.World;
 using System;
@@ -125,7 +127,6 @@ namespace Redstone.Server.Entities
 
             //_lastPosition.Copy(Position);
             IsOnGround = GetBlock().GetRelative(BlockFaceType.Bottom).IsSolid;
-            Console.WriteLine(IsOnGround);
 
             using var movePacket = new EntityPositionPacket(this, delta);
             SendPacketToVisibleEntities(movePacket);

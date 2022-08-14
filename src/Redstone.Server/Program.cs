@@ -36,7 +36,7 @@ IHost serverHost = new HostBuilder()
         services.AddMinecraftProtocol(Assembly.GetExecutingAssembly());
         services.UseLiteNetwork(builder =>
         {
-            builder.AddLiteServer<IRedstoneServer, RedstoneServer, MinecraftUser>(options =>
+            builder.AddLiteServer<IRedstoneServer, RedstoneServer>(options =>
             {
                 var serverConfiguration = context.Configuration.GetSection("server").Get<ServerOptions>();
 

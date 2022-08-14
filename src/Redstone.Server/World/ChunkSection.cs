@@ -5,6 +5,7 @@ using Redstone.Abstractions.World;
 using Redstone.Common;
 using Redstone.Common.Collections;
 using Redstone.Common.Exceptions;
+using Redstone.Common.IO;
 using Redstone.Server.World.Palettes;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -74,7 +75,7 @@ namespace Redstone.Server.World
         }
 
         [ExcludeFromCodeCoverage]
-        public void Serialize(IMinecraftPacket packet)
+        public void Serialize(MinecraftStream packet)
         {
             packet.WriteInt16(GetBlockAmount());
             packet.WriteByte((byte)_palette.BitsPerBlock);

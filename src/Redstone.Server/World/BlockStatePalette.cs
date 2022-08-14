@@ -1,6 +1,7 @@
 ﻿using Redstone.Abstractions.Protocol;
 using Redstone.Abstractions.World;
 using Redstone.Common.Extensions;
+using Redstone.Common.IO;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -76,7 +77,7 @@ namespace Redstone.Server.World.Palettes
         }
 
         [ExcludeFromCodeCoverage]
-        public void Serialize(IMinecraftPacket stream)
+        public void Serialize(MinecraftStream stream)
         {
             stream.WriteVarInt32(Count);
 

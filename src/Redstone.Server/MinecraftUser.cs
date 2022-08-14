@@ -1,5 +1,4 @@
-﻿using LiteNetwork.Protocol.Abstractions;
-using LiteNetwork.Server;
+﻿using LiteNetwork.Server;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Redstone.Abstractions;
@@ -7,6 +6,9 @@ using Redstone.Abstractions.Entities;
 using Redstone.Abstractions.Events;
 using Redstone.Abstractions.Protocol;
 using Redstone.Common.Configuration;
+using Redstone.Common.IO;
+using Redstone.Common.Utilities;
+using Redstone.Protocol;
 using Redstone.Protocol.Handlers;
 using Redstone.Protocol.Handlers.Exceptions;
 using Redstone.Protocol.Packets.Game;
@@ -16,6 +18,7 @@ using Redstone.Protocol.Packets.Status;
 using Redstone.Server.Entities;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Redstone.Server
@@ -51,7 +54,19 @@ namespace Redstone.Server
             Status = newStatus;
         }
 
-        public void Send(IMinecraftPacket packet) => base.Send(packet);
+        public void Send(IMinecraftPacket packet)
+        {
+            if (packet is MinecraftPacket minecraftPacket)
+            {
+                using var stream = new MinecraftStream();
+
+                stream.WriteVarInt32(minecraftPacket.PacketLength);
+                stream.WriteVarInt32(minecraftPacket.PacketId);
+                stream.WriteBytes(minecraftPacket.Buffer);
+
+                base.Send(stream.Buffer);
+            }
+        }
 
         public void Disconnect() => Disconnect(null);
 
@@ -82,13 +97,11 @@ namespace Redstone.Server
             // TODO: load player information from storage
         }
 
-        public override Task HandleMessageAsync(ILitePacketStream incomingPacketStream)
+        public override Task HandleMessageAsync(byte[] incomingMessage)
         {
-            if (incomingPacketStream is not IMinecraftPacket packet)
-            {
-                throw new InvalidOperationException("Incoming packet is not a Minecraft packet.");
-            }
-
+            int packetId = VariableStorageUtilities.ReadVarInt32(incomingMessage);
+            int packetIdLength = VariableStorageUtilities.GetVarInt32Length(packetId);
+            MinecraftPacket packet = new(packetId, incomingMessage.Skip(packetIdLength).ToArray());
             object packetHeader = GetMinecraftPacketType(packet.PacketId);
 
             try
